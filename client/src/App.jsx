@@ -9,6 +9,7 @@ import Error from './pages/Error.jsx';
 import GoogleTokenSetter from './pages/GoogleTokenSetter.jsx';
 import Events from './pages/Events.jsx';
 import AuthRouteLayout from './pages/AuthRouteLayout.jsx';
+import { useAppSelector } from './redux/store.js';
 
 // Lazily importing pages
 const Home = lazy(() => import('./pages/Home'));
@@ -26,11 +27,17 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const App = () => {
   const { pathname } = useLocation();
   const { isLoading, isError } = useUserStatus();
+  const theme = useAppSelector((state) => state.themeState.theme);
 
   // Scroll to top when the url changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   if (isLoading) {
     return <Loading />;
