@@ -5,13 +5,14 @@ import GithubSection from '../components/GithubSection';
 import TopPosts from '../components/TopPosts';
 import Footer from '../components/Footer';
 import OurTeam from '../components/OurTeam';
-import homePageImage from '../assets/images/pages/home-page.png'; 
+import homePageImage from '../assets/images/pages/home-page.png';
 import { Testimonials } from '../components/Testimonials';
+import { CallToAction } from '../components/CallToAction';
 
 const Home = () => {
   return (
     <>
-    <Helmet>
+      <Helmet>
         <title>Interview Experience | GSMCOE</title>
         <meta
           name="description"
@@ -31,18 +32,18 @@ const Home = () => {
           content="Share and discover interview experiences at GSMCOE to inspire and learn from the community."
         />
         <meta property="og:image" content={homePageImage} />
-        <meta
-          property="og:url"
-          content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}`}
-        />
+        <meta property="og:url" content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}`} />
         <meta property="og:type" content="website" />
       </Helmet>
       <Hero />
       <TopPosts />
-      <GithubSection /> 
+      <GithubSection />
       {/* <OurTeam /> */}
       {/* <UserReviews /> */}
-      <Testimonials />
+
+        <Testimonials />
+      <CallToAction />
+      
       <Footer />
     </>
   );
