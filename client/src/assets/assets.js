@@ -1,6 +1,8 @@
 import star_icon from './images/icons/star_icon.svg';
 import gradientBackground from './images/icons/gradientBackground.png';
 import logo from './images/icons/logo.png';
+import logogreenblackpng from './images/icons/logogreenblackpng.png';
+import logogreenwhitepng from './images/icons/logogreenwhitepng.png';
 import close_icon from './images/icons/close_icon.svg';
 import menu_icon from './images/icons/menu_icon.svg';
 import insta_icon from './images/icons/instagram_logo.svg';
@@ -17,6 +19,8 @@ export const assets = {
   star_icon,
   gradientBackground,
   logo,
+  logogreenblackpng,
+  logogreenwhitepng,
   close_icon,
   menu_icon,
   insta_icon,

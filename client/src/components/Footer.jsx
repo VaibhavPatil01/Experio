@@ -6,7 +6,7 @@ const Footer = () => {
     <div className="px-6 md:px-16 lg:px-24 xl:px-32 bg-primary/10 ">
       <div className="flex flex-col lg:flex-row lg:items-center items-start justify-between gap-7 md:gap-15 py-7 border-b border-gray-500/30  text-gray-500">
         <div>
-          <img src={assets.logo} alt="logo" className="w-70 sm:w-100 " />
+          <img src={assets.logo} alt="logo" className="w-70 sm:w-50 " />
           <p className=" mt-6">
             Interview Experience GSMCOE is a student-led platform empowering peers with firsthand
             insights into interviews across diverse companies and roles. Whether preparing for

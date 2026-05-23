@@ -25,7 +25,7 @@ const Hero = () => {
         </div>
 
         <h1 className="text-3xl sm:text-6xl font-semibold sm:leading-16 text-gray-700">
-          Share your <span className="text-primary">interview</span> <br /> success story.
+          Learn, Connect, and Grow with an <br /> AI-Powered Community.
         </h1>
 
         <p className="my-6 sm:my-8 max-w-2xl m-auto max-sm:text-xs text-gray-500">

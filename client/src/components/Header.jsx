@@ -27,10 +27,10 @@ const Navbar = () => {
   });
 
   return (
-    <div className="sticky top-0 z-50 bg-white shadow-[var(--box-shadow)] border-borderColor transition-all">
-      <div className="flex items-center justify-between px-7 sm:px-6 md:px-7 lg:px-12 xl:px-20 py-3 text-gray-600">
+    <div className="sticky top-0 z-50 bg-black shadow-[var(--box-shadow)] border-borderColor transition-all">
+      <div className="flex items-center justify-between px-7 sm:px-6 md:px-7 lg:px-12 xl:px-30 py-1 text-white bg-white">
         <Link to="/" onClick={handleCloseNavbar}>
-          <img src={assets.logo} className="h-10 sm:h-12" alt="Logo" />
+          <img src={assets.logogreenblackpng} className=" sm:h-15" alt="Logo" />
         </Link>
 
         <button
@@ -46,13 +46,22 @@ const Navbar = () => {
         </button>
 
         <div
-          className={`max-md:fixed max-md:h-screen max-md:w-full max-md:top-16 max-md:right-0 border-borderColor flex flex-col md:flex-row items-start md:items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 max-md:p-3 bg-white transition-all duration-300 ${isNavOpen ? 'max-md:translate-x-0' : 'max-md:translate-x-full'}`}
+          className={`max-md:fixed max-md:h-screen max-md:w-full max-md:top-16 max-md:right-0 border-borderColor flex flex-col md:flex-row items-start md:items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 max-md:p-3 bg-black transition-all duration-300 ${isNavOpen ? 'max-md:translate-x-0' : 'max-md:translate-x-full'}`}
         >
           <Link to="/" onClick={handleCloseNavbar} className="px-2 py-1 text-base">
             Home
           </Link>
           <Link to="/posts" onClick={handleCloseNavbar} className="px-2 py-1 text-base">
             Posts
+          </Link>
+          <Link to="/posts" onClick={handleCloseNavbar} className="px-2 py-1 text-base">
+            AI Powered Mock Interview
+          </Link>
+          <Link to="/posts" onClick={handleCloseNavbar} className="px-2 py-1 text-base">
+            AI Resume Analyzer
+          </Link>
+          <Link to="/posts" onClick={handleCloseNavbar} className="px-2 py-1 text-base">
+            AI Resume Maker
           </Link>
           {isLoggedIn && (
             <Link to="/post" onClick={handleCloseNavbar} className="px-2 py-1 text-base">
