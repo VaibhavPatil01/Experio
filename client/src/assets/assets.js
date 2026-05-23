@@ -64,6 +64,7 @@ export const footer_data = [
       { name: 'Home', path: '/' },
       { name: 'About', path: '/' },
       { name: 'Help', path: '/' },
+      { name: 'Careers', path: '/' },
       { name: 'Contact Us', path: 'mailto:interviewexperiencegsmcoe@gmail.com' }
     ]
   }

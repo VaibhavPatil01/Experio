@@ -33,9 +33,9 @@ const Navbar = () => {
 
   return (
     <div className="sticky top-0 z-50 bg-white dark:bg-black shadow-[var(--box-shadow)] border-borderColor transition-all">
-      <div className="flex items-center justify-between px-7 sm:px-6 md:px-7 lg:px-12 xl:px-30 py-1 text-black dark:text-white bg-white dark:bg-black">
+      <div className="flex items-center justify-between px-7 sm:px-6 md:px-7 lg:px-12 xl:px-30 py-3 sm:py-2 text-gray-950 dark:text-white bg-white dark:bg-black">
         <Link to="/" onClick={handleCloseNavbar}>
-          <img src={theme == 'light' ? assets.logogreenblackpng : assets.logogreenwhitepng} className=" sm:h-15" alt="Logo" />
+          <img src={theme == 'light' ? assets.logogreenblackpng : assets.logogreenwhitepng} className="h-10 sm:h-12" alt="Logo" />
         </Link>
 
         <button
