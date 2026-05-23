@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
 import LogoutButton from './LogoutButton.jsx';
@@ -16,6 +16,7 @@ const Navbar = () => {
 
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
 
   const handleCloseNavbar = () => {
@@ -30,6 +31,17 @@ const Navbar = () => {
       setShowDropdown(false);
     }
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // return (
   //   <div className="sticky top-0 z-50 dark:bg-black shadow-[var(--box-shadow)] border-borderColor transition-all">
@@ -144,7 +156,13 @@ const Navbar = () => {
   // );
 
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between w-full py-4 px-6 md:px-16 lg:px-24 xl:px-40 text-sm">
+    <nav
+  className={`sticky top-0 z-50 flex items-center justify-between w-full pt-3 pb-2 px-6 md:px-16 lg:px-24 xl:px-40 text-sm ${
+    isScrolled
+      ? 'bg-white/75 backdrop-blur-xl dark:bg-black shadow-sm'
+      : 'bg-transparent dark:bg-black'
+  }`}
+>
       <Link to="/" onClick={handleCloseNavbar}>
         <img
           src={theme == 'light' ? assets.logogreenblackpng : assets.logogreenwhitepng}
@@ -153,17 +171,17 @@ const Navbar = () => {
         />
       </Link>
 
-      <div className="hidden md:flex items-center gap-8 transition duration-500 text-slate-800">
-        <a href="#" className="hover:text-green-600 transition">
+      <div className="hidden md:flex items-center gap-8 text-slate-800 dark:text-white">
+        <a href="#" className="hover:text-green-600">
           Home
         </a>
-        <a href="#features" className="hover:text-green-600 transition">
+        <a href="#features" className="hover:text-green-600">
           Features
         </a>
-        <a href="#testimonials" className="hover:text-green-600 transition">
+        <a href="#testimonials" className="hover:text-green-600">
           Testimonials
         </a>
-        <a href="#cta" className="hover:text-green-600 transition">
+        <a href="#cta" className="hover:text-green-600">
           Contact
         </a>
       </div>
@@ -173,7 +191,7 @@ const Navbar = () => {
           <button
             type="button"
             onClick={() => dispatch(themeAction.toggleTheme())}
-            className="cursor-pointer inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
+            className="cursor-pointer inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-800 transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
           >
             {theme === 'light' ? (
@@ -208,14 +226,27 @@ const Navbar = () => {
           </div>
         </div>
         <a
-          href=""
-          className="hidden md:block px-6 py-2 border active:scale-95 hover:bg-slate-50 transition-all rounded-full text-slate-700 hover:text-slate-900"
-        >
-          Login
-        </a>
+  href=""
+  className="
+    hidden md:inline-flex items-center justify-center
+    h-10 px-8 rounded-full
+    border border-slate-300 dark:border-slate-700
+    bg-white/80 dark:bg-slate-900/80
+    text-slate-700 dark:text-white
+    font-medium
+    transition-transform duration-300
+    hover:scale-[1.02]
+    hover:bg-slate-100 dark:hover:bg-slate-800
+    hover:border-slate-300 dark:hover:border-slate-600
+    hover:shadow-md
+    active:scale-95
+  "
+>
+  Login
+</a>
       </div>
 
-      <button onClick={() => setMenuOpen(true)} className="md:hidden active:scale-90 transition">
+      <button onClick={() => setIsNavOpen(true)} className="md:hidden active:scale-90 transition">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="26"
