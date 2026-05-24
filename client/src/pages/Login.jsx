@@ -21,8 +21,15 @@ function Login() {
   const isSignupPage = pathname === '/register';
   const formTitle = isSignupPage ? 'Sign Up' : 'Login';
   const pageDescription = isSignupPage
-    ? 'Create your account details below'
-    : 'Enter your Login details below';
+    ? 'Create your account to get started.'
+    : 'Welcome back! Please enter your details.';
+  const authSpacing = {
+    formWrapperPadding: isSignupPage ? 'py-4' : 'py-10',
+    headingMargin: isSignupPage ? 'mb-4' : 'mb-6',
+    dividerMargin: isSignupPage ? 'my-4' : 'my-6',
+    formGap: isSignupPage ? 'space-y-4' : 'space-y-5',
+    footerMargin: isSignupPage ? 'mt-4' : 'mt-6'
+  };
 
   const [showPassword, setShowPassword] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -111,9 +118,9 @@ function Login() {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <main className="min-h-screen bg-white">
-        <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-          <section className="flex min-h-screen flex-col px-5 py-6 sm:px-8 lg:px-12">
+      <main className="h-screen overflow-hidden bg-white">
+        <div className="grid h-full min-h-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <section className="flex h-full min-h-0 flex-col px-5 py-6 sm:px-8 lg:px-12">
             <Link to="/" className="inline-flex w-fit" aria-label="Go to homepage">
               <img
                 src={assets.logogreenblackpng}
@@ -122,8 +129,10 @@ function Login() {
               />
             </Link>
 
-            <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10 lg:ml-auto lg:mr-0 lg:translate-x-10">
-              <div className="mb-6 text-center">
+            <div
+              className={`mx-auto flex w-full max-w-md flex-1 flex-col justify-center ${authSpacing.formWrapperPadding} lg:ml-auto lg:mr-0 lg:translate-x-15`}
+            >
+              <div className={`${authSpacing.headingMargin} text-center`}>
                 <h1 className="text-3xl font-bold text-slate-950">{formTitle}</h1>
                 <p className="mt-2 text-sm text-slate-500">{pageDescription}</p>
               </div>
@@ -147,18 +156,20 @@ function Login() {
                   onClick={() => toast.error('Facebook login is not available yet')}
                   className="flex h-12 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:shadow-md"
                 >
-                  <img src={assets.facebook_icon} alt="" className="h-5 w-5" />
-                  Facebook
+                  <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="" className="h-5 w-5" />
+                  GitHub
                 </button>
               </div>
 
-              <div className="my-6 flex items-center gap-4 text-xs text-slate-400">
+              <div
+                className={`${authSpacing.dividerMargin} flex items-center gap-4 text-xs text-slate-400`}
+              >
                 <span className="h-px flex-1 bg-slate-200" />
                 <span>or with email</span>
                 <span className="h-px flex-1 bg-slate-200" />
               </div>
 
-              <form onSubmit={formik.handleSubmit} className="space-y-5">
+              <form onSubmit={formik.handleSubmit} className={authSpacing.formGap}>
                 {isSignupPage && (
                   <div>
                     <label htmlFor="name" className="mb-2 block text-sm font-medium text-slate-950">
@@ -208,7 +219,10 @@ function Login() {
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-950">
+                  <label
+                    htmlFor="password"
+                    className="mb-2 block text-sm font-medium text-slate-950"
+                  >
                     {getFieldError('password', 'Password')}
                     <span className="text-red-500"> *</span>
                   </label>
@@ -271,7 +285,7 @@ function Login() {
 
               {modalOpen && <ForgetPasswordModal closeModalCallback={() => setModalOpen(false)} />}
 
-              <p className="mt-6 text-center text-sm text-slate-950">
+              <p className={`${authSpacing.footerMargin} text-center text-sm text-slate-950`}>
                 {isSignupPage ? 'Already have an account?' : "Don't have an account?"}
                 <Link
                   to={isSignupPage ? '/login' : '/register'}
@@ -283,12 +297,12 @@ function Login() {
             </div>
           </section>
 
-          <div className="hidden  p-20 lg:block">
+          <div className="hidden  p-5 lg:block">
             <div className="flex h-full items-center justify-center overflow-hidden rounded-lg ">
               <img
                 src={assets.loginpagegreenlogo}
                 alt="Login illustration"
-                className="h-full w-full object-cover"
+                className="h-130 w-130 object-cover"
               />
             </div>
           </div>
