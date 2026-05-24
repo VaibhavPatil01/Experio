@@ -71,11 +71,13 @@ import { getMostViewedPosts } from '../services/postServices.js';
 import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
 import Title from './Title.jsx';
 import { Zap } from 'lucide-react';
+import { useAppSelector } from '../redux/store.js';
 
 const TopPosts = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [redirectUrl, setRedirectUrl] = React.useState('');
+  const theme = useAppSelector((state) => state.themeState.theme);
 
   const { data, isLoading } = useQuery({
     queryKey: ['most-viewed-posts'],
@@ -96,12 +98,12 @@ const TopPosts = () => {
   };
 
   return (
-    <>
+    <div className="dark:bg-black">
       {isModalOpen && (
         <LoginRequiredModal redirecUrl={redirectUrl} closeModalCallback={closeModal} />
       )}
-      <div id="testimonaials" className="flex flex-col items-center my-10 scroll-mt-12 ">
-        <div className="flex items-center gap-2 text-sm text-green-600 bg-green-400/10 rounded-full px-6 py-1.5">
+      <div id="testimonaials" className="flex flex-col items-center my-10 scroll-mt-12 dark:bg-black">
+        <div className="flex items-center gap-2 text-sm text-green-600 bg-green-400/10 dark:bg-green-400/20  rounded-full px-6 py-1.5">
           <Zap width={14} />
           <span>Testimonials</span>
         </div>
@@ -111,13 +113,13 @@ const TopPosts = () => {
         />
       </div>
 
-        <div className="flex flex-col gap-6 px-6 md:px-16 lg:px-24 xl:px-38">
+        <div className="flex flex-col gap-6 px-6 md:px-16 lg:px-24 xl:px-38 dark:bg-black">
           {data?.data?.map((post) => (
             <TopPostSkeleton key={post._id} post={post} openModal={openModal} />
           ))}
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="my-10 flex justify-center">
           <button
             onClick={() => navigate('/posts')}
             className="flex items-center justify-center gap-2 px-6 py-2 border border-borderColor hover:bg-gray-50 rounded-md cursor-pointer"
@@ -126,7 +128,7 @@ const TopPosts = () => {
             <img src={assets.arrow_icon} alt="arrow" />
           </button>
         </div>
-    </>
+    </div>
   );
 };
 
