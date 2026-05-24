@@ -5,11 +5,12 @@ import { Banner } from '../components/home/Banner';
 const DefaultLayout = () => {
   const { pathname } = useLocation();
   const showHomeBanner = pathname === '/';
+  const hideHeader = pathname === '/login' || pathname === '/register';
 
   return (
     <>
       {showHomeBanner && <Banner />}
-      <Header />
+      {!hideHeader && <Header />}
       <Outlet />
     </>
   );

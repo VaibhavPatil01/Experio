@@ -24,3 +24,6 @@ yarn-error.log*
 
 # Personal todo files
 todo.txt
+
+dist/
+client/dist/

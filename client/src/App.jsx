@@ -22,7 +22,6 @@ const PostList = lazy(() => import('./pages/PostList'));
 const PostPage = lazy(() => import('./pages/PostPage'));
 const ProfileEdit = lazy(() => import('./pages/ProfileEdit'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const UserRegister = lazy(() => import('./pages/UserRegister'));
 const UserSearch = lazy(() => import('./pages/UserSearch'));
 const Login = lazy(() => import('./pages/Login'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
@@ -61,7 +60,7 @@ const App = () => {
             <Route path="/ai-resume-analyser" element={<AIResumeAnalyser />} />
             <Route path="/ai-mock-interview" element={<AIMockInterview />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<UserRegister />} />
+            <Route path="/register" element={<Login />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/posts" element={<PostList />} />

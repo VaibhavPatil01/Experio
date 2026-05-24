@@ -10,6 +10,7 @@ import twitter_icon from './images/icons/twitter_logo.svg';
 import facebook_icon from './images/icons/facebook_logo.svg';
 import mail_icon from './images/icons/gmail_logo.svg';
 import arrow_icon from './images/icons/arrow_icon.svg';
+import loginpagegreenlogo from './images/icons/loginpagegreenlogo.png';
 
 import lock_icon from './images/icons/lock_icon.svg';
 import cross_icon from './images/icons/cross_icon.svg';
@@ -30,7 +31,8 @@ export const assets = {
   arrow_icon,
   lock_icon,
   cross_icon,
-  email_icon
+  email_icon,
+  loginpagegreenlogo
 };
 
 export const branches = [
