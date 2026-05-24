@@ -369,6 +369,8 @@ export async function forgotPassword(req, res) {
     // Creating a jwt token and sending it to the user
     const token = generateForgotPasswordToken(user._id, email, user.isAdmin);
 
+    console.log("Generated Token", token);
+
     // send email to the user
     sendForgotPasswordEmail(email, token, user.username);
 

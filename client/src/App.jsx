@@ -24,7 +24,6 @@ const ProfileEdit = lazy(() => import('./pages/ProfileEdit'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const UserSearch = lazy(() => import('./pages/UserSearch'));
 const Login = lazy(() => import('./pages/Login'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 const App = () => {
   const { pathname } = useLocation();
@@ -52,6 +51,9 @@ const App = () => {
     <>
       <Suspense fallback={<Loading />}>
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Login />} />
+          <Route path="/reset-password/:token" element={<Login />} />
           <Route element={<DefaultLayout />}>
             <Route index element={<Home />} />
             <Route path="/" element={<Home />} />
@@ -59,10 +61,7 @@ const App = () => {
             <Route path="/ai-resume-maker" element={<AIResumeMaker />} />
             <Route path="/ai-resume-analyser" element={<AIResumeAnalyser />} />
             <Route path="/ai-mock-interview" element={<AIMockInterview />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Login />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/posts" element={<PostList />} />
             <Route path="/token/google/:token" element={<GoogleTokenSetter />} />
             <Route path="/user/search" element={<UserSearch />} />
