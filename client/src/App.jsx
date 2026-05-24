@@ -13,6 +13,9 @@ import { useAppSelector } from './redux/store.js';
 
 // Lazily importing pages
 const Home = lazy(() => import('./pages/Home'));
+const AIMockInterview = lazy(() => import('./pages/AIMockInterview'));
+const AIResumeAnalyser = lazy(() => import('./pages/AIResumeAnalyser'));
+const AIResumeMaker = lazy(() => import('./pages/AIResumeMaker'));
 const PostEdit = lazy(() => import('./pages/PostEdit'));
 const PostForm = lazy(() => import('./pages/PostForm'));
 const PostList = lazy(() => import('./pages/PostList'));
@@ -54,6 +57,9 @@ const App = () => {
             <Route index element={<Home />} />
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/ai-resume-maker" element={<AIResumeMaker />} />
+            <Route path="/ai-resume-analyser" element={<AIResumeAnalyser />} />
+            <Route path="/ai-mock-interview" element={<AIMockInterview />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<UserRegister />} />
             <Route path="/profile/:id" element={<ProfilePage />} />

@@ -19,9 +19,9 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [navBottomOffset, setNavBottomOffset] = useState(0);
   const aiTools = [
-    { label: 'AI Resume Maker', href: '#' },
-    { label: 'AI Resume Analyser', href: '#' },
-    { label: 'AI Mock Interview', href: '#' }
+    { label: 'AI Resume Maker', path: '/ai-resume-maker' },
+    { label: 'AI Resume Analyser', path: '/ai-resume-analyser' },
+    { label: 'AI Mock Interview', path: '/ai-mock-interview' }
   ];
 
   const handleCloseNavbar = () => {
@@ -193,7 +193,7 @@ const Navbar = () => {
       ref={dropdownRef}
       className={`sticky top-0 z-50 flex items-center justify-between w-full pt-3 pb-2 px-6 md:px-16 lg:px-24 xl:px-40 text-sm ${
         isScrolled
-          ? 'bg-white/75 backdrop-blur-xl dark:bg-black shadow-sm'
+          ? 'bg-white/75 backdrop-blur-xl dark:bg-black'
           : 'bg-transparent dark:bg-black'
       }`}
     >
@@ -223,13 +223,13 @@ const Navbar = () => {
 
           <div className="invisible absolute left-1/2 top-full z-50 mt-3 w-52 -translate-x-1/2 translate-y-2 rounded-md border border-slate-200 bg-white py-2 text-slate-800 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
             {aiTools.map((tool) => (
-              <a
+              <Link
                 key={tool.label}
-                href={tool.href}
+                to={tool.path}
                 className="block px-4 py-2.5 text-sm transition hover:bg-green-50 hover:text-green-600 dark:hover:bg-gray-800"
               >
                 {tool.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -391,14 +391,14 @@ const Navbar = () => {
           >
             <div className="mt-2 flex min-h-0 flex-col gap-1 pl-3">
             {aiTools.map((tool) => (
-              <a
+              <Link
                 key={tool.label}
-                href={tool.href}
+                to={tool.path}
                 onClick={handleCloseNavbar}
                 className="rounded-md py-2 text-sm text-slate-600 hover:text-green-600 dark:text-gray-300"
               >
                 {tool.label}
-              </a>
+              </Link>
             ))}
             </div>
           </div>
