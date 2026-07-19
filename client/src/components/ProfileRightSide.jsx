@@ -1,22 +1,132 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MoreVertical, Sparkles, FileText, Trash2, Plus, X, Link2 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateUser, uploadResumeFile } from '../services/userServices.js';
 import penIcon from '../assets/images/icons/pen-svgrepo-com.svg';
 
-const ProfileRightSide = () => {
+const ProfileRightSide = ({ profileData }) => {
+  const { id } = useParams();
+  const queryClient = useQueryClient();
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['profile', id]);
+      setIsSummaryModalOpen(false);
+      setIsSocialLinkModalOpen(false);
+      setIsAwardModalOpen(false);
+      setIsSkillsModalOpen(false);
+      setIsWorkExperienceModalOpen(false);
+    }
+  });
+
+  const uploadResumeMutation = useMutation({
+    mutationFn: uploadResumeFile,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['profile', id]);
+    }
+  });
+
+  const resumeFileInputRef = useRef(null);
+
+  const handleResumeUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('resumeFile', file);
+    uploadResumeMutation.mutate(formData);
+  };
+
+  const skillsList = profileData?.skills || [];
+  const awardsList = profileData?.awards || [];
+  const workExperiencesList = profileData?.workExperiences || [];
+  const socialLinksList = profileData?.socialLinks || [];
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
   const [showAllSkills, setShowAllSkills] = useState(false);
+  
   const [isSocialLinkModalOpen, setIsSocialLinkModalOpen] = useState(false);
   const [isNewLink, setIsNewLink] = useState(false);
   const [currentLink, setCurrentLink] = useState('');
+  const [editingLinkIndex, setEditingLinkIndex] = useState(null);
+  
   const [isAwardModalOpen, setIsAwardModalOpen] = useState(false);
   const [isNewAward, setIsNewAward] = useState(false);
   const [awardTitle, setAwardTitle] = useState('');
   const [awardDescription, setAwardDescription] = useState('');
+  const [editingAwardIndex, setEditingAwardIndex] = useState(null);
+
   const [isSkillsModalOpen, setIsSkillsModalOpen] = useState(false);
   const [newSkillInput, setNewSkillInput] = useState('');
-  const [summaryText, setSummaryText] = useState("I am looking for an opportunity where I can apply my skills in software development, problem-solving, and web application deployment, while continuing to learn from experienced professionals. I value roles that provide a balance of hands-on development and growth opportunities, allowing me to contribute meaningfully to the team and the product.");
+  const [localSkills, setLocalSkills] = useState([]);
+  
+  const [isWorkExperienceModalOpen, setIsWorkExperienceModalOpen] = useState(false);
+  const [editingWorkExpIndex, setEditingWorkExpIndex] = useState(null);
+  const [workExpForm, setWorkExpForm] = useState({
+    jobTitle: '',
+    company: '',
+    startYear: '',
+    startMonth: '',
+    isCurrentlyWorking: true,
+    currency: 'INR',
+    currentSalary: '',
+    noticePeriod: '',
+    industry: '',
+    employmentType: '',
+    description: ''
+  });
+  
+  const [summaryText, setSummaryText] = useState(profileData?.about || "");
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (profileData?.about) setSummaryText(profileData.about);
+  }, [profileData]);
+
+  const handleSaveSummary = () => updateProfileMutation.mutate({ about: summaryText });
+  
+  const handleAddSkill = () => {
+    if (!newSkillInput.trim()) return;
+    setLocalSkills([...localSkills, newSkillInput.trim()]);
+    setNewSkillInput('');
+  };
+
+  const handleSaveSkills = () => {
+    updateProfileMutation.mutate({ skills: localSkills });
+  };
+
+  const handleSaveAward = () => {
+     let newAwards = [...awardsList];
+     if (isNewAward) {
+       newAwards.push({ title: awardTitle, description: awardDescription });
+     } else if (editingAwardIndex !== null) {
+       newAwards[editingAwardIndex] = { title: awardTitle, description: awardDescription };
+     }
+     updateProfileMutation.mutate({ awards: newAwards });
+  };
+  
+  const handleSaveWorkExperience = () => {
+    let newWorkExp = [...workExperiencesList];
+    if (editingWorkExpIndex !== null) {
+      newWorkExp[editingWorkExpIndex] = workExpForm;
+    } else {
+      newWorkExp.push(workExpForm);
+    }
+    updateProfileMutation.mutate({ workExperiences: newWorkExp });
+  };
+
+  const handleSaveSocialLink = () => {
+    let newLinks = [...socialLinksList];
+    if (isNewLink) {
+      newLinks.push(currentLink);
+    } else if (editingLinkIndex !== null) {
+      newLinks[editingLinkIndex] = currentLink;
+    }
+    updateProfileMutation.mutate({ socialLinks: newLinks });
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,16 +141,27 @@ const ProfileRightSide = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen]);
+
   const navItems = [
     'Profile summary',
     'Work experience',
     'Skills',
     'Education',
     'Job preferences',
-    'Personal details',
   ];
 
   const dropdownItems = [
+    'Personal details',
     'Courses & certifications',
     'Projects',
     'Awards',
@@ -48,14 +169,6 @@ const ProfileRightSide = () => {
     'Language',
   ];
 
-  const skillsList = [
-    'Boot Strap', 'C++', 'Css', 'Redux', 'Problem Solving', 'Html', 'Node.js', 'Express.js', 'Sql', 'Git',
-    'Communcation', 'TailwindCSS', 'Mysql', 'Javascript', 'Mongodb', 'React.js', 'Postman',
-    'Data Structures And Algorithms', 'Css 3', 'Html5', 'Express', 'Node', 'React', 'Rest Apis',
-    'Asynchronous programming', 'Github', 'Vite', 'Restful Apis', 'Webpack', 'Software Development',
-    'Back-End Web Development', 'Debugging Tool', 'Analytical Skills', 'Apis', 'Web Services', 'UI', 'Vercel',
-    'ChatGPT', 'Netlify', 'Gemini'
-  ];
 
   return (
     <div className="flex flex-col gap-4">
@@ -66,7 +179,7 @@ const ProfileRightSide = () => {
             {navItems.map((item) => (
               <button
                 key={item}
-                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:text-gray-800 rounded-md transition-colors"
+                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:text-gray-800 rounded-md transition-colors cursor-pointer"
               >
                 {item}
                 {item === 'Work experience' && (
@@ -109,8 +222,8 @@ const ProfileRightSide = () => {
             <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
         </div>
-        <p className="text-gray-600 text-[15px] leading-relaxed mb-6">
-          I am looking for an opportunity where I can apply my skills in software development, application deployment, while continuing to learn from experienced professionals. I value a balance of hands-on development and growth opportunities, allowing me to contribute to both the team and the product.
+        <p className="text-gray-600 text-[15px] leading-relaxed mb-6 whitespace-pre-wrap">
+          {profileData?.about || "No summary provided."}
         </p>
         <button className="flex items-center gap-2 border-[1.5px] border-green-200 text-green-700 px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-green-50 transition-colors shadow-sm">
           <Sparkles className="w-4 h-4 text-green-600" /> Generate by AI
@@ -120,36 +233,110 @@ const ProfileRightSide = () => {
       {/* Resume Card */}
       <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Resume</h3>
-        <div className="border border-gray-200 rounded-lg p-4 flex items-center justify-between mb-4 bg-gray-50/50">
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold text-gray-800 text-[15px]">Vaibhav_Patil_Resume.pdf</span>
+        
+        {profileData?.resume?.url ? (
+          <div className="border border-gray-200 rounded-lg p-4 flex items-center justify-between mb-4 bg-gray-50/50">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-gray-500" />
+              <a href={profileData.resume.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-gray-800 text-[15px] hover:text-blue-600 transition-colors">
+                {profileData.resume.filename || 'Resume.pdf'}
+              </a>
+            </div>
+            <button 
+              onClick={() => updateProfileMutation.mutate({ resume: null })}
+              disabled={updateProfileMutation.isLoading}
+              className="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer disabled:opacity-50"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
           </div>
-          <button className="text-gray-400 hover:text-red-500 transition-colors p-1">
-            <Trash2 className="w-5 h-5" />
-          </button>
-        </div>
-        <button className="text-green-700 font-semibold text-[15px] hover:text-green-800 transition-colors">
-          Replace resume
+        ) : (
+          <div className="mb-4">
+            <p className="text-gray-500 text-sm">No resume uploaded.</p>
+          </div>
+        )}
+
+        <input 
+          type="file" 
+          accept=".pdf,.doc,.docx"
+          className="hidden" 
+          ref={resumeFileInputRef} 
+          onChange={handleResumeUpload}
+        />
+        
+        <button 
+          onClick={() => resumeFileInputRef.current.click()}
+          disabled={uploadResumeMutation.isLoading}
+          className="text-green-700 font-semibold text-[15px] hover:text-green-800 transition-colors cursor-pointer disabled:opacity-50"
+        >
+          {uploadResumeMutation.isLoading ? 'Uploading...' : (profileData?.resume?.url ? 'Replace resume' : 'Upload resume')}
         </button>
       </div>
 
       {/* Work Experience Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 flex justify-between items-center">
-        <h3 className="text-lg font-bold text-gray-900">Work experience</h3>
-        <button className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors">
-          <Plus className="w-5 h-5" />
-        </button>
+      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Work experience</h3>
+          <button 
+            onClick={() => {
+               setWorkExpForm({
+                  jobTitle: '',
+                  company: '',
+                  startYear: '',
+                  startMonth: '',
+                  isCurrentlyWorking: true,
+                  currency: 'INR',
+                  currentSalary: '',
+                  noticePeriod: '',
+                  industry: '',
+                  employmentType: '',
+                  description: ''
+               });
+               setEditingWorkExpIndex(null);
+               setIsWorkExperienceModalOpen(true);
+            }}
+            className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="flex flex-col gap-5">
+          {workExperiencesList.length === 0 && <p className="text-gray-500 text-sm">No work experiences added.</p>}
+          {workExperiencesList.map((exp, index) => (
+            <div key={index} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+              <div className="flex items-center gap-2 mb-1.5">
+                <h4 className="text-[15.5px] font-semibold text-gray-800">{exp.jobTitle}</h4>
+                <button 
+                  onClick={() => { 
+                    setWorkExpForm(exp);
+                    setEditingWorkExpIndex(index);
+                    setIsWorkExperienceModalOpen(true); 
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+              <p className="text-[14.5px] text-gray-700 font-medium">{exp.company}</p>
+              <p className="text-[13px] text-gray-500">{exp.startMonth} {exp.startYear} - {exp.isCurrentlyWorking ? 'Present' : ''} • {exp.employmentType}</p>
+              {exp.description && <p className="text-[14.5px] text-gray-600 mt-2 whitespace-pre-wrap">{exp.description}</p>}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Skills Card */}
       <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Skills</h3>
-          <button 
-            onClick={() => setIsSkillsModalOpen(true)}
-            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-          >
+            <button 
+              onClick={() => {
+                setLocalSkills(skillsList);
+                setIsSkillsModalOpen(true);
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+            >
             <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
         </div>
@@ -185,36 +372,32 @@ const ProfileRightSide = () => {
             onClick={() => { setIsNewAward(true); setAwardTitle(''); setAwardDescription(''); setIsAwardModalOpen(true); }}
             className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-5 h-5 pointer-events-none" />
           </button>
         </div>
         
         <div className="flex flex-col gap-5">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <h4 className="text-[15.5px] font-semibold text-gray-800">Academic Rank</h4>
-              <button 
-                onClick={() => { setIsNewAward(false); setAwardTitle('Academic Rank'); setAwardDescription('Secured 5th rank in First Year among all departments.'); setIsAwardModalOpen(true); }}
-                className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-              >
-                <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-              </button>
+          {awardsList.length === 0 && <p className="text-gray-500 text-sm">No awards added.</p>}
+          {awardsList.map((award, index) => (
+            <div key={index}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <h4 className="text-[15.5px] font-semibold text-gray-800">{award.title}</h4>
+                <button 
+                  onClick={() => { 
+                    setIsNewAward(false); 
+                    setAwardTitle(award.title); 
+                    setAwardDescription(award.description); 
+                    setEditingAwardIndex(index);
+                    setIsAwardModalOpen(true); 
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+              <p className="text-[14.5px] text-gray-600">{award.description}</p>
             </div>
-            <p className="text-[14.5px] text-gray-600">Secured 5th rank in First Year among all departments.</p>
-          </div>
-          
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <h4 className="text-[15.5px] font-semibold text-gray-800">HackerRank</h4>
-              <button 
-                onClick={() => { setIsNewAward(false); setAwardTitle('HackerRank'); setAwardDescription('Certified in Problem Solving (Intermediate), 5-star in C++'); setIsAwardModalOpen(true); }}
-                className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-              >
-                <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-              </button>
-            </div>
-            <p className="text-[14.5px] text-gray-600">Certified in Problem Solving (Intermediate), 5-star in C++</p>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -231,57 +414,26 @@ const ProfileRightSide = () => {
         </div>
         
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between group">
-            <div className="flex items-center gap-3">
-              <Link2 className="w-5 h-5 text-gray-600 shrink-0 transform -rotate-45" />
-              <a href="#" className="text-[15px] text-gray-600 hover:text-blue-600 truncate transition-colors">https://www.linkedin.com/in/vaibhav-patil13</a>
+          {socialLinksList.length === 0 && <p className="text-gray-500 text-sm">No social links added.</p>}
+          {socialLinksList.map((link, index) => (
+            <div key={index} className="flex items-center justify-between group">
+              <div className="flex items-center gap-3">
+                <Link2 className="w-5 h-5 text-gray-600 shrink-0 transform -rotate-45" />
+                <a href={link} target="_blank" rel="noreferrer" className="text-[15px] text-gray-600 hover:text-blue-600 truncate transition-colors">{link}</a>
+              </div>
+              <button 
+                onClick={() => { 
+                  setIsNewLink(false); 
+                  setCurrentLink(link); 
+                  setEditingLinkIndex(index);
+                  setIsSocialLinkModalOpen(true); 
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
+              >
+                <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+              </button>
             </div>
-            <button 
-              onClick={() => { setIsNewLink(false); setCurrentLink('https://www.linkedin.com/in/vaibhav-patil13'); setIsSocialLinkModalOpen(true); }}
-              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
-            >
-              <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between group">
-            <div className="flex items-center gap-3">
-              <Link2 className="w-5 h-5 text-gray-600 shrink-0 transform -rotate-45" />
-              <a href="#" className="text-[15px] text-gray-600 hover:text-blue-600 truncate transition-colors">https://leetcode.com/u/VaibhavPatil01/</a>
-            </div>
-            <button 
-              onClick={() => { setIsNewLink(false); setCurrentLink('https://leetcode.com/u/VaibhavPatil01/'); setIsSocialLinkModalOpen(true); }}
-              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
-            >
-              <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between group">
-            <div className="flex items-center gap-3">
-              <Link2 className="w-5 h-5 text-gray-600 shrink-0 transform -rotate-45" />
-              <a href="#" className="text-[15px] text-gray-600 hover:text-blue-600 truncate transition-colors">https://www.geeksforgeeks.org/user/vaibhavpatil01/</a>
-            </div>
-            <button 
-              onClick={() => { setIsNewLink(false); setCurrentLink('https://www.geeksforgeeks.org/user/vaibhavpatil01/'); setIsSocialLinkModalOpen(true); }}
-              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
-            >
-              <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between group">
-            <div className="flex items-center gap-3">
-              <Link2 className="w-5 h-5 text-gray-600 shrink-0 transform -rotate-45" />
-              <a href="#" className="text-[15px] text-gray-600 hover:text-blue-600 truncate transition-colors">https://github.com/VaibhavPatil01</a>
-            </div>
-            <button 
-              onClick={() => { setIsNewLink(false); setCurrentLink('https://github.com/VaibhavPatil01'); setIsSocialLinkModalOpen(true); }}
-              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
-            >
-              <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-            </button>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -318,10 +470,11 @@ const ProfileRightSide = () => {
             
             <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
               <button 
-                onClick={() => setIsSummaryModalOpen(false)}
-                className="bg-green-600 text-white font-semibold px-8 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
+                onClick={handleSaveSummary}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-8 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
-                Save
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>
@@ -358,15 +511,22 @@ const ProfileRightSide = () => {
             
             <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${isNewLink ? 'justify-end' : 'justify-between'}`}>
               {!isNewLink && (
-                <button className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer">
+                <button 
+                  onClick={() => {
+                    const newLinks = socialLinksList.filter((_, i) => i !== editingLinkIndex);
+                    updateProfileMutation.mutate({ socialLinks: newLinks });
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
                   Delete Link
                 </button>
               )}
               <button 
-                onClick={() => setIsSocialLinkModalOpen(false)}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
+                onClick={handleSaveSocialLink}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
-                Save
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>
@@ -417,15 +577,22 @@ const ProfileRightSide = () => {
             
             <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${isNewAward ? 'justify-end' : 'justify-between'}`}>
               {!isNewAward && (
-                <button className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer">
+                <button 
+                  onClick={() => {
+                    const newAwards = awardsList.filter((_, i) => i !== editingAwardIndex);
+                    updateProfileMutation.mutate({ awards: newAwards });
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
                   Delete Award
                 </button>
               )}
               <button 
-                onClick={() => setIsAwardModalOpen(false)}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
+                onClick={handleSaveAward}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
-                Save
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>
@@ -450,31 +617,253 @@ const ProfileRightSide = () => {
             <div className="p-6 pb-6">
               <div className="border border-gray-300 rounded-lg p-4 pb-3 flex flex-col">
                 <div className="flex flex-wrap gap-2 mb-2 max-h-[280px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
-                  {skillsList.map((skill, index) => (
+                  {localSkills.map((skill, index) => (
                     <span key={index} className="flex items-center gap-1.5 bg-white text-gray-700 px-3.5 py-1.5 rounded-full text-[14px] font-medium border border-gray-400 cursor-pointer hover:bg-gray-50 transition-colors">
                       {skill}
-                      <X className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700" />
+                      <X onClick={() => {
+                         const newSkills = localSkills.filter(s => s !== skill);
+                         setLocalSkills(newSkills);
+                      }} className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700" />
                     </span>
                   ))}
                 </div>
-                <div className="mt-2">
+                <div className="mt-2 flex items-center justify-between gap-2">
                   <input 
                     type="text" 
                     value={newSkillInput}
                     onChange={(e) => setNewSkillInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddSkill();
+                      }
+                    }}
                     placeholder="Maximum 50 can be added" 
-                    className="w-full text-[14.5px] text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
+                    className="flex-1 text-[14.5px] text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
                   />
+                  <button 
+                    onClick={handleAddSkill} 
+                    disabled={!newSkillInput.trim()} 
+                    className="text-blue-600 font-semibold text-[14.5px] hover:text-blue-800 cursor-pointer disabled:opacity-50 px-2"
+                  >
+                    Add
+                  </button>
                 </div>
               </div>
             </div>
             
             <div className="px-6 py-4 border-t border-gray-100 flex justify-end items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)]">
               <button 
-                onClick={() => { setIsSkillsModalOpen(false); setNewSkillInput(''); }}
-                className={`text-white font-semibold px-10 py-2.5 rounded-full transition-colors shadow-sm cursor-pointer ${newSkillInput.trim() ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-300 hover:bg-gray-400'}`}
+                onClick={handleSaveSkills}
+                disabled={updateProfileMutation.isLoading}
+                className={`text-white font-semibold px-10 py-2.5 rounded-full transition-colors shadow-sm cursor-pointer disabled:opacity-50 bg-green-600 hover:bg-green-700`}
               >
-                Save
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Work Experience Modal */}
+      {isWorkExperienceModalOpen && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => setIsWorkExperienceModalOpen(false)}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-[17px] font-bold text-gray-900">Add work experience</h2>
+            </div>
+            
+            <div className="p-6 pb-6 space-y-5 overflow-y-auto max-h-[60vh]" style={{ scrollbarWidth: 'thin' }}>
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Job Title</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Search job title"
+                  value={workExpForm.jobTitle}
+                  onChange={(e) => setWorkExpForm({...workExpForm, jobTitle: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Company</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Enter your company name"
+                  value={workExpForm.company}
+                  onChange={(e) => setWorkExpForm({...workExpForm, company: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Start Date</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <div className="flex gap-4">
+                  <select 
+                    value={workExpForm.startYear}
+                    onChange={(e) => setWorkExpForm({...workExpForm, startYear: e.target.value})}
+                    className="w-1/2 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
+                  >
+                    <option value="" disabled>Years</option>
+                    {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  <select 
+                    value={workExpForm.startMonth}
+                    onChange={(e) => setWorkExpForm({...workExpForm, startMonth: e.target.value})}
+                    className="w-1/2 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
+                  >
+                    <option value="" disabled>Months</option>
+                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
+                      <option key={month} value={month}>{month}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input 
+                  type="checkbox" 
+                  id="currentlyWorking"
+                  checked={workExpForm.isCurrentlyWorking}
+                  onChange={(e) => setWorkExpForm({...workExpForm, isCurrentlyWorking: e.target.checked})}
+                  className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900 accent-gray-900 cursor-pointer"
+                />
+                <label htmlFor="currentlyWorking" className="text-[15px] font-medium text-gray-800 cursor-pointer">
+                  Currently working here
+                </label>
+              </div>
+
+              {workExpForm.isCurrentlyWorking && (
+                <div>
+                  <div className="mb-2 flex items-center gap-1">
+                    <label className="text-[14.5px] font-medium text-gray-700">Current Salary (Annually)</label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <div className="flex border border-gray-200 rounded-md overflow-hidden focus-within:border-gray-400 transition-colors">
+                    <select 
+                      value={workExpForm.currency}
+                      onChange={(e) => setWorkExpForm({...workExpForm, currency: e.target.value})}
+                      className="bg-gray-50 border-r border-gray-200 px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none appearance-none cursor-pointer"
+                    >
+                      <option value="INR">🇮🇳 INR</option>
+                      <option value="USD">🇺🇸 USD</option>
+                      <option value="EUR">🇪🇺 EUR</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Enter Salary"
+                      value={workExpForm.currentSalary}
+                      onChange={(e) => setWorkExpForm({...workExpForm, currentSalary: e.target.value})}
+                      className="w-full px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Notice Period</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <select 
+                  value={workExpForm.noticePeriod}
+                  onChange={(e) => setWorkExpForm({...workExpForm, noticePeriod: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
+                >
+                  <option value="" disabled>Select Notice Period</option>
+                  <option value="15 Days">15 Days or less</option>
+                  <option value="1 Month">1 Month</option>
+                  <option value="2 Months">2 Months</option>
+                  <option value="3 Months">3 Months</option>
+                  <option value="More than 3 Months">More than 3 Months</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Industry</label>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Enter or select your Industry"
+                  value={workExpForm.industry}
+                  onChange={(e) => setWorkExpForm({...workExpForm, industry: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Employment Type</label>
+                </div>
+                <select 
+                  value={workExpForm.employmentType}
+                  onChange={(e) => setWorkExpForm({...workExpForm, employmentType: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
+                >
+                  <option value="" disabled>Select Employment Type</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Freelance">Freelance</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Description</label>
+                </div>
+                <textarea 
+                  placeholder="Enter Your Description"
+                  value={workExpForm.description}
+                  onChange={(e) => {
+                    if(e.target.value.length <= 4000) {
+                      setWorkExpForm({...workExpForm, description: e.target.value})
+                    }
+                  }}
+                  className="w-full h-32 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors resize-none"
+                />
+                <p className="text-[13px] text-gray-400 mt-1">Max. {workExpForm.description.length}/4000 character</p>
+              </div>
+            </div>
+            
+            <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${editingWorkExpIndex !== null ? 'justify-between' : 'justify-end'}`}>
+              {editingWorkExpIndex !== null && (
+                <button 
+                  onClick={() => {
+                    const newWorkExp = workExperiencesList.filter((_, i) => i !== editingWorkExpIndex);
+                    updateProfileMutation.mutate({ workExperiences: newWorkExp });
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
+                  Delete Experience
+                </button>
+              )}
+              <button 
+                onClick={handleSaveWorkExperience}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>

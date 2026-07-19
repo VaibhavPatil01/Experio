@@ -10,6 +10,10 @@ export const deleteUserService = (id) => {
   return UserModel.deleteOne({ _id: id }); 
 };
 
+export const updateUserService = (id, data) => {
+  return UserModel.findByIdAndUpdate(id, data, { new: true });
+};
+
 export const createUser = (user) => { 
   return UserModel.create(user);
 };

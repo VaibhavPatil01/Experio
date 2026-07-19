@@ -22,10 +22,10 @@ const isUserAuth = (req, res, next) => {
       req.body = {}; // Force it to an object
     }
     
-    // Adding token data to req
+    // Legacy support for existing controllers
     req.body.authTokenData = authTokenData;
-
-
+    // Safe from multer overwriting req.body
+    req.authTokenData = authTokenData;
 
     return next();
   } catch (err) {

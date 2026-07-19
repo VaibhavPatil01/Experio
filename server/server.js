@@ -28,6 +28,7 @@ const app = express();
 // --------------------- CORS ---------------------
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "https://interview-experience-gsmcoe.vercel.app",
   "https://interview-experience-gsmcoe.onrender.com",
 ];

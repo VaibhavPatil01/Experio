@@ -12,6 +12,36 @@ const userSchema = new mongoose.Schema({
   about: { type: String, required: true },
   github: { type: String, required: false },
   linkedin: { type: String, required: false },
+  phone: { type: String, required: false },
+  gender: { type: String, enum: ['Male', 'Female', 'Prefer not to say'], default: 'Prefer not to say' },
+  experienceYears: { type: Number, default: 0 },
+  experienceMonths: { type: Number, default: 0 },
+  location: { type: String, default: "" },
+  nationality: { type: String, default: "" },
+  profilePicture: { type: String, default: "" },
+  resume: { 
+    url: { type: String, default: "" },
+    filename: { type: String, default: "" }
+  },
+  skills: [{ type: String }],
+  socialLinks: [{ type: String }],
+  workExperiences: [{
+    jobTitle: String,
+    company: String,
+    startYear: String,
+    startMonth: String,
+    isCurrentlyWorking: Boolean,
+    currency: String,
+    currentSalary: String,
+    noticePeriod: String,
+    industry: String,
+    employmentType: String,
+    description: String
+  }],
+  awards: [{
+    title: String,
+    description: String
+  }]
 }, {timestamps: true}); 
 
 const User = mongoose.model('User', userSchema);
