@@ -2,7 +2,8 @@ import { FaGithubSquare } from 'react-icons/fa';
 import { FaLinkedin } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import ProfileTab from '../components/ProfileTab';
+import ProfileLeftSide from '../components/ProfileLeftSide';
+import ProfileRightSide from '../components/ProfileRightSide';
 import { useAppSelector } from '../redux/store.js';
 import { getUserProfileStats } from '../services/userServices.js';
 import { Helmet } from 'react-helmet';
@@ -94,65 +95,14 @@ const ProfilePage = () => {
         />
         <meta property="og:type" content="website" />
       </Helmet>
-    <div className="pt-0 pb-4 lg:pt-0 lg:pb-0 bg-primary/10">
-      <div className="lg:grid" style={{ gridTemplateColumns: '30% 70%' }}>
-        <div className="max-w-[30rem] mx-auto relative  py-1 px-6 lg:sticky lg:top-20 h-fit">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-primary mb-1 py-4">{profileData.username}</h2>
-            <p className="text-gray-600 text-md mb-1">{profileData.designation || 'N/A'}</p>
-            <p className="text-gray-500 text-md mb-6">
-              {profileData.branch || 'N/A'} <span className="mx-1">-</span>{' '}
-              {profileData.passingYear || 'N/A'}
-            </p>
-            <div className="flex justify-around mb-6 text-gray-700 text-lg">
-              <div>
-                <span className="block font-semibold">{profilePostStats.postCount}</span>Posts
-              </div>
-              <div>
-                <span className="block font-semibold">{profilePostStats.viewCount}</span>Views
-              </div>
-              <div>
-                <span className="block font-semibold">{votes}</span>Likes
-              </div>
-            </div>
-            <p className="text-gray-600 text-md text-center mb-6">
-              {profileData.about || 'No description available.'}
-            </p>
-            <div className="flex justify-center gap-6 text-3xl mb-6">
-              {profileData?.linkedin && (
-                <a
-                  href={profileData?.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:text-primary/95"
-                >
-                  <FaLinkedin />
-                </a>
-              )}
-              {profileData?.github && (
-                <a
-                  href={profileData?.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:text-primary/95"
-                >
-                  <FaGithubSquare />
-                </a>
-              )}
-            </div>
-
-            {/* Only show for the logged in user */}
-            {isEditable ? (
-              <Link
-                to="/profile/edit"
-                className="inline-block  mb-5    text-sm font-semibold  transition-all px-8 py-2  text-center rounded-lg border border-primary bg-primary text-white hover:bg-primary/95"
-              >
-                Edit Profile
-              </Link>
-            ) : null}
-          </div>
+    <div className="pt-4 pb-4 lg:pt-8 lg:pb-8 bg-slate-50 min-h-screen">
+      <div className="lg:flex max-w-[1200px] mx-auto gap-6 px-4">
+        <div className="w-full lg:w-[340px] shrink-0">
+          <ProfileLeftSide profileData={profileData} />
         </div>
-        <ProfileTab />
+        <div className="flex-1 min-w-0 mt-4 lg:mt-0">
+          <ProfileRightSide profileData={profileData} />
+        </div>
       </div>
     </div></>
   );
