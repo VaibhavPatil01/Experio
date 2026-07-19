@@ -18,6 +18,7 @@ const ProfileRightSide = ({ profileData }) => {
       setIsAwardModalOpen(false);
       setIsSkillsModalOpen(false);
       setIsWorkExperienceModalOpen(false);
+      setIsEducationModalOpen(false);
     }
   });
 
@@ -43,6 +44,7 @@ const ProfileRightSide = ({ profileData }) => {
   const awardsList = profileData?.awards || [];
   const workExperiencesList = profileData?.workExperiences || [];
   const socialLinksList = profileData?.socialLinks || [];
+  const educationList = profileData?.education || [];
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
@@ -79,6 +81,16 @@ const ProfileRightSide = ({ profileData }) => {
     description: ''
   });
   
+  const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
+  const [editingEducationIndex, setEditingEducationIndex] = useState(null);
+  const [isNewEducation, setIsNewEducation] = useState(false);
+  const [educationForm, setEducationForm] = useState({
+    qualification: '',
+    university: '',
+    passingYear: '',
+    educationType: ''
+  });
+  
   const [summaryText, setSummaryText] = useState(profileData?.about || "");
   const dropdownRef = useRef(null);
 
@@ -96,6 +108,19 @@ const ProfileRightSide = ({ profileData }) => {
 
   const handleSaveSkills = () => {
     updateProfileMutation.mutate({ skills: localSkills });
+  };
+
+  const handleSaveEducation = () => {
+    if (!educationForm.qualification || !educationForm.university || !educationForm.passingYear || !educationForm.educationType) return;
+    
+    let updatedEducation = [...educationList];
+    if (isNewEducation) {
+      updatedEducation.push(educationForm);
+    } else {
+      updatedEducation[editingEducationIndex] = educationForm;
+    }
+    
+    updateProfileMutation.mutate({ education: updatedEducation });
   };
 
   const handleSaveAward = () => {
@@ -362,6 +387,51 @@ const ProfileRightSide = ({ profileData }) => {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Education Card */}
+      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Education</h3>
+          <button 
+            onClick={() => { 
+              setIsNewEducation(true); 
+              setEducationForm({ qualification: '', university: '', passingYear: '', educationType: '' }); 
+              setIsEducationModalOpen(true); 
+            }}
+            className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
+          >
+            <Plus className="w-5 h-5 pointer-events-none" />
+          </button>
+        </div>
+        
+        <div className="flex flex-col gap-6">
+          {educationList.length === 0 && <p className="text-gray-500 text-sm">No education added.</p>}
+          {educationList.map((edu, index) => (
+            <div key={index} className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <h4 className="text-[15.5px] font-semibold text-gray-800">{edu.qualification}</h4>
+                <button 
+                  onClick={() => { 
+                    setIsNewEducation(false); 
+                    setEducationForm(edu); 
+                    setEditingEducationIndex(index);
+                    setIsEducationModalOpen(true); 
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer mt-0.5"
+                >
+                  <img src={penIcon} alt="edit" className="w-[16px] h-[16px] opacity-60 hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+              <p className="text-[14.5px] text-gray-600">{edu.university}</p>
+              <p className="text-[13.5px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                <span>{edu.passingYear}</span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full inline-block"></span>
+                <span>{edu.educationType}</span>
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Awards Card */}
@@ -860,6 +930,114 @@ const ProfileRightSide = ({ profileData }) => {
               )}
               <button 
                 onClick={handleSaveWorkExperience}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Education Modal */}
+      {isEducationModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-[300] flex items-center justify-center p-4 backdrop-blur-[2px]">
+          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative">
+            <button 
+              onClick={() => setIsEducationModalOpen(false)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-200 transition-colors cursor-pointer bg-black/20 hover:bg-black/40 rounded-full p-1.5"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10 shadow-[0_4px_10px_-4px_rgba(0,0,0,0.05)]">
+              <h2 className="text-xl font-bold text-gray-900">{isNewEducation ? 'Add education' : 'Edit education'}</h2>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex flex-col gap-6 custom-scrollbar">
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Qualification</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Select your degree"
+                  value={educationForm.qualification}
+                  onChange={(e) => setEducationForm({...educationForm, qualification: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+              
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">University/Institute</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Select your University"
+                  value={educationForm.university}
+                  onChange={(e) => setEducationForm({...educationForm, university: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Passing Year</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <select 
+                  value={educationForm.passingYear}
+                  onChange={(e) => setEducationForm({...educationForm, passingYear: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
+                >
+                  <option value="" disabled>Select year</option>
+                  {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() + 5 - i).map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Education Type</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <div className="flex gap-4 mt-2">
+                  {['Full time', 'Part time', 'Correspondence'].map((type) => (
+                    <label key={type} className="flex items-center gap-2 cursor-pointer border border-gray-200 rounded-full px-4 py-1.5 hover:bg-gray-50 transition-colors">
+                      <input 
+                        type="radio" 
+                        name="educationType" 
+                        value={type}
+                        checked={educationForm.educationType === type}
+                        onChange={(e) => setEducationForm({...educationForm, educationType: e.target.value})}
+                        className="w-4 h-4 text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-[14px] text-gray-700 font-medium">{type}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${editingEducationIndex !== null ? 'justify-between' : 'justify-end'}`}>
+              {editingEducationIndex !== null && (
+                <button 
+                  onClick={() => {
+                    const newEdu = educationList.filter((_, i) => i !== editingEducationIndex);
+                    updateProfileMutation.mutate({ education: newEdu });
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
+                  Delete Education
+                </button>
+              )}
+              <button 
+                onClick={handleSaveEducation}
                 disabled={updateProfileMutation.isLoading}
                 className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >

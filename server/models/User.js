@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema({
     url: { type: String, default: "" },
     filename: { type: String, default: "" }
   },
+  education: [{
+    qualification: String,
+    university: String,
+    passingYear: String,
+    educationType: String
+  }],
   skills: [{ type: String }],
   socialLinks: [{ type: String }],
   workExperiences: [{
