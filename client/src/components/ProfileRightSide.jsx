@@ -19,6 +19,8 @@ const ProfileRightSide = ({ profileData }) => {
       setIsSkillsModalOpen(false);
       setIsWorkExperienceModalOpen(false);
       setIsEducationModalOpen(false);
+      setIsJobPrefModalOpen(false);
+      setIsPersonalDetailsModalOpen(false);
     }
   });
 
@@ -45,6 +47,15 @@ const ProfileRightSide = ({ profileData }) => {
   const workExperiencesList = profileData?.workExperiences || [];
   const socialLinksList = profileData?.socialLinks || [];
   const educationList = profileData?.education || [];
+  const jobPreferencesData = profileData?.jobPreferences || { preferredJobTitles: [], preferredLocations: [] };
+  const personalDetailsData = profileData?.personalDetails || { 
+    dob: { day: '', month: '', year: '' }, 
+    equalOpportunity: '', 
+    countriesOfResidency: [], 
+    workPermitCountries: [], 
+    speciallyAbled: false 
+  };
+  const userNationality = profileData?.nationality || '';
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
@@ -91,6 +102,25 @@ const ProfileRightSide = ({ profileData }) => {
     educationType: ''
   });
   
+  const [isJobPrefModalOpen, setIsJobPrefModalOpen] = useState(false);
+  const [jobPrefForm, setJobPrefForm] = useState({ preferredJobTitles: [], preferredLocations: [] });
+  const [jobTitleInput, setJobTitleInput] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+
+  const [isPersonalDetailsModalOpen, setIsPersonalDetailsModalOpen] = useState(false);
+  const [personalDetailsForm, setPersonalDetailsForm] = useState({
+    dob: { day: '', month: '', year: '' },
+    equalOpportunity: '',
+    countriesOfResidency: [],
+    workPermitCountries: [],
+    speciallyAbled: false,
+    nationality: ''
+  });
+  const [residencyInput, setResidencyInput] = useState('');
+  const [workPermitInput, setWorkPermitInput] = useState('');
+  const [isEqOppOpen, setIsEqOppOpen] = useState(false);
+  const eqOppOptions = ['Single Parent', 'Working Mother', 'Served in Military', 'Retired(60+)', 'LGBTQ+'];
+  
   const [summaryText, setSummaryText] = useState(profileData?.about || "");
   const dropdownRef = useRef(null);
 
@@ -121,6 +151,47 @@ const ProfileRightSide = ({ profileData }) => {
     }
     
     updateProfileMutation.mutate({ education: updatedEducation });
+  };
+
+  const handleSaveJobPreferences = () => {
+    updateProfileMutation.mutate({ jobPreferences: jobPrefForm });
+  };
+
+  const handleAddJobTitle = () => {
+    if (jobTitleInput.trim() && !jobPrefForm.preferredJobTitles.includes(jobTitleInput.trim())) {
+      setJobPrefForm({...jobPrefForm, preferredJobTitles: [...jobPrefForm.preferredJobTitles, jobTitleInput.trim()]});
+    }
+    setJobTitleInput('');
+  };
+
+  const handleAddLocation = () => {
+    if (locationInput.trim() && !jobPrefForm.preferredLocations.includes(locationInput.trim())) {
+      setJobPrefForm({...jobPrefForm, preferredLocations: [...jobPrefForm.preferredLocations, locationInput.trim()]});
+    }
+    setLocationInput('');
+  };
+
+  const handleAddResidency = () => {
+    if (residencyInput.trim() && !personalDetailsForm.countriesOfResidency.includes(residencyInput.trim())) {
+      setPersonalDetailsForm({...personalDetailsForm, countriesOfResidency: [...personalDetailsForm.countriesOfResidency, residencyInput.trim()]});
+    }
+    setResidencyInput('');
+  };
+
+  const handleAddWorkPermit = () => {
+    if (workPermitInput.trim() && !personalDetailsForm.workPermitCountries.includes(workPermitInput.trim())) {
+      setPersonalDetailsForm({...personalDetailsForm, workPermitCountries: [...personalDetailsForm.workPermitCountries, workPermitInput.trim()]});
+    }
+    setWorkPermitInput('');
+  };
+
+  const handleSavePersonalDetails = () => {
+    const { nationality, ...restPersonalDetails } = personalDetailsForm;
+    updateProfileMutation.mutate({ 
+      personalDetails: restPersonalDetails,
+      nationality: nationality 
+    });
+    setIsEqOppOpen(false);
   };
 
   const handleSaveAward = () => {
@@ -167,7 +238,7 @@ const ProfileRightSide = ({ profileData }) => {
   }, []);
 
   useEffect(() => {
-    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen || isEducationModalOpen) {
+    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen || isEducationModalOpen || isJobPrefModalOpen || isPersonalDetailsModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -175,7 +246,7 @@ const ProfileRightSide = ({ profileData }) => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen, isEducationModalOpen]);
+  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen, isEducationModalOpen, isJobPrefModalOpen, isPersonalDetailsModalOpen]);
 
   const navItems = [
     'Profile summary',
@@ -195,6 +266,20 @@ const ProfileRightSide = ({ profileData }) => {
   ];
 
 
+  const getIsSectionEmpty = (itemName) => {
+    switch (itemName) {
+      case 'Profile summary': return !profileData?.about;
+      case 'Work experience': return workExperiencesList.length === 0;
+      case 'Skills': return skillsList.length === 0;
+      case 'Education': return educationList.length === 0;
+      case 'Job preferences': return jobPreferencesData.preferredJobTitles.length === 0 && jobPreferencesData.preferredLocations.length === 0;
+      case 'Personal details': return !personalDetailsData.dob.day && !personalDetailsData.dob.month && !personalDetailsData.dob.year && !personalDetailsData.equalOpportunity && personalDetailsData.countriesOfResidency.length === 0 && personalDetailsData.workPermitCountries.length === 0 && !userNationality;
+      case 'Awards': return awardsList.length === 0;
+      case 'Social links': return socialLinksList.length === 0;
+      default: return false;
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {/* Navbar Card */}
@@ -204,10 +289,10 @@ const ProfileRightSide = ({ profileData }) => {
             {navItems.map((item) => (
               <button
                 key={item}
-                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:bg-green-50 hover:text-green-700 rounded-full transition-colors cursor-pointer"
+                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:bg-green-50 hover:text-green-700 rounded-full transition-colors cursor-pointer relative"
               >
                 {item}
-                {item === 'Work experience' && (
+                {getIsSectionEmpty(item) && (
                   <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full ml-1.5 align-text-top mt-1"></span>
                 )}
               </button>
@@ -228,9 +313,12 @@ const ProfileRightSide = ({ profileData }) => {
                 {dropdownItems.map((item) => (
                   <button
                     key={item}
-                    className="w-full text-left px-4 py-2.5 text-[15px] text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors cursor-pointer"
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors cursor-pointer relative"
                   >
                     {item}
+                    {getIsSectionEmpty(item) && (
+                      <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full ml-1.5 align-text-top mt-1"></span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -431,6 +519,92 @@ const ProfileRightSide = ({ profileData }) => {
               </p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Job Preferences Card */}
+      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Job preferences</h3>
+          <button 
+            onClick={() => {
+              setJobPrefForm(jobPreferencesData);
+              setIsJobPrefModalOpen(true);
+            }}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
+          >
+            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+          </button>
+        </div>
+        
+        <div className="flex flex-col gap-5">
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Preferred Job Title</p>
+            <p className="text-[15px] font-medium text-gray-800">
+              {jobPreferencesData.preferredJobTitles.length > 0 ? jobPreferencesData.preferredJobTitles.join(', ') : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Preferred Location</p>
+            <p className="text-[15px] font-medium text-gray-800">
+              {jobPreferencesData.preferredLocations.length > 0 ? jobPreferencesData.preferredLocations.join(', ') : '-'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Personal Details Card */}
+      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Personal details</h3>
+          <button 
+            onClick={() => {
+              setPersonalDetailsForm({
+                ...personalDetailsData,
+                nationality: userNationality
+              });
+              setIsEqOppOpen(false);
+              setIsPersonalDetailsModalOpen(true);
+            }}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
+          >
+            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Date of Birth</p>
+            <p className="text-[15px] font-medium text-gray-800">
+              {personalDetailsData.dob.day || personalDetailsData.dob.month || personalDetailsData.dob.year 
+                ? `${personalDetailsData.dob.day} ${personalDetailsData.dob.month} ${personalDetailsData.dob.year}`.trim() 
+                : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Equal Opportunity</p>
+            <p className="text-[15px] font-medium text-gray-800">{personalDetailsData.equalOpportunity || '-'}</p>
+          </div>
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Countries of Residency</p>
+            <p className="text-[15px] font-medium text-gray-800">
+              {personalDetailsData.countriesOfResidency.length > 0 ? personalDetailsData.countriesOfResidency.join(', ') : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Work Permit Countries</p>
+            <p className="text-[15px] font-medium text-gray-800">
+              {personalDetailsData.workPermitCountries.length > 0 ? personalDetailsData.workPermitCountries.join(', ') : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Nationality</p>
+            <p className="text-[15px] font-medium text-gray-800">{userNationality || '-'}</p>
+          </div>
+          <div>
+            <p className="text-[14.5px] text-gray-500 mb-1">Specially Abled</p>
+            <p className="text-[15px] font-medium text-gray-800">{personalDetailsData.speciallyAbled ? 'Yes' : 'No'}</p>
+          </div>
         </div>
       </div>
 
@@ -1038,6 +1212,303 @@ const ProfileRightSide = ({ profileData }) => {
               )}
               <button 
                 onClick={handleSaveEducation}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Job Preferences Modal */}
+      {isJobPrefModalOpen && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => setIsJobPrefModalOpen(false)}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10 shadow-[0_4px_10px_-4px_rgba(0,0,0,0.05)]">
+              <h2 className="text-[17px] font-bold text-gray-900">Job preferences</h2>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex flex-col gap-6 custom-scrollbar max-h-[70vh]">
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Preferred Job Title(s)</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <div className="border border-gray-300 rounded-lg p-4 pb-3 flex flex-col">
+                  <div className="flex flex-wrap gap-2 mb-2 max-h-[150px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
+                    {jobPrefForm.preferredJobTitles.map((title, i) => (
+                      <span key={i} className="flex items-center gap-1.5 bg-white text-gray-700 px-3.5 py-1.5 rounded-full text-[14px] font-medium border border-gray-400 cursor-pointer hover:bg-gray-50 transition-colors">
+                        {title}
+                        <X onClick={() => setJobPrefForm({...jobPrefForm, preferredJobTitles: jobPrefForm.preferredJobTitles.filter((_, idx) => idx !== i)})} className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700" />
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter or select your preferred job title"
+                      value={jobTitleInput}
+                      onChange={(e) => setJobTitleInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddJobTitle();
+                        }
+                      }}
+                      className="flex-1 text-[14.5px] text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
+                    />
+                    <button 
+                      onClick={handleAddJobTitle} 
+                      disabled={!jobTitleInput.trim()} 
+                      className="text-blue-600 font-semibold text-[14.5px] hover:text-blue-800 cursor-pointer disabled:opacity-50 px-2"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Preferred Location(s)</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <div className="border border-gray-300 rounded-lg p-4 pb-3 flex flex-col">
+                  <div className="flex flex-wrap gap-2 mb-2 max-h-[150px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
+                    {jobPrefForm.preferredLocations.map((loc, i) => (
+                      <span key={i} className="flex items-center gap-1.5 bg-white text-gray-700 px-3.5 py-1.5 rounded-full text-[14px] font-medium border border-gray-400 cursor-pointer hover:bg-gray-50 transition-colors">
+                        {loc}
+                        <X onClick={() => setJobPrefForm({...jobPrefForm, preferredLocations: jobPrefForm.preferredLocations.filter((_, idx) => idx !== i)})} className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700" />
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter or select your preferred location"
+                      value={locationInput}
+                      onChange={(e) => setLocationInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddLocation();
+                        }
+                      }}
+                      className="flex-1 text-[14.5px] text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
+                    />
+                    <button 
+                      onClick={handleAddLocation} 
+                      disabled={!locationInput.trim()} 
+                      className="text-blue-600 font-semibold text-[14.5px] hover:text-blue-800 cursor-pointer disabled:opacity-50 px-2"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] justify-end">
+              <button 
+                onClick={handleSaveJobPreferences}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Personal Details Modal */}
+      {isPersonalDetailsModalOpen && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => {
+              setIsEqOppOpen(false);
+              setIsPersonalDetailsModalOpen(false);
+            }}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10 shadow-[0_4px_10px_-4px_rgba(0,0,0,0.05)]">
+              <h2 className="text-[17px] font-bold text-gray-900">Personal details</h2>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex flex-col gap-6 custom-scrollbar max-h-[70vh]">
+              <div>
+                <label className="block text-[14.5px] font-medium text-gray-700 mb-2">Date of Birth</label>
+                <div className="flex gap-4">
+                  <select 
+                    value={personalDetailsForm.dob.day}
+                    onChange={(e) => setPersonalDetailsForm({...personalDetailsForm, dob: {...personalDetailsForm.dob, day: e.target.value}})}
+                    className="flex-1 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                  >
+                    <option value="">Day</option>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                  <select 
+                    value={personalDetailsForm.dob.month}
+                    onChange={(e) => setPersonalDetailsForm({...personalDetailsForm, dob: {...personalDetailsForm.dob, month: e.target.value}})}
+                    className="flex-1 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                  >
+                    <option value="">Month</option>
+                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                  <select 
+                    value={personalDetailsForm.dob.year}
+                    onChange={(e) => setPersonalDetailsForm({...personalDetailsForm, dob: {...personalDetailsForm.dob, year: e.target.value}})}
+                    className="flex-1 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                  >
+                    <option value="">Year</option>
+                    {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[14.5px] font-medium text-gray-700 mb-2">Equal Opportunity</label>
+                <div className="relative">
+                  <div 
+                    onClick={() => setIsEqOppOpen(!isEqOppOpen)}
+                    className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] bg-white cursor-pointer flex justify-between items-center"
+                  >
+                    <span className={personalDetailsForm.equalOpportunity ? 'text-gray-800' : 'text-gray-400'}>
+                      {personalDetailsForm.equalOpportunity || 'Select your equal opportunity'}
+                    </span>
+                    <svg className={`w-4 h-4 text-gray-500 transition-transform ${isEqOppOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                  
+                  {isEqOppOpen && (
+                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto custom-scrollbar">
+                      {eqOppOptions.map((option, idx) => (
+                        <div 
+                          key={idx}
+                          onClick={() => {
+                            setPersonalDetailsForm({...personalDetailsForm, equalOpportunity: option});
+                            setIsEqOppOpen(false);
+                          }}
+                          className="px-3.5 py-2.5 text-[15px] text-gray-800 cursor-pointer hover:bg-green-50 transition-colors"
+                        >
+                          {option}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[14.5px] font-medium text-gray-700 mb-2">Countries of Residency</label>
+                <div className="border border-gray-300 rounded-lg p-4 pb-3 flex flex-col">
+                  <div className="flex flex-wrap gap-2 mb-2 max-h-[150px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
+                    {personalDetailsForm.countriesOfResidency.map((country, i) => (
+                      <span key={i} className="flex items-center gap-1.5 bg-white text-gray-700 px-3.5 py-1.5 rounded-full text-[14px] font-medium border border-gray-400 cursor-pointer hover:bg-gray-50 transition-colors">
+                        {country}
+                        <X onClick={() => setPersonalDetailsForm({...personalDetailsForm, countriesOfResidency: personalDetailsForm.countriesOfResidency.filter((_, idx) => idx !== i)})} className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700" />
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <input
+                      type="text"
+                      placeholder="Choose the countries where you hold residency"
+                      value={residencyInput}
+                      onChange={(e) => setResidencyInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddResidency();
+                        }
+                      }}
+                      className="flex-1 text-[14.5px] text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
+                    />
+                    <button 
+                      onClick={handleAddResidency} 
+                      disabled={!residencyInput.trim()} 
+                      className="text-blue-600 font-semibold text-[14.5px] hover:text-blue-800 cursor-pointer disabled:opacity-50 px-2"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[14.5px] font-medium text-gray-700 mb-2">Work Permit Countries</label>
+                <div className="border border-gray-300 rounded-lg p-4 pb-3 flex flex-col">
+                  <div className="flex flex-wrap gap-2 mb-2 max-h-[150px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
+                    {personalDetailsForm.workPermitCountries.map((country, i) => (
+                      <span key={i} className="flex items-center gap-1.5 bg-white text-gray-700 px-3.5 py-1.5 rounded-full text-[14px] font-medium border border-gray-400 cursor-pointer hover:bg-gray-50 transition-colors">
+                        {country}
+                        <X onClick={() => setPersonalDetailsForm({...personalDetailsForm, workPermitCountries: personalDetailsForm.workPermitCountries.filter((_, idx) => idx !== i)})} className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700" />
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <input
+                      type="text"
+                      placeholder="Select the countries you have a work permit for"
+                      value={workPermitInput}
+                      onChange={(e) => setWorkPermitInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddWorkPermit();
+                        }
+                      }}
+                      className="flex-1 text-[14.5px] text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
+                    />
+                    <button 
+                      onClick={handleAddWorkPermit} 
+                      disabled={!workPermitInput.trim()} 
+                      className="text-blue-600 font-semibold text-[14.5px] hover:text-blue-800 cursor-pointer disabled:opacity-50 px-2"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[14.5px] font-medium text-gray-700 mb-2">Nationality</label>
+                <input 
+                  type="text"
+                  value={personalDetailsForm.nationality}
+                  onChange={(e) => setPersonalDetailsForm({...personalDetailsForm, nationality: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setPersonalDetailsForm({...personalDetailsForm, speciallyAbled: !personalDetailsForm.speciallyAbled})}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none cursor-pointer ${personalDetailsForm.speciallyAbled ? 'bg-green-600' : 'bg-gray-200'}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${personalDetailsForm.speciallyAbled ? 'translate-x-4' : 'translate-x-1'}`}
+                  />
+                </button>
+                <span className="text-[14.5px] font-medium text-gray-700">I am specially abled</span>
+              </div>
+            </div>
+            
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] justify-end">
+              <button 
+                onClick={handleSavePersonalDetails}
                 disabled={updateProfileMutation.isLoading}
                 className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >

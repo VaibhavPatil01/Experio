@@ -23,6 +23,21 @@ const userSchema = new mongoose.Schema({
     url: { type: String, default: "" },
     filename: { type: String, default: "" }
   },
+  jobPreferences: {
+    preferredJobTitles: [{ type: String }],
+    preferredLocations: [{ type: String }]
+  },
+  personalDetails: {
+    dob: {
+      day: { type: String, default: "" },
+      month: { type: String, default: "" },
+      year: { type: String, default: "" }
+    },
+    equalOpportunity: { type: String, default: "" },
+    countriesOfResidency: [{ type: String }],
+    workPermitCountries: [{ type: String }],
+    speciallyAbled: { type: Boolean, default: false }
+  },
   education: [{
     qualification: String,
     university: String,
