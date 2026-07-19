@@ -167,7 +167,7 @@ const ProfileRightSide = ({ profileData }) => {
   }, []);
 
   useEffect(() => {
-    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen) {
+    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen || isEducationModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -175,7 +175,7 @@ const ProfileRightSide = ({ profileData }) => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen]);
+  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen, isEducationModalOpen]);
 
   const navItems = [
     'Profile summary',
@@ -204,7 +204,7 @@ const ProfileRightSide = ({ profileData }) => {
             {navItems.map((item) => (
               <button
                 key={item}
-                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:text-gray-800 rounded-md transition-colors cursor-pointer"
+                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:bg-green-50 hover:text-green-700 rounded-full transition-colors cursor-pointer"
               >
                 {item}
                 {item === 'Work experience' && (
@@ -217,18 +217,18 @@ const ProfileRightSide = ({ profileData }) => {
           <div className="relative shrink-0" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className={`p-1 text-gray-700 hover:bg-green-100 hover:text-green-800 rounded-md transition-colors ml-2 cursor-pointer ${dropdownOpen ? 'bg-green-100 text-green-800' : ''}`}
+              className={`p-1 text-gray-700 hover:bg-green-100 hover:text-green-800 rounded-full transition-colors ml-2 cursor-pointer ${dropdownOpen ? 'bg-green-100 text-green-800' : ''}`}
             >
               <MoreVertical className="w-5 h-5" />
             </button>
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 z-[100] py-2">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 z-[100] py-2 overflow-hidden">
                 {dropdownItems.map((item) => (
                   <button
                     key={item}
-                    className="w-full text-left px-4 py-2.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer"
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors cursor-pointer"
                   >
                     {item}
                   </button>
@@ -942,15 +942,15 @@ const ProfileRightSide = ({ profileData }) => {
 
       {/* Education Modal */}
       {isEducationModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-[300] flex items-center justify-center p-4 backdrop-blur-[2px]">
-          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative">
-            <button 
-              onClick={() => setIsEducationModalOpen(false)}
-              className="absolute -top-12 right-0 text-white hover:text-gray-200 transition-colors cursor-pointer bg-black/20 hover:bg-black/40 rounded-full p-1.5"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => setIsEducationModalOpen(false)}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
             <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10 shadow-[0_4px_10px_-4px_rgba(0,0,0,0.05)]">
               <h2 className="text-xl font-bold text-gray-900">{isNewEducation ? 'Add education' : 'Edit education'}</h2>
             </div>
