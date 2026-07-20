@@ -17,6 +17,9 @@ const Navbar = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isAiToolsOpen, setIsAiToolsOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('All');
+  const notificationRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [navBottomOffset, setNavBottomOffset] = useState(0);
   const aiTools = [
@@ -29,6 +32,7 @@ const Navbar = () => {
     setIsNavOpen(false);
     setShowDropdown(false);
     setIsAiToolsOpen(false);
+    setIsNotificationOpen(false);
   };
 
   const dropdownRef = useRef(null);
@@ -42,6 +46,12 @@ const Navbar = () => {
   useOutsideAlerter(dropdownRef, () => {
     if (showDropdown) {
       setShowDropdown(false);
+    }
+  });
+
+  useOutsideAlerter(notificationRef, () => {
+    if (isNotificationOpen) {
+      setIsNotificationOpen(false);
     }
   });
 
@@ -239,9 +249,84 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="cursor-pointer inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800">
-          <img src={notificationIcon} alt="Notifications" className="h-[22px] w-[22px] opacity-70 dark:invert" />
-        </button>
+        <div className="relative" ref={notificationRef}>
+          <button 
+            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+            className="peer cursor-pointer inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
+          >
+            <img src={notificationIcon} alt="Notifications" className="h-[22px] w-[22px] opacity-70 dark:invert pointer-events-none" />
+          </button>
+          
+          {/* Tooltip */}
+          <div
+            className="
+      pointer-events-none absolute left-1/2 top-12 z-50
+      -translate-x-1/2 translate-y-1
+      whitespace-nowrap rounded-lg
+      bg-gray-900 px-3 py-1.5 text-xs font-medium text-white
+      opacity-0 shadow-lg ring-1 ring-white/10
+      transition-all duration-200
+      peer-hover:translate-y-0 peer-hover:opacity-100
+      dark:bg-white dark:text-gray-900
+      ${isNotificationOpen ? 'hidden' : ''}
+    "
+          >
+            Notifications
+            {/* Tooltip Arrow */}
+            <div
+              className="
+        absolute left-1/2 top-0 h-2 w-2
+        -translate-x-1/2 -translate-y-1/2 rotate-45
+        bg-gray-900 dark:bg-white
+      "
+            />
+          </div>
+
+          {/* Notification Modal */}
+          {isNotificationOpen && (
+            <div className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:-right-16 md:-right-24 -translate-x-1/2 sm:translate-x-0 top-[4.5rem] sm:top-[3.25rem] w-[calc(100vw-32px)] sm:w-[520px] max-w-[520px] bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-[100] overflow-hidden flex flex-col cursor-default" onClick={e => e.stopPropagation()}>
+              <div className="p-4 pb-0 border-b border-gray-100 dark:border-gray-700">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-left">Notifications</h3>
+                <div className="flex gap-4 sm:gap-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                  {['All', 'Job Recommendations', 'Recruiter Actions', 'Application Status'].map(tab => (
+                    <button
+                      key={tab}
+                      onClick={(e) => { e.stopPropagation(); setActiveTab(tab); }}
+                      className={`pb-3 text-[13px] sm:text-sm font-medium transition-colors relative whitespace-nowrap cursor-pointer ${
+                        activeTab === tab 
+                          ? 'text-primary' 
+                          : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      {tab}
+                      {activeTab === tab && (
+                        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto">
+                <div className="px-4 py-3 text-xs sm:text-sm text-gray-500 font-medium text-left">Today</div>
+                <div className="flex gap-3 sm:gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-l-2 border-transparent hover:border-primary cursor-pointer relative text-left">
+                  <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                  <div className="w-10 h-10 rounded-md bg-[#001b44] flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
+                    ADITI
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] sm:text-[15px] text-gray-800 dark:text-gray-200 leading-snug">
+                      <span className="font-bold">10 job recommendations!</span> from Aditi Tech Consulting Private Limited and +9 other companies
+                    </p>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">Job Recommendations</span>
+                      <span className="text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">13h ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="relative group">
           <button
@@ -251,9 +336,9 @@ const Navbar = () => {
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
           >
             {theme === 'light' ? (
-              <Moon className="h-4 w-4 opacity-70 transition-transform duration-300 group-hover:rotate-12" />
+              <Moon className="h-[19px] w-[19px] opacity-70 transition-transform duration-300 group-hover:rotate-12" />
             ) : (
-              <Sun className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+              <Sun className="h-[20px] w-[20px] transition-transform duration-300 group-hover:rotate-90" />
             )}
           </button>
 
