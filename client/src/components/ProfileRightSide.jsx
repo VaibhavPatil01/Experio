@@ -1,9 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MoreVertical, Sparkles, FileText, Trash2, Plus, X, Link2 } from 'lucide-react';
+import { MoreVertical, Sparkles, FileText, Trash2, Plus, X, Link2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser, uploadResumeFile } from '../services/userServices.js';
 import penIcon from '../assets/images/icons/pen-svgrepo-com.svg';
+
+const navItems = [
+  'Profile summary',
+  'Work experience',
+  'Skills',
+  'Education',
+  'Job preferences',
+];
+
+const dropdownItems = [
+  'Personal details',
+  'Courses & certifications',
+  'Projects',
+  'Awards',
+  'Social links',
+  'Language',
+];
+
+const allNavItems = [...navItems, ...dropdownItems];
 
 const ProfileRightSide = ({ profileData }) => {
   const { id } = useParams();
@@ -21,6 +40,9 @@ const ProfileRightSide = ({ profileData }) => {
       setIsEducationModalOpen(false);
       setIsJobPrefModalOpen(false);
       setIsPersonalDetailsModalOpen(false);
+      setIsCoursesModalOpen(false);
+      setIsProjectsModalOpen(false);
+      setIsLanguagesModalOpen(false);
     }
   });
 
@@ -121,8 +143,100 @@ const ProfileRightSide = ({ profileData }) => {
   const [isEqOppOpen, setIsEqOppOpen] = useState(false);
   const eqOppOptions = ['Single Parent', 'Working Mother', 'Served in Military', 'Retired(60+)', 'LGBTQ+'];
   
+  const coursesList = profileData?.coursesAndCertifications || [];
+  const [isCoursesModalOpen, setIsCoursesModalOpen] = useState(false);
+  const [isNewCourse, setIsNewCourse] = useState(false);
+  const [courseForm, setCourseForm] = useState({ certificationName: '', issuedBy: '' });
+  const [editingCourseIndex, setEditingCourseIndex] = useState(null);
+
+  const projectsList = profileData?.projects || [];
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
+  const [isNewProject, setIsNewProject] = useState(false);
+  const [projectForm, setProjectForm] = useState({ title: '', description: '' });
+  const [editingProjectIndex, setEditingProjectIndex] = useState(null);
+
+  const languagesList = profileData?.languages || [];
+  const [showAllLanguages, setShowAllLanguages] = useState(false);
+  const [isLanguagesModalOpen, setIsLanguagesModalOpen] = useState(false);
+  const [isNewLanguage, setIsNewLanguage] = useState(false);
+  const [languageForm, setLanguageForm] = useState({ 
+    language: '', 
+    proficiency: '', 
+    read: false, 
+    write: false, 
+    speak: false 
+  });
+  const [editingLanguageIndex, setEditingLanguageIndex] = useState(null);
+
   const [summaryText, setSummaryText] = useState(profileData?.about || "");
   const dropdownRef = useRef(null);
+  const navbarRef = useRef(null);
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const [activeSection, setActiveSection] = useState('Profile summary');
+
+  const scrollToSection = (sectionName) => {
+    const sectionId = sectionName.replace(/\s+/g, '-');
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const yOffset = -140; // Offset for both main header and sticky navbar
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const intersectingEntries = entries.filter(e => e.isIntersecting);
+        if (intersectingEntries.length > 0) {
+          // Sort by proximity to the top offset (140px)
+          intersectingEntries.sort((a, b) => Math.abs(a.boundingClientRect.top - 140) - Math.abs(b.boundingClientRect.top - 140));
+          const activeId = intersectingEntries[0].target.id;
+          const matchingItem = allNavItems.find(item => item.replace(/\s+/g, '-') === activeId);
+          if (matchingItem) setActiveSection(matchingItem);
+        }
+      },
+      {
+        root: null,
+        threshold: 0.1, // Trigger when 10% visible
+        rootMargin: "-140px 0px -40% 0px" 
+      }
+    );
+
+    allNavItems.forEach((item) => {
+      const sectionId = item.replace(/\s+/g, '-');
+      const element = document.getElementById(sectionId);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsNavbarVisible(entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        rootMargin: "-68px 0px 0px 0px"
+      }
+    );
+
+    if (navbarRef.current) {
+      observer.observe(navbarRef.current);
+    }
+
+    return () => {
+      if (navbarRef.current) {
+        observer.unobserve(navbarRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (profileData?.about) setSummaryText(profileData.about);
@@ -204,6 +318,36 @@ const ProfileRightSide = ({ profileData }) => {
      updateProfileMutation.mutate({ awards: newAwards });
   };
   
+  const handleSaveCourse = () => {
+     let newCourses = [...coursesList];
+     if (isNewCourse) {
+       newCourses.push(courseForm);
+     } else if (editingCourseIndex !== null) {
+       newCourses[editingCourseIndex] = courseForm;
+     }
+     updateProfileMutation.mutate({ coursesAndCertifications: newCourses });
+  };
+  
+  const handleSaveProject = () => {
+     let newProjects = [...projectsList];
+     if (isNewProject) {
+       newProjects.push(projectForm);
+     } else if (editingProjectIndex !== null) {
+       newProjects[editingProjectIndex] = projectForm;
+     }
+     updateProfileMutation.mutate({ projects: newProjects });
+  };
+  
+  const handleSaveLanguage = () => {
+     let newLanguages = [...languagesList];
+     if (isNewLanguage) {
+       newLanguages.push(languageForm);
+     } else if (editingLanguageIndex !== null) {
+       newLanguages[editingLanguageIndex] = languageForm;
+     }
+     updateProfileMutation.mutate({ languages: newLanguages });
+  };
+  
   const handleSaveWorkExperience = () => {
     let newWorkExp = [...workExperiencesList];
     if (editingWorkExpIndex !== null) {
@@ -238,7 +382,7 @@ const ProfileRightSide = ({ profileData }) => {
   }, []);
 
   useEffect(() => {
-    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen || isEducationModalOpen || isJobPrefModalOpen || isPersonalDetailsModalOpen) {
+    if (isSummaryModalOpen || isSocialLinkModalOpen || isAwardModalOpen || isSkillsModalOpen || isWorkExperienceModalOpen || isEducationModalOpen || isJobPrefModalOpen || isPersonalDetailsModalOpen || isCoursesModalOpen || isProjectsModalOpen || isLanguagesModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -246,25 +390,7 @@ const ProfileRightSide = ({ profileData }) => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen, isEducationModalOpen, isJobPrefModalOpen, isPersonalDetailsModalOpen]);
-
-  const navItems = [
-    'Profile summary',
-    'Work experience',
-    'Skills',
-    'Education',
-    'Job preferences',
-  ];
-
-  const dropdownItems = [
-    'Personal details',
-    'Courses & certifications',
-    'Projects',
-    'Awards',
-    'Social links',
-    'Language',
-  ];
-
+  }, [isSummaryModalOpen, isSocialLinkModalOpen, isAwardModalOpen, isSkillsModalOpen, isWorkExperienceModalOpen, isEducationModalOpen, isJobPrefModalOpen, isPersonalDetailsModalOpen, isCoursesModalOpen, isProjectsModalOpen, isLanguagesModalOpen]);
 
   const getIsSectionEmpty = (itemName) => {
     switch (itemName) {
@@ -274,22 +400,61 @@ const ProfileRightSide = ({ profileData }) => {
       case 'Education': return educationList.length === 0;
       case 'Job preferences': return jobPreferencesData.preferredJobTitles.length === 0 && jobPreferencesData.preferredLocations.length === 0;
       case 'Personal details': return !personalDetailsData.dob.day && !personalDetailsData.dob.month && !personalDetailsData.dob.year && !personalDetailsData.equalOpportunity && personalDetailsData.countriesOfResidency.length === 0 && personalDetailsData.workPermitCountries.length === 0 && !userNationality;
+      case 'Courses & certifications': return coursesList.length === 0;
+      case 'Projects': return projectsList.length === 0;
       case 'Awards': return awardsList.length === 0;
       case 'Social links': return socialLinksList.length === 0;
+      case 'Language': return languagesList.length === 0;
       default: return false;
     }
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Navbar Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-2">
+    <>
+      {/* Sliding Sticky Navbar */}
+      <div 
+        className={`fixed top-[68px] left-0 w-full z-40 bg-white shadow-md border-t border-b border-gray-200 transform transition-all duration-300 ${
+          isNavbarVisible ? '-translate-y-4 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 pointer-events-auto'
+        }`}
+      >
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="w-full py-2 flex items-center gap-2"> 
+            <div className="flex items-center gap-2 overflow-x-auto w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {allNavItems.map((item) => (
+                <button
+                  key={`sticky-${item}`}
+                  onClick={() => scrollToSection(item)}
+                  className={`whitespace-nowrap px-4 py-2 text-[15px] font-medium rounded-full transition-colors cursor-pointer relative ${
+                    activeSection === item 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'text-gray-500 hover:bg-green-50 hover:text-green-700'
+                  }`}
+                >
+                  {item}
+                  {getIsSectionEmpty(item) && (
+                    <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full ml-1.5 align-text-top mt-1"></span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {/* Navbar Card */}
+        <div ref={navbarRef} className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-2">
         <div className="flex items-center justify-between gap-2 relative">
           <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {navItems.map((item) => (
               <button
                 key={item}
-                className="whitespace-nowrap px-4 py-2 text-[15px] font-medium text-gray-500 hover:bg-green-50 hover:text-green-700 rounded-full transition-colors cursor-pointer relative"
+                onClick={() => scrollToSection(item)}
+                className={`whitespace-nowrap px-4 py-2 text-[15px] font-medium rounded-full transition-colors cursor-pointer relative ${
+                  activeSection === item 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'text-gray-500 hover:bg-green-50 hover:text-green-700'
+                }`}
               >
                 {item}
                 {getIsSectionEmpty(item) && (
@@ -313,7 +478,15 @@ const ProfileRightSide = ({ profileData }) => {
                 {dropdownItems.map((item) => (
                   <button
                     key={item}
-                    className="w-full text-left px-4 py-2.5 text-[15px] text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors cursor-pointer relative"
+                    onClick={() => {
+                      scrollToSection(item);
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-[15px] transition-colors cursor-pointer relative ${
+                      activeSection === item 
+                        ? 'bg-green-50 text-green-700 font-medium' 
+                        : 'text-gray-600 hover:bg-green-50 hover:text-green-700'
+                    }`}
                   >
                     {item}
                     {getIsSectionEmpty(item) && (
@@ -328,7 +501,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Profile Summary Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Profile-summary" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold text-gray-900">Profile summary</h3>
           <button onClick={() => setIsSummaryModalOpen(true)} className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
@@ -387,7 +560,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Work Experience Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Work-experience" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Work experience</h3>
           <button 
@@ -440,7 +613,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Skills Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Skills" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Skills</h3>
             <button 
@@ -478,7 +651,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Education Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Education" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Education</h3>
           <button 
@@ -523,7 +696,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Job Preferences Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Job-preferences" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Job preferences</h3>
           <button 
@@ -554,7 +727,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Personal Details Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Personal-details" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Personal details</h3>
           <button 
@@ -608,8 +781,91 @@ const ProfileRightSide = ({ profileData }) => {
         </div>
       </div>
 
+      {/* Courses & Certifications Card */}
+      <div id="Courses-&-certifications" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Courses & certifications</h3>
+          <button 
+            onClick={() => { setIsNewCourse(true); setCourseForm({ certificationName: '', issuedBy: '' }); setIsCoursesModalOpen(true); }}
+            className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
+          >
+            <Plus className="w-5 h-5 pointer-events-none" />
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {coursesList.length === 0 && <p className="text-gray-500 text-sm col-span-full">No courses added.</p>}
+          {coursesList.map((course, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-4 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[15.5px] font-semibold text-gray-800">{course.certificationName}</h4>
+                <button 
+                  onClick={() => { 
+                    setIsNewCourse(false); 
+                    setCourseForm(course); 
+                    setEditingCourseIndex(index);
+                    setIsCoursesModalOpen(true); 
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+              <p className="text-[14.5px] text-gray-600">{course.issuedBy}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Projects Card */}
+      <div id="Projects" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Projects</h3>
+          <button 
+            onClick={() => { setIsNewProject(true); setProjectForm({ title: '', description: '' }); setIsProjectsModalOpen(true); }}
+            className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
+          >
+            <Plus className="w-5 h-5 pointer-events-none" />
+          </button>
+        </div>
+        
+        <div className="flex flex-col gap-5">
+          {projectsList.length === 0 && <p className="text-gray-500 text-sm">No projects added.</p>}
+          {projectsList.slice(0, showAllProjects ? projectsList.length : 2).map((project, index) => (
+            <div key={index}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <h4 className="text-[15.5px] font-semibold text-gray-800">{project.title}</h4>
+                <button 
+                  onClick={() => { 
+                    setIsNewProject(false); 
+                    setProjectForm(project); 
+                    setEditingProjectIndex(index);
+                    setIsProjectsModalOpen(true); 
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+              <p className="text-[14.5px] text-gray-600 whitespace-pre-wrap">{project.description}</p>
+            </div>
+          ))}
+          {projectsList.length > 2 && (
+            <div className="flex justify-center mt-2">
+              <button 
+                onClick={() => setShowAllProjects(!showAllProjects)}
+                className="text-gray-500 hover:text-gray-700 text-[14.5px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                {showAllProjects ? 'View less' : `+ ${projectsList.length - 2} more`}
+                {showAllProjects ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Awards Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Awards" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Awards</h3>
           <button 
@@ -646,7 +902,7 @@ const ProfileRightSide = ({ profileData }) => {
       </div>
 
       {/* Social Links Card */}
-      <div className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+      <div id="Social-links" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Social Links</h3>
           <button 
@@ -678,6 +934,53 @@ const ProfileRightSide = ({ profileData }) => {
               </button>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Languages Card */}
+      <div id="Language" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-900">Languages</h3>
+          <button 
+            onClick={() => { setIsNewLanguage(true); setLanguageForm({ language: '', proficiency: '', read: false, write: false, speak: false }); setIsLanguagesModalOpen(true); }}
+            className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
+          >
+            <Plus className="w-5 h-5 pointer-events-none" />
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {languagesList.length === 0 && <p className="text-gray-500 text-sm col-span-full">No languages added.</p>}
+          {languagesList.slice(0, showAllLanguages ? languagesList.length : 2).map((lang, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-4 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[15.5px] font-semibold text-gray-800">{lang.language}</h4>
+                <button 
+                  onClick={() => { 
+                    setIsNewLanguage(false); 
+                    setLanguageForm(lang); 
+                    setEditingLanguageIndex(index);
+                    setIsLanguagesModalOpen(true); 
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+              <p className="text-[14.5px] text-gray-600">{lang.proficiency}</p>
+            </div>
+          ))}
+          {languagesList.length > 2 && (
+            <div className="col-span-full flex justify-center mt-2">
+              <button 
+                onClick={() => setShowAllLanguages(!showAllLanguages)}
+                className="text-gray-500 hover:text-gray-700 text-[14.5px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                {showAllLanguages ? 'View less' : `+ ${languagesList.length - 2} more`}
+                {showAllLanguages ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1518,7 +1821,248 @@ const ProfileRightSide = ({ profileData }) => {
           </div>
         </div>
       )}
+      {/* Courses Modal */}
+      {isCoursesModalOpen && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => setIsCoursesModalOpen(false)}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-[17px] font-bold text-gray-900">Edit courses & certifications</h2>
+            </div>
+            
+            <div className="p-6 pb-6 space-y-6">
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Certification Name</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  value={courseForm.certificationName}
+                  onChange={(e) => setCourseForm({...courseForm, certificationName: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Issued By</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  value={courseForm.issuedBy}
+                  onChange={(e) => setCourseForm({...courseForm, issuedBy: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+            </div>
+            
+            <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${isNewCourse ? 'justify-end' : 'justify-between'}`}>
+              {!isNewCourse && (
+                <button 
+                  onClick={() => {
+                    const newCourses = coursesList.filter((_, i) => i !== editingCourseIndex);
+                    updateProfileMutation.mutate({ coursesAndCertifications: newCourses });
+                    setIsCoursesModalOpen(false);
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
+                  Delete Courses & Certification
+                </button>
+              )}
+              <button 
+                onClick={handleSaveCourse}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Projects Modal */}
+      {isProjectsModalOpen && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => setIsProjectsModalOpen(false)}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-[17px] font-bold text-gray-900">Edit project</h2>
+            </div>
+            
+            <div className="p-6 pb-6 space-y-6">
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Title</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  value={projectForm.title}
+                  onChange={(e) => setProjectForm({...projectForm, title: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Description</label>
+                </div>
+                <textarea 
+                  value={projectForm.description}
+                  onChange={(e) => {
+                    if(e.target.value.length <= 1000) {
+                      setProjectForm({...projectForm, description: e.target.value})
+                    }
+                  }}
+                  className="w-full h-32 border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors resize-none"
+                />
+                <p className="text-[13px] text-gray-400 mt-1">Max. {projectForm.description.length}/1000 character</p>
+              </div>
+            </div>
+            
+            <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${isNewProject ? 'justify-end' : 'justify-between'}`}>
+              {!isNewProject && (
+                <button 
+                  onClick={() => {
+                    const newProjects = projectsList.filter((_, i) => i !== editingProjectIndex);
+                    updateProfileMutation.mutate({ projects: newProjects });
+                    setIsProjectsModalOpen(false);
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
+                  Delete Project
+                </button>
+              )}
+              <button 
+                onClick={handleSaveProject}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Languages Modal */}
+      {isLanguagesModalOpen && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-4">
+          <button 
+            onClick={() => setIsLanguagesModalOpen(false)}
+            className="mb-4 bg-gray-800/80 text-white rounded-full p-2.5 hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-[17px] font-bold text-gray-900">Add language</h2>
+            </div>
+            
+            <div className="p-6 pb-6 space-y-6">
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Language</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Select value"
+                  value={languageForm.language}
+                  onChange={(e) => setLanguageForm({...languageForm, language: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <label className="text-[14.5px] font-medium text-gray-700">Proficiency</label>
+                  <span className="text-red-500">*</span>
+                </div>
+                <select 
+                  value={languageForm.proficiency}
+                  onChange={(e) => setLanguageForm({...languageForm, proficiency: e.target.value})}
+                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors bg-white"
+                >
+                  <option value="">Select value</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Proficient">Proficient</option>
+                  <option value="Expert">Expert</option>
+                </select>
+              </div>
+
+              <div className="flex gap-6 items-center pt-2">
+                <label className="flex items-center gap-2 text-[14.5px] text-gray-700 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={languageForm.read}
+                    onChange={(e) => setLanguageForm({...languageForm, read: e.target.checked})}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                  />
+                  Read
+                </label>
+                <label className="flex items-center gap-2 text-[14.5px] text-gray-700 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={languageForm.write}
+                    onChange={(e) => setLanguageForm({...languageForm, write: e.target.checked})}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                  />
+                  Write
+                </label>
+                <label className="flex items-center gap-2 text-[14.5px] text-gray-700 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={languageForm.speak}
+                    onChange={(e) => setLanguageForm({...languageForm, speak: e.target.checked})}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                  />
+                  Speak
+                </label>
+              </div>
+            </div>
+            
+            <div className={`px-6 py-4 border-t border-gray-100 flex items-center bg-white shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)] ${isNewLanguage ? 'justify-end' : 'justify-between'}`}>
+              {!isNewLanguage && (
+                <button 
+                  onClick={() => {
+                    const newLanguages = languagesList.filter((_, i) => i !== editingLanguageIndex);
+                    updateProfileMutation.mutate({ languages: newLanguages });
+                    setIsLanguagesModalOpen(false);
+                  }}
+                  className="text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors cursor-pointer"
+                >
+                  Delete Language
+                </button>
+              )}
+              <button 
+                onClick={handleSaveLanguage}
+                disabled={updateProfileMutation.isLoading}
+                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </>
   );
 };
 

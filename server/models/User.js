@@ -59,9 +59,24 @@ const userSchema = new mongoose.Schema({
     employmentType: String,
     description: String
   }],
+  coursesAndCertifications: [{
+    certificationName: String,
+    issuedBy: String
+  }],
+  projects: [{
+    title: String,
+    description: String
+  }],
   awards: [{
     title: String,
     description: String
+  }],
+  languages: [{
+    language: String,
+    proficiency: String,
+    read: Boolean,
+    write: Boolean,
+    speak: Boolean
   }]
 }, {timestamps: true}); 
 

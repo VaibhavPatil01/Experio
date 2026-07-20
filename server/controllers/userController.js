@@ -66,7 +66,10 @@ export async function loginUser(req, res) {
         skills: user.skills,
         socialLinks: user.socialLinks,
         workExperiences: user.workExperiences,
+        coursesAndCertifications: user.coursesAndCertifications,
+        projects: user.projects,
         awards: user.awards,
+        languages: user.languages,
       },
     });
   } catch (error) {
@@ -234,7 +237,10 @@ export async function getLoginStatus(req, res) {
       skills: user.skills,
       socialLinks: user.socialLinks,
       workExperiences: user.workExperiences,
+      coursesAndCertifications: user.coursesAndCertifications,
+      projects: user.projects,
       awards: user.awards,
+      languages: user.languages,
     };
 
     return res.status(200).json({
