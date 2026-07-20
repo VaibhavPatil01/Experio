@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../redux/store.js';
 import useOutsideAlerter from '../hooks/useOutsideAlerter.js';
 import { themeAction } from '../redux/theme/themeState.js';
 import { ChevronDown, MenuIcon, Moon, Sun, X } from 'lucide-react';
+import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -191,11 +192,10 @@ const Navbar = () => {
   return (
     <nav
       ref={dropdownRef}
-      className={`sticky top-0 z-50 flex items-center justify-between w-full pt-3 pb-2 px-6 md:px-16 lg:px-24 xl:px-40 text-sm ${
-        isScrolled
+      className={`sticky top-0 z-50 flex items-center justify-between w-full pt-3 pb-2 px-6 md:px-16 lg:px-24 xl:px-40 text-sm ${isScrolled
           ? 'bg-white/75 backdrop-blur-xl dark:bg-black'
           : 'bg-transparent dark:bg-black'
-      }`}
+        }`}
     >
       <Link to="/" onClick={handleCloseNavbar}>
         <img
@@ -239,6 +239,10 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-2">
+        <button className="cursor-pointer inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800">
+          <img src={notificationIcon} alt="Notifications" className="h-[22px] w-[22px] opacity-70 dark:invert" />
+        </button>
+
         <div className="relative group">
           <button
             type="button"
@@ -353,9 +357,8 @@ const Navbar = () => {
       </div>
 
       <div
-        className={`fixed left-0 right-0 z-40 flex h-screen flex-col gap-1 overflow-y-auto bg-white px-6 py-5 text-base text-slate-800 shadow-lg transition-transform duration-300 md:hidden dark:bg-gray-950 dark:text-white ${
-          isNavOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed left-0 right-0 z-40 flex h-screen flex-col gap-1 overflow-y-auto bg-white px-6 py-5 text-base text-slate-800 shadow-lg transition-transform duration-300 md:hidden dark:bg-gray-950 dark:text-white ${isNavOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
         style={{
           top: `${navBottomOffset}px`
         }}
@@ -379,27 +382,25 @@ const Navbar = () => {
           >
             <span>AI Tools</span>
             <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${
-                isAiToolsOpen ? 'rotate-180' : ''
-              }`}
+              className={`h-4 w-4 transition-transform duration-200 ${isAiToolsOpen ? 'rotate-180' : ''
+                }`}
             />
           </button>
           <div
-            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${
-              isAiToolsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-            }`}
+            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${isAiToolsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+              }`}
           >
             <div className="mt-2 flex min-h-0 flex-col gap-1 pl-3">
-            {aiTools.map((tool) => (
-              <Link
-                key={tool.label}
-                to={tool.path}
-                onClick={handleCloseNavbar}
-                className="rounded-md py-2 text-sm text-slate-600 hover:text-green-600 dark:text-gray-300"
-              >
-                {tool.label}
-              </Link>
-            ))}
+              {aiTools.map((tool) => (
+                <Link
+                  key={tool.label}
+                  to={tool.path}
+                  onClick={handleCloseNavbar}
+                  className="rounded-md py-2 text-sm text-slate-600 hover:text-green-600 dark:text-gray-300"
+                >
+                  {tool.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
