@@ -13,8 +13,10 @@ const commentSchema = new mongoose.Schema({
 
 const roundSchema = new mongoose.Schema({
   roundType: { type: String, required: true },
+  duration: { type: String, required: false },
+  difficulty: { type: String, required: false },
   topicsCovered: [{ type: String }],
-  questionsAsked: { type: String, required: true },
+  questionsAsked: [{ type: String, required: true }],
   experienceAndTips: { type: String, required: true },
   isMostImportant: { type: Boolean, default: false }
 });
@@ -42,7 +44,6 @@ const postSchema = new mongoose.Schema({
   interviewMode: { type: String, required: false },
   interviewDate: { type: String, required: false },
   result: { type: String, required: false },
-  difficulty: { type: String, required: false },
   rounds: [roundSchema],
   technologies: [{ type: String }],
   dsaTopics: [{ type: String }],
