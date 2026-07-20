@@ -186,33 +186,32 @@ const ProfileRightSide = ({ profileData }) => {
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const intersectingEntries = entries.filter(e => e.isIntersecting);
-        if (intersectingEntries.length > 0) {
-          // Sort by proximity to the top offset (140px)
-          intersectingEntries.sort((a, b) => Math.abs(a.boundingClientRect.top - 140) - Math.abs(b.boundingClientRect.top - 140));
-          const activeId = intersectingEntries[0].target.id;
-          const matchingItem = allNavItems.find(item => item.replace(/\s+/g, '-') === activeId);
-          if (matchingItem) setActiveSection(matchingItem);
+    const handleScroll = () => {
+      let currentActive = allNavItems[0];
+      for (let i = allNavItems.length - 1; i >= 0; i--) {
+        const sectionId = allNavItems[i].replace(/\s+/g, '-');
+        const element = document.getElementById(sectionId);
+        if (element) {
+          // 160px allows a 20px buffer below the 140px scroll offset
+          if (element.getBoundingClientRect().top <= 160) {
+            currentActive = allNavItems[i];
+            break;
+          }
         }
-      },
-      {
-        root: null,
-        threshold: 0.1, // Trigger when 10% visible
-        rootMargin: "-140px 0px -40% 0px" 
       }
-    );
-
-    allNavItems.forEach((item) => {
-      const sectionId = item.replace(/\s+/g, '-');
-      const element = document.getElementById(sectionId);
-      if (element) {
-        observer.observe(element);
+      
+      // If user scrolls to the absolute bottom, select the last available section
+      if (window.innerHeight + Math.round(window.scrollY) >= document.documentElement.scrollHeight - 10) {
+        currentActive = allNavItems[allNavItems.length - 1];
       }
-    });
 
-    return () => observer.disconnect();
+      setActiveSection(prev => prev !== currentActive ? currentActive : prev);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -511,7 +510,7 @@ const ProfileRightSide = ({ profileData }) => {
         <p className="text-gray-600 text-[15px] leading-relaxed mb-6 whitespace-pre-wrap">
           {profileData?.about || "No summary provided."}
         </p>
-        <button className="flex items-center gap-2 border-[1.5px] border-green-200 text-green-700 px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-green-50 transition-colors shadow-sm">
+        <button className="flex items-center gap-2 border-[1.5px] border-green-200 text-green-700 px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-green-50 transition-colors shadow-sm cursor-pointer">
           <Sparkles className="w-4 h-4 text-green-600" /> Generate by AI
         </button>
       </div>
