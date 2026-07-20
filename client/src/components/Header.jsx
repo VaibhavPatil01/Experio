@@ -5,14 +5,22 @@ import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
 import useOutsideAlerter from '../hooks/useOutsideAlerter.js';
 import { themeAction } from '../redux/theme/themeState.js';
-import { ChevronDown, MenuIcon, Moon, Sun, X } from 'lucide-react';
+import { ChevronDown, MenuIcon, Moon, Sun, X, Users, LogOut } from 'lucide-react';
 import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
+import { useQuery } from '@tanstack/react-query';
+import { getUserProfileStats } from '../services/userServices.js';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
   const user = useAppSelector((state) => state.userState.user);
   const theme = useAppSelector((state) => state.themeState.theme);
+
+  const { data: profileData } = useQuery({
+    queryKey: ['profile', user?.userId],
+    queryFn: () => getUserProfileStats(user?.userId),
+    enabled: !!user?.userId,
+  });
 
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -284,7 +292,7 @@ const Navbar = () => {
 
           {/* Notification Modal */}
           {isNotificationOpen && (
-            <div className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:-right-16 md:-right-24 -translate-x-1/2 sm:translate-x-0 top-[4.5rem] sm:top-[3.25rem] w-[calc(100vw-32px)] sm:w-[520px] max-w-[520px] bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-[100] overflow-hidden flex flex-col cursor-default" onClick={e => e.stopPropagation()}>
+            <div className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:-right-16 md:-right-24 -translate-x-1/2 sm:translate-x-0 top-[4.5rem] sm:top-[3.25rem] w-[calc(100vw-32px)] sm:w-[520px] max-w-[520px] bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-[100] overflow-hidden flex flex-col cursor-default" onClick={e => e.stopPropagation()}>
               <div className="p-4 pb-0 border-b border-gray-100 dark:border-gray-700">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-left">Notifications</h3>
                 <div className="flex gap-4 sm:gap-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -306,23 +314,25 @@ const Navbar = () => {
                   ))}
                 </div>
               </div>
-              <div className="max-h-[400px] overflow-y-auto">
+              <div className="h-[350px] sm:h-[450px] overflow-y-auto custom-scrollbar">
                 <div className="px-4 py-3 text-xs sm:text-sm text-gray-500 font-medium text-left">Today</div>
-                <div className="flex gap-3 sm:gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-l-2 border-transparent hover:border-primary cursor-pointer relative text-left">
-                  <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                  <div className="w-10 h-10 rounded-md bg-[#001b44] flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
-                    ADITI
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] sm:text-[15px] text-gray-800 dark:text-gray-200 leading-snug">
-                      <span className="font-bold">10 job recommendations!</span> from Aditi Tech Consulting Private Limited and +9 other companies
-                    </p>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">Job Recommendations</span>
-                      <span className="text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">13h ago</span>
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} className="flex gap-3 sm:gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-l-2 border-transparent hover:border-primary cursor-pointer relative text-left">
+                    <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                    <div className="w-10 h-10 rounded-md bg-[#001b44] flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
+                      ADITI
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] sm:text-[15px] text-gray-800 dark:text-gray-200 leading-snug">
+                        <span className="font-bold">10 job recommendations!</span> from Aditi Tech Consulting Private Limited and +9 other companies
+                      </p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">Job Recommendations</span>
+                        <span className="text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">{i + 1}h ago</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
           )}
@@ -391,31 +401,54 @@ const Navbar = () => {
           <div className="relative hidden md:block">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="cursor-pointer h-10 px-5 bg-primary hover:bg-primary/95 text-white rounded-full md:max-w-[150px] truncate"
+              className="cursor-pointer flex items-center gap-2.5 h-[42px] pr-4 pl-1 bg-[#f0fdf4] dark:bg-gray-800 rounded-full border border-transparent"
             >
-              Hi, {user.username}
+              <div className="w-[34px] h-[34px] rounded-full bg-black flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                {profileData?.profilePicture || user?.profilePicture ? (
+                  <img src={profileData?.profilePicture || user?.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  user?.username ? user.username[0].toUpperCase() : 'V'
+                )}
+              </div>
+              <span className="text-[15px] font-medium text-gray-900 dark:text-gray-100 truncate max-w-[75px]">
+                Hi, {user?.username}
+              </span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-gray-900 dark:text-gray-100 ml-0.5">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="16" y2="12" />
+                <line x1="4" y1="18" x2="12" y2="18" />
+              </svg>
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 shadow-lg rounded-md border border-borderColor dark:border-gray-700 overflow-hidden z-50">
+              <div className="absolute right-0 mt-3 w-[190px] bg-white dark:bg-gray-900 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] rounded-lg border border-gray-100 dark:border-gray-700 z-[100] py-3 flex flex-col gap-1.5">
                 <Link
                   to={`/profile/${user?.userId}`}
                   onClick={handleCloseNavbar}
-                  className="block px-3 py-2 text-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+                  className="flex items-center gap-3 px-4 py-1.5 text-[15px] font-medium text-[#001b44] dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
                 >
-                  Profile
+                  <div className="w-[22px] h-[22px] rounded-full bg-black flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0 overflow-hidden">
+                    {profileData?.profilePicture || user?.profilePicture ? (
+                      <img src={profileData?.profilePicture || user?.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      user?.username ? user.username[0].toUpperCase() : 'V'
+                    )}
+                  </div>
+                  View Profile
                 </Link>
                 <Link
                   to="/user/search"
                   onClick={handleCloseNavbar}
-                  className="block px-3 py-2 text-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+                  className="flex items-center gap-3 px-4 py-1.5 text-[15px] font-medium text-[#001b44] dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
                 >
+                  <Users className="w-[22px] h-[22px]" strokeWidth={1.5} />
                   Users
                 </Link>
                 <LogoutButton
-                  classNames="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+                  classNames="flex items-center gap-3 w-full text-left px-4 py-1.5 text-[15px] font-medium text-[#001b44] dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
                   onClickCallback={handleCloseNavbar}
                 >
+                  <LogOut className="w-[22px] h-[22px]" strokeWidth={1.5} />
                   Logout
                 </LogoutButton>
               </div>
