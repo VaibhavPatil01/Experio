@@ -69,50 +69,77 @@ export async function getPost(req, res) {
 export async function createPost(req, res) {
   // Destructure
   const {
-    title,
-    content,
     company,
     role,
+    status,
+    authTokenData,
+    
+    // Legacy fields
+    title,
+    content,
     postType,
     domain,
     rating,
-    status,
     tags,
-    authTokenData,
+    
+    // New Fields
+    hiringType,
+    interviewMode,
+    interviewDate,
+    result,
+    difficulty,
+    rounds,
+    technologies,
+    dsaTopics,
+    coreSubjects,
+    preparationDuration,
+    preparationResources,
+    overallTips,
+    isAnonymous
   } = req.body;
 
-  // Check if user has passed all values 
-  if (
-    !title ||
-    !content ||
-    !company ||
-    !role ||
-    !postType ||
-    !domain ||
-    !rating ||
-    !status ||
-    !tags
-  ) {
+  // Check if user has passed all required values 
+  if (!company || !role || !status) {
     return res
       .status(401)
       .json({ message: 'Please enter all required fields' });
   }
 
-  // Generating summary
-  const summary = await generateSummaryFromHTMLContent(content);
+  const postTitle = title || `${company} - ${role} Interview Experience`;
+
+  // Generating summary if content exists
+  let summary = '';
+  if (content) {
+    summary = await generateSummaryFromHTMLContent(content);
+  }
 
   const postData = {
-    title,
-    content,
+    title: postTitle,
+    content: content || '',
     summary,
     company,
     role,
-    postType,
-    domain,
-    rating,
+    postType: postType || '',
+    domain: domain || '',
+    rating: rating || 0,
     status,
-    tags,
+    tags: tags || [],
     userId: authTokenData.id,
+    
+    // New Fields
+    hiringType,
+    interviewMode,
+    interviewDate,
+    result,
+    difficulty,
+    rounds: rounds || [],
+    technologies: technologies || [],
+    dsaTopics: dsaTopics || [],
+    coreSubjects: coreSubjects || [],
+    preparationDuration,
+    preparationResources,
+    overallTips,
+    isAnonymous: isAnonymous || false,
   };
 
   // Create post using the post services
@@ -237,17 +264,34 @@ export async function editPost(req, res) {
   //destructuring
   const {
     postId,
+    company,
+    role,
+    status,
+    authTokenData,
+    
+    // Legacy fields
     title,
     content,
     summary,
-    company,
-    role,
     postType,
     domain,
     rating,
-    status,
     tags,
-    authTokenData,
+    
+    // New Fields
+    hiringType,
+    interviewMode,
+    interviewDate,
+    result,
+    difficulty,
+    rounds,
+    technologies,
+    dsaTopics,
+    coreSubjects,
+    preparationDuration,
+    preparationResources,
+    overallTips,
+    isAnonymous
   } = req.body;
 
   // Check if user has passed all values
@@ -255,18 +299,7 @@ export async function editPost(req, res) {
     return res.status(401).json({ message: 'NO such post found....' });
   }
 
-  if (
-    !title ||
-    !content ||
-    !summary ||
-    !company ||
-    !role ||
-    !postType ||
-    !domain ||
-    !rating ||
-    !status ||
-    !tags
-  ) {
+  if (!company || !role || !status) {
     return res
       .status(401)
       .json({ message: 'Please enter all required fields ' });
@@ -274,17 +307,32 @@ export async function editPost(req, res) {
 
   const userId = authTokenData.id;
   const editedPostData = {
-    title,
-    content,
-    summary,
+    title: title || `${company} - ${role} Interview Experience`,
+    content: content || '',
+    summary: summary || '',
     company,
     role,
-    postType,
-    domain,
-    rating,
+    postType: postType || '',
+    domain: domain || '',
+    rating: rating || 0,
     status,
-    tags,
-    userId: authTokenData.id,
+    tags: tags || [],
+    userId,
+
+    // New Fields
+    hiringType,
+    interviewMode,
+    interviewDate,
+    result,
+    difficulty,
+    rounds: rounds || [],
+    technologies: technologies || [],
+    dsaTopics: dsaTopics || [],
+    coreSubjects: coreSubjects || [],
+    preparationDuration,
+    preparationResources,
+    overallTips,
+    isAnonymous: isAnonymous || false,
   };
 
   try {

@@ -71,7 +71,7 @@ export function getPostsPaginated(page, limit, filter, signal) {
 
 export function createPost(postData, status) {
   const url = `${BASE_API_URL}/posts`;
-  const tags = getTagsFromString(postData.tags);
+  const tags = postData.tags ? getTagsFromString(postData.tags) : [];
   const body = { ...postData, tags, status };
 
   return axios
@@ -155,7 +155,7 @@ export function getCompanyAndRoleList() {
 
 export function editPost(editedPostData, postId, status) {
   const url = `${BASE_API_URL}/posts/edit`;
-  const tags = getTagsFromString(editedPostData.tags);
+  const tags = editedPostData.tags ? getTagsFromString(editedPostData.tags) : [];
   const body = {
     ...editedPostData,
     tags,
