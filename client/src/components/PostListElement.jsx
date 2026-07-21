@@ -4,6 +4,10 @@ import generateSlug from '../utils/generateSlug.js';
 import getFormattedDate from '../utils/getFormatedDate.js';
 import { BadgeCheck, Bookmark, MoreVertical, ArrowBigUp, MessageSquare, Eye, MapPin, Calendar, Clock } from 'lucide-react';
 import LoginRequiredLink from './LoginRequiredLink';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toggleBookmark } from '../services/postServices.js';
+import { useAppSelector } from '../redux/store.js';
+import { toast } from 'react-hot-toast';
 
 function PostListElement({ post, openModal, openDeleteModal }) {
   // Fallbacks and mocks for missing data to match the design
@@ -13,6 +17,29 @@ function PostListElement({ post, openModal, openDeleteModal }) {
   const location = 'Bangalore'; // Mocked as it's not in schema
   const interviewDate = post.interviewDate || getFormattedDate(post.createdAt);
   
+  const user = useAppSelector((state) => state.userState.user);
+  const queryClient = useQueryClient();
+
+  const bookmarkMutation = useMutation({
+    mutationFn: () => toggleBookmark(post._id, post.isBookmarked),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['posts']);
+      toast.success(data.message || (post.isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'));
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || 'Failed to toggle bookmark');
+    }
+  });
+
+  const handleBookmarkClick = (e) => {
+    e.preventDefault();
+    if (!user) {
+      openModal(window.location.pathname);
+      return;
+    }
+    bookmarkMutation.mutate();
+  };
+
   // Tags aggregation
   let tags = [];
   if (post.dsaTopics && post.dsaTopics.length > 0) tags = [...tags, ...post.dsaTopics];
@@ -99,8 +126,12 @@ function PostListElement({ post, openModal, openDeleteModal }) {
           <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
             {matchScore}% Match
           </span>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-            <Bookmark className="w-5 h-5" />
+          <button 
+            className={`transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
+            onClick={handleBookmarkClick}
+            disabled={bookmarkMutation.isLoading}
+          >
+            <Bookmark className="w-5 h-5" fill={post.isBookmarked ? 'currentColor' : 'none'} />
           </button>
           <button className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
             <MoreVertical className="w-5 h-5" />

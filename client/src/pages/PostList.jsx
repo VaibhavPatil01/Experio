@@ -8,7 +8,7 @@ import PostSkeleton from '../components/PostSkeleton';
 import PostFilters from '../components/PostFilters';
 import { PopularSubjectsWidget, TopCompaniesWidget } from '../components/SidebarWidgets';
 import { Sparkles, Info } from 'lucide-react';
-import { getCompanyAndRoleList, getPostsPaginated } from '../services/postServices.js';
+import { getCompanyAndRoleList, getPostsPaginated, getBookmarkedPostsPaginated } from '../services/postServices.js';
 import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
 import { useAppSelector } from '../redux/store.js';
 import DeletePostModal from '../components/DeletePostModal.jsx';
@@ -22,6 +22,7 @@ function PostList() {
   const [redirectUrl, setRedirectUrl] = useState('');
   const user = useAppSelector((state) => state.userState.user);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('For You');
 
   const filter = {
     search: searchParams.get('search') || '',
@@ -38,9 +39,15 @@ function PostList() {
   });
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['posts', filter],
+    queryKey: ['posts', filter, activeTab],
     getNextPageParam: (prevData) => prevData.page?.nextPage,
-    queryFn: ({ pageParam = 1, signal }) => getPostsPaginated(pageParam, 10, filter, signal)
+    queryFn: ({ pageParam = 1, signal }) => {
+      if (activeTab === 'Bookmarks') {
+        if (!user) return Promise.resolve({ data: [], page: {} }); 
+        return getBookmarkedPostsPaginated(user._id, pageParam, 10);
+      }
+      return getPostsPaginated(pageParam, 10, filter, signal);
+    }
   });
 
   let scrollFooterElement = <p className="text-lg">— Nothing More to Load —</p>;
@@ -164,16 +171,23 @@ function PostList() {
 
               {/* Tabs */}
               <div className="flex flex-wrap gap-2 mb-6">
-                {['For You', 'Following', 'Recent', 'Most Upvoted', 'Trending'].map((tab) => (
+                {['For You', 'Bookmarks', 'Recent', 'Most Upvoted', 'Trending'].map((tab) => (
                   <button 
                     key={tab} 
+                    onClick={() => {
+                      if (tab === 'Bookmarks' && !user) {
+                        openLoginModal(window.location.pathname);
+                        return;
+                      }
+                      setActiveTab(tab);
+                    }}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                      tab === 'For You' 
+                      activeTab === tab 
                         ? 'bg-primary text-white' 
                         : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                     }`}
                   >
-                    {tab === 'For You' && <Sparkles className="inline w-3.5 h-3.5 mr-1.5" />}
+                    {tab === 'For You' && <Sparkles className={`inline w-3.5 h-3.5 mr-1.5 ${activeTab === 'For You' ? 'text-white' : 'text-primary'}`} />}
                     {tab}
                   </button>
                 ))}
