@@ -89,7 +89,8 @@ function PostForm() {
     rounds: [
       {
         roundType: '',
-        duration: '',
+        durationHr: '',
+        durationMin: '',
         difficulty: '',
         topicsCovered: [],
         questionsAsked: [''],
@@ -116,19 +117,40 @@ function PostForm() {
     rounds: Yup.array().of(
       Yup.object({
         roundType: Yup.string().required('Required'),
-        duration: Yup.string().required('Required'),
+        durationHr: Yup.number().typeError('Invalid').min(0, 'Invalid'),
+        durationMin: Yup.number().typeError('Invalid').min(0, 'Invalid').max(59, 'Invalid'),
         difficulty: Yup.string().required('Required'),
         questionsAsked: Yup.array().of(Yup.string().required('Required')).min(1, 'At least one question is required'),
         experienceAndTips: Yup.string().required('Required'),
+      }).test('duration-check', 'Duration is required', function (value) {
+        const hr = Number(value.durationHr) || 0;
+        const min = Number(value.durationMin) || 0;
+        if (hr === 0 && min === 0) {
+          return this.createError({ path: `${this.path}.durationMin`, message: 'Required' });
+        }
+        return true;
       })
     ).min(1, 'At least one round is required'),
     overallTips: Yup.string().required('Required'),
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
+    // Process rounds to add a duration string
+    const processedRounds = values.rounds.map(round => {
+      let durationStr = '';
+      if (round.durationHr && round.durationHr !== '0') durationStr += `${round.durationHr} hr `;
+      if (round.durationMin && round.durationMin !== '0') durationStr += `${round.durationMin} min`;
+      
+      return {
+        ...round,
+        duration: durationStr.trim() || undefined
+      };
+    });
+
     // Convert status explicitly since it's required by backend
     const submissionData = {
       ...values,
+      rounds: processedRounds,
       status: 'published'
     };
     mutate(submissionData, {
@@ -287,7 +309,7 @@ function PostForm() {
                                 const current = formik.values.rounds.length;
                                 if (target > current) {
                                   const diff = target - current;
-                                  const newRounds = Array.from({ length: diff }, () => ({ roundType: '', duration: '', difficulty: '', topicsCovered: [], questionsAsked: [''], experienceAndTips: '', isMostImportant: false }));
+                                  const newRounds = Array.from({ length: diff }, () => ({ roundType: '', durationHr: '', durationMin: '', difficulty: '', topicsCovered: [], questionsAsked: [''], experienceAndTips: '', isMostImportant: false }));
                                   formik.setFieldValue('rounds', [...formik.values.rounds, ...newRounds]);
                                 } else if (target < current) {
                                   formik.setFieldValue('rounds', formik.values.rounds.slice(0, target));
@@ -308,7 +330,7 @@ function PostForm() {
                                 <h3 className="font-medium text-gray-900">Round-wise Details <span className="text-red-500">*</span></h3>
                                 <p className="text-sm text-gray-500">Add all the rounds you went through in the interview process.</p>
                               </div>
-                              <button type="button" onClick={() => push({ roundType: '', duration: '', difficulty: '', topicsCovered: [], questionsAsked: [''], experienceAndTips: '', isMostImportant: false })} className="cursor-pointer text-green-600 border border-green-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 hover:bg-green-50 transition">
+                              <button type="button" onClick={() => push({ roundType: '', durationHr: '', durationMin: '', difficulty: '', topicsCovered: [], questionsAsked: [''], experienceAndTips: '', isMostImportant: false })} className="cursor-pointer text-green-600 border border-green-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 hover:bg-green-50 transition">
                                 <Plus size={16} /> Add Round
                               </button>
                             </div>

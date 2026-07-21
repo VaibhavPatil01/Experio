@@ -224,12 +224,12 @@ const Navbar = () => {
       </Link>
 
       <div className="hidden md:flex items-center gap-8 text-slate-800 dark:text-white">
-        <a href="#" className="hover:text-green-600">
+        <Link to="/" className="hover:text-green-600">
           Home
-        </a>
-        <a href="#features" className="hover:text-green-600">
+        </Link>
+        <Link to="/posts" className="hover:text-green-600">
           Experiences
-        </a>
+        </Link>
         <div className="group relative">
           <button
             type="button"
@@ -481,16 +481,16 @@ const Navbar = () => {
           top: `${navBottomOffset}px`
         }}
       >
-        <a href="#" onClick={handleCloseNavbar} className="rounded-md px-2 py-3 hover:text-green-600">
+        <Link to="/" onClick={handleCloseNavbar} className="rounded-md px-2 py-3 hover:text-green-600">
           Home
-        </a>
-        <a
-          href="#features"
+        </Link>
+        <Link
+          to="/posts"
           onClick={handleCloseNavbar}
           className="rounded-md px-2 py-3 hover:text-green-600"
         >
-          Features
-        </a>
+          Experiences
+        </Link>
         <div className="px-2 py-3">
           <button
             type="button"

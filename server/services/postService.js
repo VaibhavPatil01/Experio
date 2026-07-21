@@ -114,7 +114,7 @@ export const getAllPostsService = (filter, sort, limit, skip) => {
       status: 0,
       tags: 0,
     })
-    .populate('userId', 'username')
+    .populate('userId', 'username profilePicture')
     .limit(limit)
     .skip(skip)
     .lean();
@@ -129,7 +129,7 @@ export const getUserBookmarkedPostService = (userId, limit, skip) => {
       views: 0,
       status: 0,
     })
-    .populate('userId', 'username')
+    .populate('userId', 'username profilePicture')
     .limit(limit)
     .skip(skip)
     .lean();
@@ -203,7 +203,7 @@ export const getUserPostsService = (userId, limit, skip) => {
   return postModel
     .find({ userId })
     .select({ comments: 0, tags: 0 })
-    .populate('userId', 'username')
+    .populate('userId', 'username profilePicture')
     .limit(limit)
     .skip(skip)
     .lean();
@@ -216,7 +216,7 @@ export const deletePostUsingAuthorId = (postId, userId) => {
 export const getPostService = (postId) => {
   return postModel
     .findByIdAndUpdate({ _id: postId }, { $inc: { views: 1 } }, { new: true })
-    .populate('userId', 'username');
+    .populate('userId', 'username profilePicture');
 };
 
 

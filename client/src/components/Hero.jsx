@@ -127,10 +127,10 @@ const Hero = () => {
                             Create post
                             <ArrowRight height="16"  />
                         </Link>
-                        <button className="flex items-center justify-center gap-0.5 border border-slate-400 hover:bg-green-50 transition rounded-full px-7 h-12 text-slate-700">
+                        <Link to="/posts" className="flex items-center justify-center gap-0.5 border border-slate-400 hover:bg-green-50 transition rounded-full px-7 h-12 text-slate-700">
                             <Eye height="16" className='opacity-90' />
                             <span>View posts</span>
-                        </button>
+                        </Link>
                     </div>
 
                     <p className="py-6 text-slate-600 mt-14">Students posted about</p>
