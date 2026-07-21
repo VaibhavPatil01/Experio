@@ -30,7 +30,8 @@ function PostList() {
     articleType: searchParams.get('articleType') || '',
     jobRole: searchParams.get('jobRole') || '',
     company: searchParams.get('company') || '',
-    rating: searchParams.get('rating') || ''
+    rating: searchParams.get('rating') || '',
+    datePosted: searchParams.get('datePosted') || 'Anytime'
   };
 
   const companyAndRoleQuery = useQuery({
@@ -44,7 +45,7 @@ function PostList() {
     queryFn: ({ pageParam = 1, signal }) => {
       if (activeTab === 'Bookmarks') {
         if (!user) return Promise.resolve({ data: [], page: {} }); 
-        return getBookmarkedPostsPaginated(user._id, pageParam, 10);
+        return getBookmarkedPostsPaginated(user.userId, pageParam, 10);
       }
       return getPostsPaginated(pageParam, 10, filter, signal);
     }

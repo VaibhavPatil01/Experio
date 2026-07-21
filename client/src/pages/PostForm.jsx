@@ -9,6 +9,8 @@ import { Helmet } from 'react-helmet';
 import postFormImage from '../assets/images/pages/post-form.png';
 import { ChevronDown, ChevronUp, X, Plus, Trash2, CheckCircle2, MessageSquare, BookOpen, PenTool, ShieldAlert, Eye, Clock, GripVertical } from 'lucide-react';
 import { useAppSelector } from '../redux/store.js';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Options Constants
 const hiringTypes = ['On Campus', 'Off Campus', 'Referral'];
@@ -269,9 +271,20 @@ function PostForm() {
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Interview Date <span className="text-red-500">*</span></label>
-                          <input type="month" name="interviewDate"
+                          <DatePicker 
+                            selected={formik.values.interviewDate ? new Date(formik.values.interviewDate) : null}
+                            onChange={(date) => {
+                              if (date) {
+                                const offset = date.getTimezoneOffset();
+                                const formattedDate = new Date(date.getTime() - (offset*60*1000)).toISOString().split('T')[0];
+                                formik.setFieldValue('interviewDate', formattedDate);
+                              } else {
+                                formik.setFieldValue('interviewDate', '');
+                              }
+                            }}
+                            dateFormat="dd MMM yyyy"
+                            placeholderText="Select Interview Date"
                             className={`w-full mt-2 p-3 border ${formik.errors.interviewDate ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none cursor-pointer`}
-                            value={formik.values.interviewDate} onChange={formik.handleChange}
                           />
                           {formik.errors.interviewDate && <span className="text-red-500 text-xs mt-1">{formik.errors.interviewDate}</span>}
                         </div>

@@ -451,7 +451,7 @@ export async function removeUserBookmark(req, res) {
 // ----------------------------------------------------------------------------------------------- //
 
 export async function getAllPost(req, res) {
-  const { sortBy, articleType, jobRole, company, rating } = req.query;
+  const { sortBy, articleType, jobRole, company, rating, datePosted } = req.query;
 
   // Getting search from query and making sure it is string
   // If not then assigning it to empty string
@@ -510,6 +510,17 @@ export async function getAllPost(req, res) {
   }
   const convertedRating = parseInt(rating);
   if (convertedRating) filters['$and'][1].rating = convertedRating;
+
+  if (datePosted) {
+    const now = new Date();
+    if (datePosted === 'Past 24 hours') {
+      filters['$and'][1].createdAt = { $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) };
+    } else if (datePosted === 'Past week') {
+      filters['$and'][1].createdAt = { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) };
+    } else if (datePosted === 'Past month') {
+      filters['$and'][1].createdAt = { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) };
+    }
+  }
 
   try {
     const userId = req.body.userId;

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Search, ChevronUp, ChevronDown } from 'lucide-react';
+import FilterModal from './FilterModal';
 
 const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
-  const [showAllCompanies, setShowAllCompanies] = useState(false);
-  const [showAllRoles, setShowAllRoles] = useState(false);
+  const [activeModal, setActiveModal] = useState(null);
   const [isCompanyCollapsed, setIsCompanyCollapsed] = useState(false);
   const [isRoleCollapsed, setIsRoleCollapsed] = useState(false);
   const [matchScore, setMatchScore] = useState(70);
+  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
+  const [companySearchTerm, setCompanySearchTerm] = useState('');
+  const [roleSearchTerm, setRoleSearchTerm] = useState('');
 
   // Parse arrays from filter if we choose to support multiple, for now just treat as strings or split
   const selectedCompanies = filter.company ? filter.company.split(',') : [];
@@ -41,20 +44,28 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
     });
   };
 
+  const updateFilterBulk = (key, valuesArray) => {
+    const updatedSearchParams = new URLSearchParams(window.location.search);
+    if (valuesArray.length > 0) {
+      updatedSearchParams.set(key, valuesArray.join(','));
+    } else {
+      updatedSearchParams.delete(key);
+    }
+    setSearchParams(updatedSearchParams);
+  };
+
   const clearFilters = () => {
     setSearchParams({});
   };
 
-  const companies = companyAndRoleQuery.data?.data?.company || [
-    'Google', 'Microsoft', 'Amazon', 'Adobe', 'Flipkart', 'Netflix', 'JPMorgan Chase & Co.'
-  ];
+  const companies = companyAndRoleQuery.data?.data?.company || [];
+  const roles = companyAndRoleQuery.data?.data?.role || [];
 
-  const roles = companyAndRoleQuery.data?.data?.role || [
-    'Software Engineer', 'SDE Intern', 'Product Manager', 'Data Scientist', 'Backend Developer'
-  ];
+  const filteredCompanies = companies.filter(c => c.toLowerCase().includes(companySearchTerm.toLowerCase()));
+  const filteredRoles = roles.filter(r => r.toLowerCase().includes(roleSearchTerm.toLowerCase()));
 
-  const visibleCompanies = showAllCompanies ? companies : companies.slice(0, 5);
-  const visibleRoles = showAllRoles ? roles : roles.slice(0, 5);
+  const visibleCompanies = filteredCompanies.slice(0, 5);
+  const visibleRoles = filteredRoles.slice(0, 5);
 
   const experienceTypes = ['All', 'Full Time', 'Internship', 'Placement', 'Contract'];
 
@@ -62,7 +73,7 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
     <div className="w-full text-sm">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-semibold text-lg text-gray-800">Filters</h3>
-        <button onClick={clearFilters} className="text-primary hover:underline text-xs font-medium">Reset all</button>
+        <button onClick={clearFilters} className="text-primary hover:underline text-xs font-medium cursor-pointer">Reset all</button>
       </div>
 
       {/* Search */}
@@ -97,6 +108,8 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
               <input
                 type="text"
                 placeholder="Search Company"
+                value={companySearchTerm}
+                onChange={(e) => setCompanySearchTerm(e.target.value)}
                 className="w-full outline-none text-[14px] text-gray-600 border-b border-gray-300 py-1 pl-6 focus:border-primary transition bg-transparent"
               />
             </div>
@@ -113,20 +126,12 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
                 </label>
               ))}
             </div>
-            {companies.length > 5 && !showAllCompanies && (
+            {filteredCompanies.length > 5 && (
               <button
-                onClick={() => setShowAllCompanies(true)}
-                className="text-blue-600 hover:text-blue-700 text-[12px] font-semibold mt-4 text-left w-full uppercase"
+                onClick={() => setActiveModal('company')}
+                className="text-blue-600 hover:text-blue-700 text-[12px] font-semibold mt-4 text-left w-full uppercase cursor-pointer"
               >
-                {companies.length - 5} MORE
-              </button>
-            )}
-            {showAllCompanies && (
-              <button
-                onClick={() => setShowAllCompanies(false)}
-                className="text-gray-500 hover:text-gray-700 text-[12px] font-semibold mt-4 text-left w-full uppercase"
-              >
-                SHOW LESS
+                {filteredCompanies.length - 5} MORE
               </button>
             )}
           </div>
@@ -150,6 +155,8 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
               <input
                 type="text"
                 placeholder="Search Role"
+                value={roleSearchTerm}
+                onChange={(e) => setRoleSearchTerm(e.target.value)}
                 className="w-full outline-none text-[14px] text-gray-600 border-b border-gray-300 py-1 pl-6 focus:border-primary transition bg-transparent"
               />
             </div>
@@ -166,20 +173,12 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
                 </label>
               ))}
             </div>
-            {roles.length > 5 && !showAllRoles && (
+            {filteredRoles.length > 5 && (
               <button
-                onClick={() => setShowAllRoles(true)}
-                className="text-blue-600 hover:text-blue-700 text-[12px] font-semibold mt-4 text-left w-full uppercase"
+                onClick={() => setActiveModal('role')}
+                className="text-blue-600 hover:text-blue-700 text-[12px] font-semibold mt-4 text-left w-full uppercase cursor-pointer"
               >
-                {roles.length - 5} MORE
-              </button>
-            )}
-            {showAllRoles && (
-              <button
-                onClick={() => setShowAllRoles(false)}
-                className="text-gray-500 hover:text-gray-700 text-[12px] font-semibold mt-4 text-left w-full uppercase"
-              >
-                SHOW LESS
+                {filteredRoles.length - 5} MORE
               </button>
             )}
           </div>
@@ -196,7 +195,7 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
               <button
                 key={type}
                 onClick={() => updateFilter('articleType', type === 'All' ? '' : type)}
-                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${isSelected
+                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${isSelected
                     ? 'bg-primary text-white border-primary'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-primary/30 hover:bg-primary/5'
                   }`}
@@ -211,15 +210,35 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
       {/* Date Posted */}
       <div className="border-b border-gray-200 py-4">
         <h4 className="font-semibold text-gray-800 text-[13px] tracking-wider uppercase mb-3">Date Posted</h4>
-        <select
-          className="w-full outline-none text-sm text-gray-600 border border-gray-200 bg-white rounded-lg py-2 px-3 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition appearance-none cursor-pointer"
-          defaultValue="Anytime"
-        >
-          <option value="Anytime">Anytime</option>
-          <option value="Past 24 hours">Past 24 hours</option>
-          <option value="Past week">Past week</option>
-          <option value="Past month">Past month</option>
-        </select>
+        <div className="relative">
+          <button
+            onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
+            className={`w-full flex items-center justify-between outline-none text-sm text-gray-600 bg-white rounded-lg py-2 px-3 transition cursor-pointer border ${isDateDropdownOpen ? 'border-primary/50 ring-1 ring-primary/50' : 'border-gray-200 hover:border-gray-300'}`}
+          >
+            <span>{filter.datePosted || 'Anytime'}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDateDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {isDateDropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsDateDropdownOpen(false)}></div>
+              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-100 rounded-lg shadow-lg z-50 overflow-hidden py-1">
+                {['Anytime', 'Past 24 hours', 'Past week', 'Past month'].map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      updateFilter('datePosted', option);
+                      setIsDateDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm transition-colors cursor-pointer ${(filter.datePosted || 'Anytime') === option ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Match Score */}
@@ -234,7 +253,7 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
           max="100"
           value={matchScore}
           onChange={(e) => setMatchScore(e.target.value)}
-          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
         />
         <div className="flex justify-between mt-2 text-xs text-gray-400">
           <span>0%</span>
@@ -248,6 +267,32 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
         Apply Filters
       </button>
 
+    {/* Filter Modals */}
+      {activeModal === 'company' && (
+        <FilterModal 
+          title="Company"
+          options={companies}
+          initialSelected={selectedCompanies}
+          onClose={() => setActiveModal(null)}
+          onApply={(selections) => {
+            updateFilterBulk('company', selections);
+            setActiveModal(null);
+          }}
+        />
+      )}
+
+      {activeModal === 'role' && (
+        <FilterModal 
+          title="Role"
+          options={roles}
+          initialSelected={selectedRoles}
+          onClose={() => setActiveModal(null)}
+          onApply={(selections) => {
+            updateFilterBulk('jobRole', selections);
+            setActiveModal(null);
+          }}
+        />
+      )}
     </div>
   );
 };

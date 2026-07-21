@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import generateSlug from '../utils/generateSlug.js';
 import getFormattedDate from '../utils/getFormatedDate.js';
-import { BadgeCheck, Bookmark, MoreVertical, ArrowBigUp, MessageSquare, Eye, MapPin, Calendar, Clock } from 'lucide-react';
+import { BadgeCheck, Bookmark, MoreVertical, ArrowBigUp, MessageSquare, Eye, MapPin, Calendar, Clock, Share2, Flag, Link2 } from 'lucide-react';
 import LoginRequiredLink from './LoginRequiredLink';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleBookmark } from '../services/postServices.js';
@@ -10,12 +10,25 @@ import { useAppSelector } from '../redux/store.js';
 import { toast } from 'react-hot-toast';
 
 function PostListElement({ post, openModal, openDeleteModal }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Fallbacks and mocks for missing data to match the design
   const companyName = post.company || 'Unknown Company';
   const companyInitial = companyName.charAt(0).toUpperCase();
   const role = post.role || 'Unknown Role';
   const location = 'Bangalore'; // Mocked as it's not in schema
-  const interviewDate = post.interviewDate || getFormattedDate(post.createdAt);
+  const interviewDate = post.interviewDate ? getFormattedDate(post.interviewDate) : getFormattedDate(post.createdAt);
   
   const user = useAppSelector((state) => state.userState.user);
   const queryClient = useQueryClient();
@@ -133,9 +146,56 @@ function PostListElement({ post, openModal, openDeleteModal }) {
           >
             <Bookmark className="w-5 h-5" fill={post.isBookmarked ? 'currentColor' : 'none'} />
           </button>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-            <MoreVertical className="w-5 h-5" />
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button 
+              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsMenuOpen(!isMenuOpen);
+              }}
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            
+            {isMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-2 z-10">
+                <div className="absolute -top-1.5 right-1.5 w-3 h-3 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
+                <div className="relative bg-white flex flex-col">
+                  <button 
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      toast.success("Sharing functionality coming soon");
+                      setIsMenuOpen(false); 
+                    }}
+                  >
+                    <Share2 className="w-4 h-4 text-gray-500" strokeWidth={2} /> Share Post
+                  </button>
+                  <button 
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left w-full cursor-pointer" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      toast.success("Post reported");
+                      setIsMenuOpen(false); 
+                    }}
+                  >
+                    <Flag className="w-4 h-4 text-red-500" strokeWidth={2} /> Report Post
+                  </button>
+                  <button 
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      navigator.clipboard.writeText(`${window.location.origin}/post/${generateSlug(post.title, post._id)}`);
+                      toast.success("Link copied to clipboard!");
+                      setIsMenuOpen(false); 
+                    }}
+                  >
+                    <Link2 className="w-4 h-4 text-gray-500" strokeWidth={2} /> Copy Link
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -177,7 +237,10 @@ function PostListElement({ post, openModal, openDeleteModal }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <Link 
+          to={`/profile/${post.userId?._id || post.userId}`} 
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+        >
           {post.userId?.profilePicture ? (
              <img src={post.userId.profilePicture} alt={authorName} className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
           ) : (
@@ -191,7 +254,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
               {formatTimeAgo(post.createdAt)}
             </p>
           </div>
-        </div>
+        </Link>
       </div>
       
     </div>

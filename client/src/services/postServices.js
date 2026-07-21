@@ -52,6 +52,10 @@ export function getPostsPaginated(page, limit, filter, signal) {
     url.searchParams.set('rating', filter.rating);
   }
 
+  if (filter.datePosted && filter.datePosted !== 'Anytime') {
+    url.searchParams.set('datePosted', filter.datePosted);
+  }
+
   const options = {
     headers: { token: getAuthToken() },
     signal
