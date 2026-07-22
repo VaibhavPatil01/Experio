@@ -36,7 +36,7 @@ const Home = () => {
         <meta property="og:type" content="website" />
       </Helmet>
       <Hero />
-      <TopPosts />
+      {/* <TopPosts /> */}
       <GithubSection />
       {/* <OurTeam /> */}
       {/* <UserReviews /> */}

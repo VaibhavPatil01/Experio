@@ -15,6 +15,7 @@ import loginpagegreenlogo from './images/icons/loginpagegreenlogo.png';
 import lock_icon from './images/icons/lock_icon.svg';
 import cross_icon from './images/icons/cross_icon.svg';
 import email_icon from './images/icons/email_icon.svg';
+import standingfooter from './images/icons/standingfooter.png';
 
 export const assets = {
   star_icon,
@@ -32,7 +33,8 @@ export const assets = {
   lock_icon,
   cross_icon,
   email_icon,
-  loginpagegreenlogo
+  loginpagegreenlogo,
+  standingfooter
 };
 
 export const branches = [
@@ -61,23 +63,21 @@ export const editorPlaceholder = `- Interview date - an approximate date is fine
 
 export const footer_data = [
   {
-    title: 'Quick Links',
+    title: 'Products',
     links: [
-      { name: 'Home', path: '/' },
-      { name: 'About', path: '/' },
-      { name: 'Help', path: '/' },
-      { name: 'Careers', path: '/' },
-      { name: 'Contact Us', path: 'mailto:interviewexperiencegsmcoe@gmail.com' }
+      { name: 'Components', path: '/' },
+      { name: 'Templates', path: '/' },
+      { name: 'Icons', path: '/' }
     ]
   },
   {
-    title: 'Quick Links',
+    title: 'Resources',
     links: [
-      { name: 'Home', path: '/' },
-      { name: 'About', path: '/' },
-      { name: 'Help', path: '/' },
-      { name: 'Careers', path: '/' },
-      { name: 'Contact Us', path: 'mailto:interviewexperiencegsmcoe@gmail.com' }
+      { name: 'PrebuiltUI', path: '/' },
+      { name: 'Templates', path: '/' },
+      { name: 'Components', path: '/' },
+      { name: 'Blogs', path: '/' },
+      { name: 'Store', path: '/' }
     ]
   }
 ];

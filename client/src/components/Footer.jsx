@@ -1,217 +1,93 @@
 import React from 'react';
 import { assets, footer_data } from '../assets/assets';
-import { useAppDispatch, useAppSelector } from '../redux/store.js';
 
 const Footer = () => {
-  const theme = useAppSelector((state) => state.themeState.theme);
-
   return (
-    <div
-      className="
-    relative overflow-hidden
-    px-6 md:px-16 lg:px-24 xl:px-38
-
-    bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.10),transparent_55%)]
-
-    dark:bg-black
-    dark:bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.12),transparent_50%)]
-
-    dark:text-white
-  "
-    >
-      <div className="
-  flex flex-col lg:flex-row
-  lg:items-start
-  justify-between
-
-  gap-10 lg:gap-16
-
-  py-10
-
-  border-b border-gray-300/30 dark:border-gray-700/40
-
-  text-gray-600 dark:text-gray-400
-">
-        <div>
-          <img
-            src={theme == 'light' ? assets.logogreenblackpng : assets.logogreenwhitepng}
-            alt="logo"
-            className="w-30 sm:w-30 "
-          />
-          <p className="mt-3 dark:text-gray-400">
-            Mozify is a student-led platform empowering peers with firsthand insights into
-            interviews across diverse companies and roles. Whether preparing for placements or
-            refining strategies, students learn from those who’ve been there. By contributing and
-            engaging, users foster a culture of collaboration, growth, and shared success.
-          </p>
-          <div className="flex items-center gap-5 mt-6">
-            <a href="https://x.com/prebuiltui" target="_blank" rel="noreferrer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="
-      size-5
-      text-slate-700 dark:text-white
-      opacity-80
-      transition-all duration-300
-      hover:text-green-500
-      hover:-translate-y-0.5 
-    "
-                aria-hidden="true"
-              >
-                <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-              </svg>
-            </a>
-            <a href="#" class="text-neutral-600 hover:text-neutral-700">
-              <svg
-                class="opacity-90"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="
-      size-5
-      text-slate-700 dark:text-white
-      opacity-80
-      transition-all duration-300
-      hover:text-green-500
-      hover:-translate-y-0.5 
-    "
-                aria-hidden="true"
-              >
-                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-                <path d="M9 18c-4.51 2-5-2-7-2" />
-              </svg>
-            </a>
-            <a href="#" className="group">
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="
-      size-5
-      text-slate-700 dark:text-white
-      opacity-80
-      transition-all duration-300
-      hover:text-green-500
-      hover:-translate-y-0.5
-    "
-  >
-    <path
-      d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</a>
-
-<a href="#" className="group">
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="
-      size-5
-      text-slate-700 dark:text-white
-      opacity-80
-      transition-all duration-300
-      hover:text-green-500
-      hover:-translate-y-0.5
-    "
-  >
-    <path
-      d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M16 11.37a4 4 0 1 1-7.914 1.173A4 4 0 0 1 16 11.37m1.5-4.87h.01"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</a>
-
-<a href="#" className="group">
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="
-      size-5
-      text-slate-700 dark:text-white
-      opacity-80
-      transition-all duration-300
-      hover:text-green-500
-      hover:-translate-y-0.5
-    "
-  >
-    <path
-      d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6M6 9H2v12h4zM4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</a>
-          </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+      `}</style>
+      <div style={{ fontFamily: '"Geist", sans-serif' }} className="w-full">
+        <div className="w-full max-w-7xl mx-auto flex justify-center px-4 sm:px-8 md:px-16 lg:px-28 -mb-[1px] relative z-10 pointer-events-none">
+          <img src={assets.standingfooter} alt="standing footer" className="h-64 sm:h-80 md:h-96 lg:h-[28rem] object-contain pointer-events-auto" />
         </div>
+        <footer className="bg-white w-full text-black pt-12 lg:pt-16 px-4 sm:px-8 md:px-16 lg:px-28 overflow-hidden border-t border-gray-100">
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between gap-12 lg:gap-24">
 
-        {/* Quick Links */}
-        <div className="flex  xl:justify-between w-full md:w-[45%] xl:gap-5 gap-15">
-          {footer_data.map((section, index) => (
-            <div key={index}>
-              <h3 className="font-semibold text-base text-gray-900 md:mb-5 mb-2 dark:text-white whitespace-nowrap">
-                {section.title}
-              </h3>
-              <ul className="text-sm space-y-1">
-                {section.links.map((link, i) => (
-                  <li key={i}>
-                    <a href={link.path} className="
-  whitespace-nowrap
-  hover:underline
-  transition
-  dark:text-gray-400
-">
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            <div className="w-full flex-1 space-y-4">
+              <a href="/" className="block">
+                <img
+                  src={assets.logogreenblackpng}
+                  alt="logo"
+                  className="w-32 sm:w-40"
+                />
+              </a>
+              <p className="text-sm/6 text-neutral-600">
+                Mozify is a student-led platform empowering peers with firsthand insights into interviews across diverse companies and roles. By contributing and engaging, users foster a culture of collaboration and growth.
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Labore modi beatae veritatis. Consequuntur id magni consectetur eaque obcaecati. Quisquam inventore id minima ratione nisi aliquam quam, quod deserunt. Sit labore, praesentium omnis nesciunt fugiat quasi reprehenderit quisquam veritatis nisi dignissimos facere qui ut enim provident nihil, magnam velit animi unde?
+              </p>
+              <div className="flex gap-5 md:gap-6 order-1 md:order-2">
+                {/* Twitter */}
+                <a href="#" className="text-neutral-600 hover:text-neutral-700">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+                  </svg>
+                </a>
+                {/* Github */}
+                <a href="#" className="text-neutral-600 hover:text-neutral-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" />
+                  </svg>
+                </a>
+                {/* Linkedin */}
+                <a href="#" className="text-neutral-600 hover:text-neutral-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" />
+                  </svg>
+                </a>
+                {/* Youtube */}
+                <a href="#" className="text-neutral-600 hover:text-neutral-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" /><path d="m10 15 5-3-5-3z" />
+                  </svg>
+                </a>
+                {/* Instagram */}
+                <a href="#" className="text-neutral-600 hover:text-neutral-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+                </a>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <p className="py-4 text-center text-sm md:text-base text-gray-500/80 dark:text-gray-400">
-        Copyright 2026 © Mozify - All Rights Reserved.
-      </p>
-    </div>
+            <div className="w-full lg:w-auto flex justify-start lg:justify-end gap-16 md:gap-24">
+              {footer_data.map((section, index) => (
+                <div key={index}>
+                  <h3 className="font-medium text-sm mb-4">{section.title}</h3>
+                  <ul className="space-y-3 text-sm text-neutral-800">
+                    {section.links.map((link, i) => (
+                      <li key={i}>
+                        <a href={link.path} className="hover:text-neutral-700">{link.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="max-w-7xl mx-auto mt-6 pt-2 border-t border-neutral-300 flex justify-between items-center z-10 relative">
+            <p className="text-neutral-600 text-sm">© 2026 Mozify</p>
+            <p className="text-sm text-neutral-600">All rights reserved.</p>
+          </div>
+
+          <div className="relative mt-2 z-0">
+            <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-3xl h-full max-h-64 bg-slate-100 rounded-full blur-[100px] pointer-events-none"></div>
+            <h1 className="text-center font-extrabold leading-[0.7] text-transparent text-[clamp(4rem,15vw,15rem)] [-webkit-text-stroke:1px_#D4D4D4] relative z-10">
+              Mozify
+            </h1>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 };
 
