@@ -7,11 +7,15 @@ const Footer = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
       `}</style>
-      <div style={{ fontFamily: '"Geist", sans-serif' }} className="w-full">
-        <div className="w-full max-w-7xl mx-auto flex justify-center px-4 sm:px-8 md:px-16 lg:px-28 -mb-[1px] relative z-10 pointer-events-none">
+      <div style={{ fontFamily: '"Geist", sans-serif' }} className="w-full relative">
+        <div className="w-full max-w-7xl mx-auto flex justify-center px-4 sm:px-8 md:px-16 lg:px-28 relative z-10 pointer-events-none">
           <img src={assets.standingfooter} alt="standing footer" className="h-64 sm:h-80 md:h-96 lg:h-[28rem] object-contain pointer-events-auto" />
+          
         </div>
-        <footer className="bg-white w-full text-black pt-12 lg:pt-16 px-4 sm:px-8 md:px-16 lg:px-28 overflow-hidden border-t border-gray-100">
+        
+        <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent relative z-10"></div>
+
+        <footer className="bg-white w-full text-black pt-20 lg:pt-28 px-4 sm:px-8 md:px-16 lg:px-28 overflow-hidden">
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between gap-12 lg:gap-24">
 
             <div className="w-full flex-1 space-y-4">

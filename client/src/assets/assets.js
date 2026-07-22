@@ -16,6 +16,7 @@ import lock_icon from './images/icons/lock_icon.svg';
 import cross_icon from './images/icons/cross_icon.svg';
 import email_icon from './images/icons/email_icon.svg';
 import standingfooter from './images/icons/standingfooter.png';
+import sittingboy from './images/icons/sittingboy.png';
 
 export const assets = {
   star_icon,
@@ -34,7 +35,8 @@ export const assets = {
   cross_icon,
   email_icon,
   loginpagegreenlogo,
-  standingfooter
+  standingfooter,
+  sittingboy
 };
 
 export const branches = [
