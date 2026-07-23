@@ -66,6 +66,22 @@ export const editPostService = (postId, userId, editedPostData, isEditorAdmin = 
     rating: editedPostData.rating,
     status: editedPostData.status,
     tags: editedPostData.tags,
+    
+    // New Fields
+    hiringType: editedPostData.hiringType,
+    interviewMode: editedPostData.interviewMode,
+    interviewDate: editedPostData.interviewDate,
+    result: editedPostData.result,
+    difficulty: editedPostData.difficulty,
+    rounds: editedPostData.rounds,
+    technologies: editedPostData.technologies,
+    dsaTopics: editedPostData.dsaTopics,
+    coreSubjects: editedPostData.coreSubjects,
+    preparationDuration: editedPostData.preparationDuration,
+    preparationResources: editedPostData.preparationResources,
+    overallTips: editedPostData.overallTips,
+    salary: editedPostData.salary,
+    isAnonymous: editedPostData.isAnonymous,
   };
 
   return postModel.findOneAndUpdate(filter, update);

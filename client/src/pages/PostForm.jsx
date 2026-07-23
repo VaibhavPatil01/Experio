@@ -59,6 +59,55 @@ const MultiSelect = ({ options, value, onChange, placeholder, error }) => {
   );
 };
 
+const SingleSelect = ({ options, value, onChange, placeholder, error }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  React.useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const handleSelect = (opt) => {
+    onChange(opt.value);
+    setIsOpen(false);
+  };
+
+  const selectedOpt = options.find(o => o.value === value);
+
+  return (
+    <div className="relative mt-2" ref={containerRef}>
+      <div
+        className={`w-full p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex gap-2 cursor-pointer bg-white items-center justify-between ${isOpen ? 'ring-2 ring-green-500 border-transparent' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className={value ? "text-gray-900" : "text-gray-400"}>
+          {selectedOpt ? selectedOpt.label : placeholder}
+        </span>
+        <ChevronDown className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} size={20} />
+      </div>
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+          {options.map(opt => (
+            <div 
+              key={opt.value} 
+              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors ${value === opt.value ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-700'}`}
+              onClick={() => handleSelect(opt)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 function PostForm() {
   const navigate = useNavigate();
   const formRef = useRef();
@@ -559,29 +608,45 @@ function PostForm() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Currency</label>
-                          <select name="salary.currency" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer"
-                            value={formik.values.salary.currency} onChange={formik.handleChange}>
-                            <option value="INR">INR (₹)</option>
-                            <option value="USD">USD ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="GBP">GBP (£)</option>
-                          </select>
+                          <SingleSelect 
+                            options={[
+                              { value: "INR", label: "INR (₹)" },
+                              { value: "USD", label: "USD ($)" },
+                              { value: "EUR", label: "EUR (€)" },
+                              { value: "GBP", label: "GBP (£)" }
+                            ]}
+                            value={formik.values.salary.currency}
+                            onChange={(val) => formik.setFieldValue('salary.currency', val)}
+                            placeholder="Select Currency"
+                          />
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Base Salary</label>
-                          <input type="text" name="salary.base" placeholder="e.g. 15 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
+                          <div className="relative mt-2">
+                            <input type="number" step="any" min="0" name="salary.base" placeholder="e.g. 15" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
+                            <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
+                          </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Bonus / Sign-on</label>
-                          <input type="text" name="salary.bonus" placeholder="e.g. 2 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
+                          <div className="relative mt-2">
+                            <input type="number" step="any" min="0" name="salary.bonus" placeholder="e.g. 2" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
+                            <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
+                          </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Stocks / RSUs</label>
-                          <input type="text" name="salary.stocks" placeholder="e.g. 10 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
+                          <div className="relative mt-2">
+                            <input type="number" step="any" min="0" name="salary.stocks" placeholder="e.g. 10" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
+                            <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
+                          </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Total CTC</label>
-                          <input type="text" name="salary.totalCTC" placeholder="e.g. 27 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
+                          <div className="relative mt-2">
+                            <input type="number" step="any" min="0" name="salary.totalCTC" placeholder="e.g. 27" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
+                            <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
+                          </div>
                         </div>
                       </div>
                     </div>

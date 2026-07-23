@@ -39,16 +39,16 @@ const PostContent = ({ activeTab, post }) => {
                 {allQuestions.map((qGroup, idx) => (
                   <div key={idx} className="bg-gray-50 rounded-lg p-5 border border-gray-200">
                     <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5 text-primary" />
+                      <img src={greenTickSvg} alt="round" className="w-5 h-5" />
                       <span className="text-gray-500 font-medium">Round {qGroup.roundNum}:</span> {qGroup.roundType}
                     </h4>
                     <ul className="flex flex-col gap-3">
                       {qGroup.questions.map((q, qIdx) => (
-                        <li key={qIdx} className="flex gap-3 items-start bg-white p-3 rounded-md border border-gray-100 shadow-sm">
-                          <div className="w-6 h-6 rounded bg-green-50 text-primary flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        <li key={qIdx} className="flex gap-3 items-center bg-white p-3 rounded-md border border-gray-100">
+                          <div className="w-6 h-6 rounded bg-green-50 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                             Q{qIdx + 1}
                           </div>
-                          <span className="text-gray-700 text-[14px] leading-relaxed">{q}</span>
+                          <span className="text-gray-700 text-[15px] leading-relaxed">{q}</span>
                         </li>
                       ))}
                     </ul>
@@ -73,10 +73,10 @@ const PostContent = ({ activeTab, post }) => {
                   <div className="absolute left-3 top-2 bottom-6 w-[2px] bg-gray-200 z-0"></div>
                   {post.rounds.map((round, index) => (
                     <div key={index} className="flex gap-4 relative z-10">
-                      <div className="mt-1 bg-white relative z-10">
+                      <div className="mt-1 bg-white relative z-10 h-6 shrink-0 rounded-full">
                         <img src={greenTickSvg} alt="" className="w-6 h-6" />
                       </div>
-                      <div className="flex-1 bg-white border border-gray-100 rounded-lg p-5 shadow-sm">
+                      <div className="flex-1 pb-2">
                         <div className="flex justify-between items-start gap-4 mb-3">
                           <div>
                             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">
@@ -136,8 +136,7 @@ const PostContent = ({ activeTab, post }) => {
           <section>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Overall Tips & Advice</h3>
             {post.overallTips ? (
-              <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-lg text-emerald-900 text-[15px] leading-relaxed">
-                <AlertCircle className="w-5 h-5 text-emerald-600 mb-2 inline-block mr-2" />
+              <div className="bg-white border border-gray-200 p-5 rounded-lg text-gray-700 text-[15px] leading-relaxed">
                 {post.overallTips}
               </div>
             ) : (
@@ -173,19 +172,19 @@ const PostContent = ({ activeTab, post }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center items-center text-center">
                   <span className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Base Salary</span>
-                  <span className="text-2xl font-bold text-gray-900">{post.salary.base || "N/A"} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
+                  <span className="text-2xl font-bold text-gray-900">{post.salary.base || "N/A"} {post.salary.base && post.salary.base !== 'N/A' && !isNaN(post.salary.base) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center items-center text-center">
                   <span className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Bonus</span>
-                  <span className="text-2xl font-bold text-gray-900">{post.salary.bonus || "N/A"} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
+                  <span className="text-2xl font-bold text-gray-900">{post.salary.bonus || "N/A"} {post.salary.bonus && post.salary.bonus !== 'N/A' && !isNaN(post.salary.bonus) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center items-center text-center">
                   <span className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Stocks</span>
-                  <span className="text-2xl font-bold text-gray-900">{post.salary.stocks || "N/A"} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
+                  <span className="text-2xl font-bold text-gray-900">{post.salary.stocks || "N/A"} {post.salary.stocks && post.salary.stocks !== 'N/A' && !isNaN(post.salary.stocks) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
                 </div>
                 <div className="bg-gradient-to-br from-green-500 to-emerald-600 border border-green-600 rounded-lg p-5 shadow-md flex flex-col justify-center items-center text-center text-white">
                   <span className="text-green-100 text-sm font-medium mb-1 uppercase tracking-wider">Total CTC</span>
-                  <span className="text-3xl font-bold">{post.salary.totalCTC || "N/A"} <span className="text-sm font-normal text-green-100">{post.salary.currency}</span></span>
+                  <span className="text-3xl font-bold">{post.salary.totalCTC || "N/A"} {post.salary.totalCTC && post.salary.totalCTC !== 'N/A' && !isNaN(post.salary.totalCTC) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-green-100">{post.salary.currency}</span></span>
                 </div>
               </div>
             ) : (

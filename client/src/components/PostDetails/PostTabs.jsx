@@ -4,8 +4,8 @@ import { Briefcase, MessageSquare, ListTree, Lightbulb, DollarSign, LineChart } 
 const PostTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'experience', label: 'Experience', icon: Briefcase },
-    { id: 'questions', label: 'Questions', icon: MessageSquare },
     { id: 'process', label: 'Interview Process', icon: ListTree },
+    { id: 'questions', label: 'Questions', icon: MessageSquare },
     { id: 'tips', label: 'Tips', icon: Lightbulb },
     { id: 'salary', label: 'Salary', icon: DollarSign },
     { id: 'insights', label: 'Insights', icon: LineChart },
