@@ -17,8 +17,9 @@ export async function getPost(req, res) {
     if (!post) {
       return res.status(404).json({ message: 'No such Post found' });
     }
-    const postAuthor = post.userId.username;
-    const postAuthorId = post.userId._id;
+    const postAuthor = post.userId?.username;
+    const postAuthorId = post.userId?._id?.toString();
+    const postAuthorProfilePicture = post.userId?.profilePicture;
 
     // get the userId
     const userId = req.body.authTokenData.id;
@@ -55,6 +56,7 @@ export async function getPost(req, res) {
         commentCount,
         isBookmarked,
         postAuthor,
+        postAuthorProfilePicture,
         isUpVoted,
         isDownVoted,
       },

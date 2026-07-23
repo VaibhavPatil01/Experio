@@ -78,8 +78,8 @@ const Footer = () => {
           </div>
 
           <div className="max-w-7xl mx-auto mt-6 pt-2 border-t border-neutral-300 flex justify-between items-center z-10 relative">
-            <p className="text-neutral-600 text-sm">© 2026 Mozify</p>
-            <p className="text-sm text-neutral-600">All rights reserved.</p>
+            <p className="text-neutral-600 text-sm">Copyright © 2025 Mozify.</p>
+            <p className="text-sm text-neutral-600">Built with ♡ by Vaibhav Patil</p>
           </div>
 
           <div className="relative mt-2 z-0">
