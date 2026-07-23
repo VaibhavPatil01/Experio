@@ -1,5 +1,5 @@
 import React from 'react';
-import { Briefcase, MessageSquare, ListTree, Lightbulb, DollarSign, LineChart } from 'lucide-react';
+import { Briefcase, MessageSquare, ListTree, Lightbulb, DollarSign, LineChart, Sparkles } from 'lucide-react';
 
 const PostTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
@@ -8,12 +8,13 @@ const PostTabs = ({ activeTab, setActiveTab }) => {
     { id: 'questions', label: 'Questions', icon: MessageSquare },
     { id: 'tips', label: 'Tips', icon: Lightbulb },
     { id: 'salary', label: 'Salary', icon: DollarSign },
-    { id: 'insights', label: 'Insights', icon: LineChart },
+    { id: 'insights', label: 'Topics & Skills', icon: LineChart },
+    { id: 'ai-insights', label: 'AI Insights', icon: Sparkles },
   ];
 
   return (
     <div className="border-b border-gray-200 mb-6 overflow-x-auto hide-scrollbar">
-      <div className="flex gap-10 min-w-max px-2">
+      <div className="flex gap-6 lg:gap-8 min-w-max px-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;

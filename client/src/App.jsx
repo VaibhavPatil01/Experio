@@ -16,7 +16,6 @@ const Home = lazy(() => import('./pages/Home'));
 const AIMockInterview = lazy(() => import('./pages/AIMockInterview'));
 const AIResumeAnalyser = lazy(() => import('./pages/AIResumeAnalyser'));
 const AIResumeMaker = lazy(() => import('./pages/AIResumeMaker'));
-const PostEdit = lazy(() => import('./pages/PostEdit'));
 const PostForm = lazy(() => import('./pages/PostForm'));
 const PostList = lazy(() => import('./pages/PostList'));
 const PostPage = lazy(() => import('./pages/PostPage'));
@@ -70,7 +69,7 @@ const App = () => {
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/post/:id" element={<PostPage />} />
               <Route path="/post/:id/:slug" element={<PostPage />} />
-              <Route path="/post/edit/:id" element={<PostEdit />} />
+              <Route path="/post/edit/:id" element={<PostForm />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFound />} />

@@ -4,7 +4,8 @@ import { Formik, FieldArray } from 'formik';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { createPost, getCompanyAndRoleList } from '../services/postServices.js';
+import { createPost, editPost, getPost, getCompanyAndRoleList } from '../services/postServices.js';
+import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import postFormImage from '../assets/images/pages/post-form.png';
 import { ChevronDown, ChevronUp, X, Plus, Trash2, CheckCircle2, MessageSquare, BookOpen, PenTool, ShieldAlert, Eye, Clock, GripVertical } from 'lucide-react';
@@ -110,6 +111,8 @@ const SingleSelect = ({ options, value, onChange, placeholder, error }) => {
 
 function PostForm() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
   const formRef = useRef();
   const [expandedRounds, setExpandedRounds] = useState({});
   const toggleRound = (index) => setExpandedRounds(prev => ({ ...prev, [index]: prev[index] === undefined ? false : !prev[index] }));
@@ -119,18 +122,77 @@ function PostForm() {
     queryFn: () => getCompanyAndRoleList()
   });
 
+  const { data: postToEdit, isLoading: isFetchingPost } = useQuery({
+    queryKey: ['post', id],
+    queryFn: () => getPost(id),
+    enabled: isEditMode
+  });
+
   const { mutate, isLoading } = useMutation({
-    mutationFn: (postData) => createPost(postData, 'published'),
+    mutationFn: (postData) => isEditMode ? editPost(postData, id, 'published') : createPost(postData, 'published'),
     onError: (error) => {
       toast.error(error.response?.data?.message || 'An error occurred');
     },
     onSuccess: (data) => {
       toast.success(data.message);
-      navigate(`/post/${data.postId}`);
+      navigate(`/post/${isEditMode ? id : data.postId}`);
     }
   });
 
-  const initialValues = {
+  const parseDuration = (durationStr) => {
+    let hr = '', min = '';
+    if (!durationStr) return { hr, min };
+    const hrMatch = durationStr.match(/(\d+)\s*hr/);
+    const minMatch = durationStr.match(/(\d+)\s*min/);
+    if (hrMatch) hr = hrMatch[1];
+    if (minMatch) min = minMatch[1];
+    return { hr, min };
+  };
+
+  const initialValues = isEditMode && postToEdit ? {
+    company: postToEdit.company || '',
+    role: postToEdit.role || '',
+    hiringType: postToEdit.hiringType || '',
+    interviewMode: postToEdit.interviewMode || '',
+    interviewDate: postToEdit.interviewDate || '',
+    result: postToEdit.result || '',
+    content: postToEdit.content || '',
+    rounds: postToEdit.rounds?.length > 0 ? postToEdit.rounds.map(r => ({
+      roundType: r.roundType || '',
+      durationHr: parseDuration(r.duration).hr,
+      durationMin: parseDuration(r.duration).min,
+      difficulty: r.difficulty || '',
+      topicsCovered: r.topicsCovered || [],
+      questionsAsked: r.questionsAsked?.length > 0 ? r.questionsAsked : [''],
+      experienceAndTips: r.experienceAndTips || '',
+      isMostImportant: r.isMostImportant || false,
+    })) : [
+      {
+        roundType: '',
+        durationHr: '',
+        durationMin: '',
+        difficulty: '',
+        topicsCovered: [],
+        questionsAsked: [''],
+        experienceAndTips: '',
+        isMostImportant: false,
+      }
+    ],
+    salary: {
+      base: postToEdit.salary?.base || '',
+      bonus: postToEdit.salary?.bonus || '',
+      stocks: postToEdit.salary?.stocks || '',
+      totalCTC: postToEdit.salary?.totalCTC || '',
+      currency: postToEdit.salary?.currency || 'INR'
+    },
+    technologies: postToEdit.technologies || [],
+    dsaTopics: postToEdit.dsaTopics || [],
+    coreSubjects: postToEdit.coreSubjects || [],
+    preparationDuration: postToEdit.preparationDuration || '',
+    preparationResources: postToEdit.preparationResources || '',
+    overallTips: postToEdit.overallTips || '',
+    isAnonymous: postToEdit.isAnonymous || false,
+  } : {
     company: '',
     role: '',
     hiringType: '',
@@ -218,6 +280,10 @@ function PostForm() {
     });
   };
 
+  if (isEditMode && isFetchingPost) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500 font-medium">Loading post details...</div>;
+  }
+
   return (
     <>
       <Helmet>
@@ -230,18 +296,18 @@ function PostForm() {
           {/* Header */}
           <div className="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
             <div>
-              <div className="text-sm text-gray-500 mb-2">Home &gt; Create Post</div>
-              <h1 className="text-3xl font-bold text-gray-900">Create Interview Experience Post</h1>
-              <p className="text-gray-500 mt-1">Share your interview experience to help other students</p>
+              <div className="text-sm text-gray-500 mb-2">Home &gt; {isEditMode ? 'Edit Post' : 'Create Post'}</div>
+              <h1 className="text-3xl font-bold text-gray-900">{isEditMode ? 'Update Interview Experience Post' : 'Create Interview Experience Post'}</h1>
+              <p className="text-gray-500 mt-1">{isEditMode ? 'Update your interview experience details' : 'Share your interview experience to help other students'}</p>
             </div>
             <div className="flex gap-4">
               <button className="cursor-pointer px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 font-medium flex items-center gap-2">
                 <BookOpen size={18} />
                 Save as Draft
               </button>
-              <button onClick={() => { if (formRef.current) formRef.current.handleSubmit() }} className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2">
-                <Eye size={18} />
-                Preview Post
+              <button disabled={isLoading} onClick={() => { if (formRef.current) formRef.current.handleSubmit() }} className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2">
+                <CheckCircle2 size={18} />
+                {isLoading ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post')}
               </button>
             </div>
           </div>
@@ -249,6 +315,7 @@ function PostForm() {
           <Formik
             innerRef={formRef}
             initialValues={initialValues}
+            enableReinitialize={true}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
             validateOnBlur={false}
@@ -703,7 +770,7 @@ function PostForm() {
                             Cancel
                           </button>
                           <button type="submit" disabled={isLoading} className="cursor-pointer px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium w-full sm:w-auto flex items-center justify-center gap-2 disabled:opacity-70 transition">
-                            <PenTool size={18} /> Publish Post
+                            <PenTool size={18} /> {isLoading ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post')}
                           </button>
                         </div>
                       </div>

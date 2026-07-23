@@ -116,10 +116,10 @@ function PostPage() {
             Back to posts
           </Link>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-4">
             
-            {/* Left Column (Main Content) - 8 cols */}
-            <div className="lg:col-span-8">
+            {/* Left Column (Main Content) - 5 cols */}
+            <div className="lg:col-span-5">
               <div className="bg-white rounded-lg border border-gray-100 p-6 sm:p-8">
                 <PostHeader post={post} postId={id} isEditable={isEditable} openDeleteModal={openDeleteModal} />
                 <PostTabs activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -130,8 +130,8 @@ function PostPage() {
               </div>
             </div>
 
-            {/* Right Column (Sidebar) - 4 cols */}
-            <div className="lg:col-span-4 flex flex-col gap-0 sticky top-4 h-fit">
+            {/* Right Column (Sidebar) - 2 cols */}
+            <div className="lg:col-span-2 flex flex-col gap-0 sticky top-4 h-fit">
               <PostAuthorCard post={post} />
               <ExperienceHighlightsCard post={post} />
               <SimilarExperiencesCard postId={id} />

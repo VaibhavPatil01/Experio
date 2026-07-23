@@ -1,6 +1,6 @@
 import React from 'react';
 import DisplayQuill from '../../components/DisplayQuill';
-import { Clock, Tag, MessageSquare, AlertCircle, BookOpen } from 'lucide-react';
+import { Clock, Tag, MessageSquare, AlertCircle, BookOpen, Banknote, Gift, TrendingUp, Briefcase } from 'lucide-react';
 import greenTickSvg from '../../assets/images/icons/greentick.svg';
 
 const PostContent = ({ activeTab, post }) => {
@@ -169,23 +169,31 @@ const PostContent = ({ activeTab, post }) => {
             <h3 className="text-lg font-bold text-gray-900 mb-5">Compensation Details</h3>
             
             {post.salary && (post.salary.base || post.salary.totalCTC) ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center items-center text-center">
-                  <span className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Base Salary</span>
-                  <span className="text-2xl font-bold text-gray-900">{post.salary.base || "N/A"} {post.salary.base && post.salary.base !== 'N/A' && !isNaN(post.salary.base) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
-                </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center items-center text-center">
-                  <span className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Bonus</span>
-                  <span className="text-2xl font-bold text-gray-900">{post.salary.bonus || "N/A"} {post.salary.bonus && post.salary.bonus !== 'N/A' && !isNaN(post.salary.bonus) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
-                </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center items-center text-center">
-                  <span className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Stocks</span>
-                  <span className="text-2xl font-bold text-gray-900">{post.salary.stocks || "N/A"} {post.salary.stocks && post.salary.stocks !== 'N/A' && !isNaN(post.salary.stocks) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></span>
-                </div>
-                <div className="bg-gradient-to-br from-green-500 to-emerald-600 border border-green-600 rounded-lg p-5 shadow-md flex flex-col justify-center items-center text-center text-white">
-                  <span className="text-green-100 text-sm font-medium mb-1 uppercase tracking-wider">Total CTC</span>
-                  <span className="text-3xl font-bold">{post.salary.totalCTC || "N/A"} {post.salary.totalCTC && post.salary.totalCTC !== 'N/A' && !isNaN(post.salary.totalCTC) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-green-100">{post.salary.currency}</span></span>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Banknote className="w-5 h-5 text-green-600" /> Base Salary
+                  </h4>
+                  <p className="text-gray-700 text-lg font-bold">{post.salary.base || "N/A"} {post.salary.base && post.salary.base !== 'N/A' && !isNaN(post.salary.base) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-purple-500" /> Bonus
+                  </h4>
+                  <p className="text-gray-700 text-lg font-bold">{post.salary.bonus || "N/A"} {post.salary.bonus && post.salary.bonus !== 'N/A' && !isNaN(post.salary.bonus) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-blue-500" /> Stocks
+                  </h4>
+                  <p className="text-gray-700 text-lg font-bold">{post.salary.stocks || "N/A"} {post.salary.stocks && post.salary.stocks !== 'N/A' && !isNaN(post.salary.stocks) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-emerald-600" /> Total CTC
+                  </h4>
+                  <p className="text-gray-700 text-xl font-bold">{post.salary.totalCTC || "N/A"} {post.salary.totalCTC && post.salary.totalCTC !== 'N/A' && !isNaN(post.salary.totalCTC) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
               </div>
             ) : (
               <div className="bg-gray-50 rounded-lg p-8 text-center border border-gray-200">
@@ -243,6 +251,15 @@ const PostContent = ({ activeTab, post }) => {
               </div>
 
             </div>
+          </section>
+        </div>
+      );
+
+    case 'ai-insights':
+      return (
+        <div className="flex flex-col gap-8">
+          <section className="bg-white border border-gray-200 rounded-lg p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
+            {/* Design to be implemented later */}
           </section>
         </div>
       );
