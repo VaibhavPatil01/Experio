@@ -1,7 +1,50 @@
-import React from 'react';
-import { Bookmark, MoreVertical, MapPin, Calendar, Briefcase, BadgeCheck } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Bookmark, MoreVertical, MapPin, Calendar, Briefcase, BadgeCheck, Share2, Flag, Link2, Pencil, Trash2 } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toggleBookmark } from '../../services/postServices.js';
+import { useAppSelector } from '../../redux/store.js';
+import { toast } from 'react-hot-toast';
+import generateSlug from '../../utils/generateSlug.js';
 
-const PostHeader = ({ post, postId }) => {
+const PostHeader = ({ post, postId, isEditable, openDeleteModal }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const user = useAppSelector((state) => state.userState.user);
+  const queryClient = useQueryClient();
+
+  const bookmarkMutation = useMutation({
+    mutationFn: () => toggleBookmark(postId, post.isBookmarked),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['post', postId]);
+      queryClient.invalidateQueries(['posts']);
+      toast.success(data.message || (post.isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks'));
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || 'Failed to toggle bookmark');
+    }
+  });
+
+  const handleBookmarkClick = (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error('Please login to bookmark posts');
+      return;
+    }
+    bookmarkMutation.mutate();
+  };
+
   if (!post) return null;
 
   return (
@@ -23,15 +66,88 @@ const PostHeader = ({ post, postId }) => {
 
         {/* Right Side: Match % & Actions */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
             92% Match
+          </span>
+          <button 
+            className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
+            onClick={handleBookmarkClick}
+            disabled={bookmarkMutation.isLoading}
+          >
+            <Bookmark className="w-5 h-5" fill={post.isBookmarked ? 'currentColor' : 'none'} />
+          </button>
+          
+          <div className="relative flex items-center" ref={menuRef}>
+            <button 
+              className="flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsMenuOpen(!isMenuOpen);
+              }}
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            
+            {isMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-2 z-10">
+                <div className="absolute -top-1.5 right-1.5 w-3 h-3 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
+                <div className="relative bg-white flex flex-col">
+                  {isEditable && (
+                    <>
+                      <Link 
+                        to={`/post/edit/${postId}`}
+                        className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Pencil className="w-4 h-4 text-gray-500" strokeWidth={2} /> Edit Post
+                      </Link>
+                      <button 
+                        className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left w-full cursor-pointer border-b border-gray-50" 
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          setIsMenuOpen(false); 
+                          openDeleteModal({ id: postId, title: post.title });
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" strokeWidth={2} /> Delete Post
+                      </button>
+                    </>
+                  )}
+                  <button 
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      toast.success("Sharing functionality coming soon");
+                      setIsMenuOpen(false); 
+                    }}
+                  >
+                    <Share2 className="w-4 h-4 text-gray-500" strokeWidth={2} /> Share Post
+                  </button>
+                  <button 
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left w-full cursor-pointer" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      toast.success("Post reported");
+                      setIsMenuOpen(false); 
+                    }}
+                  >
+                    <Flag className="w-4 h-4 text-red-500" strokeWidth={2} /> Report Post
+                  </button>
+                  <button 
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer" 
+                    onClick={(e) => { 
+                      e.preventDefault(); 
+                      navigator.clipboard.writeText(`${window.location.origin}/post/${generateSlug(post.title, post._id)}`);
+                      toast.success("Link copied to clipboard!");
+                      setIsMenuOpen(false); 
+                    }}
+                  >
+                    <Link2 className="w-4 h-4 text-gray-500" strokeWidth={2} /> Copy Link
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          <button className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors">
-            <Bookmark className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors">
-            <MoreVertical className="w-5 h-5" />
-          </button>
         </div>
       </div>
 
@@ -39,11 +155,11 @@ const PostHeader = ({ post, postId }) => {
       <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-600">
         <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
           <Briefcase className="w-4 h-4 text-gray-500" />
-          <span className="font-medium">{post.hiringType || post.postType || 'Internship'}</span>
+          <span className="font-medium">{post.interviewMode || 'Online'}</span>
         </div>
         <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
           <MapPin className="w-4 h-4 text-gray-500" />
-          <span className="font-medium">{post.interviewMode || 'Bangalore'}</span>
+          <span className="font-medium">{post.hiringType || 'On Campus'}</span>
         </div>
         <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
           <Calendar className="w-4 h-4 text-gray-500" />

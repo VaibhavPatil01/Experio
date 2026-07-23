@@ -111,7 +111,7 @@ function PostPage() {
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
           
           {/* Back Button */}
-          <Link to="/" className="inline-flex items-center gap-2 text-primary font-bold text-sm mb-6 hover:underline">
+          <Link to="/" className="inline-flex items-center gap-2 text-primary font-bold text-[15px] mb-4 hover:opacity-80 transition-opacity">
             <ArrowLeft className="w-4 h-4" />
             Back to posts
           </Link>
@@ -121,29 +121,12 @@ function PostPage() {
             {/* Left Column (Main Content) - 8 cols */}
             <div className="lg:col-span-8">
               <div className="bg-white rounded-lg border border-gray-100 p-6 sm:p-8">
-                <PostHeader post={post} postId={id} />
+                <PostHeader post={post} postId={id} isEditable={isEditable} openDeleteModal={openDeleteModal} />
                 <PostTabs activeTab={activeTab} setActiveTab={setActiveTab} />
                 <PostContent activeTab={activeTab} post={post} />
                 <PostVotingAndShare post={post} />
                 <PostComments postId={id} />
                 
-                {/* Admin/Author Edit/Delete Controls */}
-                {isEditable && (
-                  <div className="mt-8 pt-6 border-t border-gray-200 flex gap-4">
-                    <Link
-                      to={`/post/edit/${id}`}
-                      className="px-6 py-2 rounded-lg border border-primary text-primary font-medium hover:bg-primary/5 transition-colors"
-                    >
-                      Edit Post
-                    </Link>
-                    <button
-                      onClick={() => openDeleteModal({ id, title: post.title })}
-                      className="px-6 py-2 rounded-lg bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
 

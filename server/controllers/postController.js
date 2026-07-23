@@ -59,6 +59,18 @@ export async function getPost(req, res) {
         postAuthorProfilePicture,
         isUpVoted,
         isDownVoted,
+        hiringType: post.hiringType,
+        interviewMode: post.interviewMode,
+        interviewDate: post.interviewDate,
+        result: post.result,
+        rounds: post.rounds,
+        technologies: post.technologies,
+        dsaTopics: post.dsaTopics,
+        coreSubjects: post.coreSubjects,
+        preparationDuration: post.preparationDuration,
+        preparationResources: post.preparationResources,
+        overallTips: post.overallTips,
+        salary: post.salary,
       },
     });
   } catch (error) {
@@ -97,6 +109,7 @@ export async function createPost(req, res) {
     preparationDuration,
     preparationResources,
     overallTips,
+    salary,
     isAnonymous
   } = req.body;
 
@@ -141,6 +154,7 @@ export async function createPost(req, res) {
     preparationDuration,
     preparationResources,
     overallTips,
+    salary,
     isAnonymous: isAnonymous || false,
   };
 
@@ -293,6 +307,7 @@ export async function editPost(req, res) {
     preparationDuration,
     preparationResources,
     overallTips,
+    salary,
     isAnonymous
   } = req.body;
 
@@ -334,6 +349,7 @@ export async function editPost(req, res) {
     preparationDuration,
     preparationResources,
     overallTips,
+    salary,
     isAnonymous: isAnonymous || false,
   };
 

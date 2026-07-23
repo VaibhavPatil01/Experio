@@ -27,7 +27,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
   const companyName = post.company || 'Unknown Company';
   const companyInitial = companyName.charAt(0).toUpperCase();
   const role = post.role || 'Unknown Role';
-  const location = 'Bangalore'; // Mocked as it's not in schema
+  const displayHiringType = post.hiringType || 'On Campus';
   const interviewDate = post.interviewDate ? getFormattedDate(post.interviewDate) : getFormattedDate(post.createdAt);
   
   const user = useAppSelector((state) => state.userState.user);
@@ -116,16 +116,16 @@ function PostListElement({ post, openModal, openDeleteModal }) {
               <BadgeCheck className="w-4 h-4 text-emerald-500" fill="currentColor" stroke="white" />
             </div>
             <p className="text-sm text-gray-500 mt-0.5">
-              {role} • {location} • {interviewDate}
+              {role} • {displayHiringType} • {interviewDate}
             </p>
             
             {/* Chips */}
             <div className="flex flex-wrap items-center gap-3 mt-2.5">
               <span className="inline-flex items-center text-[11px] font-medium px-2.5 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-100">
-                {post.postType || post.hiringType || 'Full Time'}
+                {post.interviewMode || 'Online'}
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-100">
-                <MapPin className="w-3 h-3" /> {location}
+                <MapPin className="w-3 h-3" /> {displayHiringType}
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-100">
                 <Calendar className="w-3 h-3" /> {interviewDate}
@@ -140,15 +140,15 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             {matchScore}% Match
           </span>
           <button 
-            className={`transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
             onClick={handleBookmarkClick}
             disabled={bookmarkMutation.isLoading}
           >
             <Bookmark className="w-5 h-5" fill={post.isBookmarked ? 'currentColor' : 'none'} />
           </button>
-          <div className="relative" ref={menuRef}>
+          <div className="relative flex items-center" ref={menuRef}>
             <button 
-              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+              className="flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
               onClick={(e) => {
                 e.preventDefault();
                 setIsMenuOpen(!isMenuOpen);

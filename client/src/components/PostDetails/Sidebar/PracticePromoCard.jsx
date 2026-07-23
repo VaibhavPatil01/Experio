@@ -1,9 +1,10 @@
 import React from 'react';
-import { Target, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import arrowImage from '../../../assets/images/icons/arrow-Photoroom.png';
 
 const PracticePromoCard = () => {
   return (
-    <div className="bg-indigo-50 rounded-lg border border-indigo-100 p-5 mb-4 overflow-hidden relative">
+    <div className="bg-green-50 rounded-lg border border-green-100 p-5 mb-4 overflow-hidden relative">
       <h3 className="text-lg font-bold text-gray-900 mb-2 relative z-10">Practice for your next interview</h3>
       <p className="text-gray-600 text-[13px] mb-5 relative z-10 leading-relaxed max-w-[80%]">
         Explore curated resources and mock interviews tailored for Google.
@@ -14,9 +15,9 @@ const PracticePromoCard = () => {
         <ArrowRight className="w-4 h-4" />
       </button>
 
-      {/* Background decoration (mocking the illustration) */}
-      <div className="absolute -right-4 -bottom-4 opacity-30 text-indigo-300 pointer-events-none">
-        <Target className="w-32 h-32" />
+      {/* Background decoration */}
+      <div className="absolute right-0 bottom-0 pointer-events-none opacity-80">
+        <img src={arrowImage} alt="" className="w-32 h-auto" />
       </div>
     </div>
   );

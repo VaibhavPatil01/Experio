@@ -88,6 +88,7 @@ function PostForm() {
     interviewMode: '',
     interviewDate: '',
     result: '',
+    content: '',
     rounds: [
       {
         roundType: '',
@@ -100,6 +101,13 @@ function PostForm() {
         isMostImportant: false,
       }
     ],
+    salary: {
+      base: '',
+      bonus: '',
+      stocks: '',
+      totalCTC: '',
+      currency: 'INR'
+    },
     technologies: [],
     dsaTopics: [],
     coreSubjects: [],
@@ -116,6 +124,7 @@ function PostForm() {
     interviewMode: Yup.string().required('Required'),
     interviewDate: Yup.string().required('Required'),
     result: Yup.string().required('Required'),
+    content: Yup.string().required('Required'),
     rounds: Yup.array().of(
       Yup.object({
         roundType: Yup.string().required('Required'),
@@ -298,7 +307,19 @@ function PostForm() {
                           {formik.errors.result && <span className="text-red-500 text-xs mt-1">{formik.errors.result}</span>}
                         </div>
 
-
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700">About the Role <span className="text-red-500">*</span></label>
+                          <textarea
+                            name="content"
+                            placeholder="Share some details about the role, team, or overall experience..."
+                            className={`w-full mt-2 p-3 border ${formik.errors.content && formik.touched.content ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none resize-y`}
+                            rows="4"
+                            value={formik.values.content}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                          ></textarea>
+                          {formik.errors.content && formik.touched.content && <span className="text-red-500 text-xs mt-1">{formik.errors.content}</span>}
+                        </div>
                       </div>
                     </div>
 
@@ -528,10 +549,49 @@ function PostForm() {
 
                     <hr className="my-8 border-gray-200" />
 
-                    {/* Section 4: Additional Information */}
-                    <div>
+                    {/* Section 4: Salary Information */}
+                    <div className="mb-10">
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">4</div>
+                        <h2 className="text-xl font-bold text-gray-900">Salary Details <span className="text-gray-400 font-normal text-base">(Optional)</span></h2>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <div className="lg:col-span-1">
+                          <label className="block text-sm font-medium text-gray-700">Currency</label>
+                          <select name="salary.currency" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer"
+                            value={formik.values.salary.currency} onChange={formik.handleChange}>
+                            <option value="INR">INR (₹)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                          </select>
+                        </div>
+                        <div className="lg:col-span-1">
+                          <label className="block text-sm font-medium text-gray-700">Base Salary</label>
+                          <input type="text" name="salary.base" placeholder="e.g. 15 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
+                        </div>
+                        <div className="lg:col-span-1">
+                          <label className="block text-sm font-medium text-gray-700">Bonus / Sign-on</label>
+                          <input type="text" name="salary.bonus" placeholder="e.g. 2 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
+                        </div>
+                        <div className="lg:col-span-1">
+                          <label className="block text-sm font-medium text-gray-700">Stocks / RSUs</label>
+                          <input type="text" name="salary.stocks" placeholder="e.g. 10 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
+                        </div>
+                        <div className="lg:col-span-1">
+                          <label className="block text-sm font-medium text-gray-700">Total CTC</label>
+                          <input type="text" name="salary.totalCTC" placeholder="e.g. 27 LPA" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr className="my-8 border-gray-200" />
+
+                    {/* Section 5: Additional Information */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">5</div>
                         <h2 className="text-xl font-bold text-gray-900">Additional Information</h2>
                       </div>
 

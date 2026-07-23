@@ -11,7 +11,7 @@ function DisplayQuill({ content }) {
   return (
     <div className="my-0.25">
       <ReactQuill theme="bubble" readOnly value={content} />
-      <style>{'.ql-editor {padding: 0rem;}'}</style>
+      <style>{'.ql-editor {padding: 0rem; font-size: 16px; font-family: inherit; line-height: 1.6;}'}</style>
     </div>
   );
 }

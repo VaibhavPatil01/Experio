@@ -44,6 +44,13 @@ const postSchema = new mongoose.Schema({
   interviewMode: { type: String, required: false },
   interviewDate: { type: String, required: false },
   result: { type: String, required: false },
+  salary: {
+    base: { type: String, required: false },
+    bonus: { type: String, required: false },
+    stocks: { type: String, required: false },
+    totalCTC: { type: String, required: false },
+    currency: { type: String, default: 'INR' }
+  },
   rounds: [roundSchema],
   technologies: [{ type: String }],
   dsaTopics: [{ type: String }],
