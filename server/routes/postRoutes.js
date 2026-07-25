@@ -1,7 +1,7 @@
 import express from 'express';
 import tokenDataParser from '../middleware/tokenDataParser.js';
 import isUserAuth from '../middleware/isUserAuth.js';
-import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAllPost, getCompanyAndRole, getPost, getRelatedPosts, getUserBookmarkedPost, getUserPost, removeUserBookmark, upVotePost } from '../controllers/postController.js';
+import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAllPost, getCompanyAndRole, getPost, getRelatedPosts, getUserBookmarkedPost, getUserPost, removeUserBookmark, upVotePost, getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote } from '../controllers/postController.js';
 
 const postRouter = express.Router(); 
 
@@ -20,6 +20,13 @@ postRouter.get('/user/bookmarked/:userId', tokenDataParser, getUserBookmarkedPos
 postRouter.get('/related/:id', isUserAuth, getRelatedPosts);
 postRouter.get('/user/all/:userId', tokenDataParser, getUserPost); 
 
-
+// Comment and Reply Routes
+postRouter.get('/:id/comments', tokenDataParser, getPostComments);
+postRouter.post('/:id/comments', isUserAuth, addComment);
+postRouter.post('/:id/comments/:commentId/replies', isUserAuth, addReply);
+postRouter.post('/:id/comments/:commentId/upvote', isUserAuth, toggleCommentUpvote);
+postRouter.post('/:id/comments/:commentId/replies/:replyId/upvote', isUserAuth, toggleReplyUpvote);
+postRouter.post('/:id/comments/:commentId/downvote', isUserAuth, toggleCommentDownvote);
+postRouter.post('/:id/comments/:commentId/replies/:replyId/downvote', isUserAuth, toggleReplyDownvote);
 
 export default postRouter;

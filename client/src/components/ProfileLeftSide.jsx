@@ -129,14 +129,11 @@ const ProfileLeftSide = ({ profileData }) => {
           <h2 className="text-[22px] font-bold text-gray-900 mb-1 leading-tight">
             {profileData?.username || 'Vaibhav Patil'}
           </h2>
-          <p className="text-blue-700 text-[14px] font-medium mb-3 tracking-wide">
-            Total exp: {profileData?.experienceYears || 0} yrs {profileData?.experienceMonths || 0} mos
-          </p>
           <p className="text-gray-900 font-medium text-[15px] mb-1">
-            {profileData?.degree || 'Bachelor Of Technology (B.Tech/B.E)'}
+            {profileData?.workExperiences?.find(exp => exp.isCurrentlyWorking)?.jobTitle || profileData?.workExperiences?.[0]?.jobTitle || 'Fresher'}
           </p>
-          <p className="text-gray-500 text-[14px] mb-1">
-            {profileData?.branch || 'NA'} • {profileData?.passingYear || 'NA'}
+          <p className="text-blue-700 text-[14px] font-medium mb-1 tracking-wide">
+            Total exp: {profileData?.experienceYears || 0} yrs {profileData?.experienceMonths || 0} mos
           </p>
           <p className="text-gray-500 text-[14px]">
             {profileData?.location || 'Pune'} {profileData?.nationality ? `• ${profileData.nationality}` : ''}

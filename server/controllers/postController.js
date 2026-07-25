@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLContent.js';
-import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, editPostService, deletePostService, createPostService } from '../services/postService.js';
+import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService } from '../services/postService.js';
 import { findUserById } from '../services/userService.js';
 
 
@@ -784,4 +784,116 @@ export async function getUserPost(req, res) {
 
 
 
+
+export async function getPostComments(req, res) {
+  const postId = req.params['id'];
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(404).json({ message: 'No such Post found' });
+  }
+  try {
+    const post = await getPostCommentsService(postId);
+    if (!post) return res.status(404).json({ message: 'No such Post found' });
+    
+    return res.status(200).json({ message: 'Comments fetched successfully', comments: post.comments });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function addComment(req, res) {
+  const postId = req.params['id'];
+  const { authTokenData, content } = req.body;
+  const userId = authTokenData.id;
+
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(404).json({ message: 'Invalid Post ID' });
+  }
+  if (!content) return res.status(400).json({ message: 'Content is required' });
+
+  try {
+    const updatedPost = await addCommentService(postId, userId, content);
+    if (!updatedPost) return res.status(404).json({ message: 'Post not found' });
+    return res.status(200).json({ message: 'Comment added successfully' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function addReply(req, res) {
+  const { id: postId, commentId } = req.params;
+  const { authTokenData, content } = req.body;
+  const userId = authTokenData.id;
+
+  if (!mongoose.Types.ObjectId.isValid(postId) || !mongoose.Types.ObjectId.isValid(commentId)) {
+    return res.status(404).json({ message: 'Invalid Post or Comment ID' });
+  }
+  if (!content) return res.status(400).json({ message: 'Content is required' });
+
+  try {
+    const updatedPost = await addReplyService(postId, commentId, userId, content);
+    if (!updatedPost) return res.status(404).json({ message: 'Post or comment not found' });
+    return res.status(200).json({ message: 'Reply added successfully' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function toggleCommentUpvote(req, res) {
+  const { id: postId, commentId } = req.params;
+  const { authTokenData } = req.body;
+  const userId = authTokenData.id;
+
+  try {
+    await toggleCommentUpvoteService(postId, commentId, userId);
+    return res.status(200).json({ message: 'Upvote toggled' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function toggleReplyUpvote(req, res) {
+  const { id: postId, commentId, replyId } = req.params;
+  const { authTokenData } = req.body;
+  const userId = authTokenData.id;
+
+  try {
+    await toggleReplyUpvoteService(postId, commentId, replyId, userId);
+    return res.status(200).json({ message: 'Upvote toggled' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function toggleCommentDownvote(req, res) {
+  const { id: postId, commentId } = req.params;
+  const { authTokenData } = req.body;
+  const userId = authTokenData.id;
+
+  try {
+    await toggleCommentDownvoteService(postId, commentId, userId);
+    return res.status(200).json({ message: 'Downvote toggled' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function toggleReplyDownvote(req, res) {
+  const { id: postId, commentId, replyId } = req.params;
+  const { authTokenData } = req.body;
+  const userId = authTokenData.id;
+
+  try {
+    await toggleReplyDownvoteService(postId, commentId, replyId, userId);
+    return res.status(200).json({ message: 'Downvote toggled' });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
 

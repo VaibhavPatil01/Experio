@@ -245,3 +245,110 @@ export const getPostService = (postId) => {
 
 
 
+export const getPostCommentsService = (postId) => {
+  return postModel.findById(postId)
+    .select('comments')
+    .populate({
+      path: 'comments.userId',
+      select: 'username profilePicture role badge'
+    })
+    .populate({
+      path: 'comments.replies.userId',
+      select: 'username profilePicture role badge'
+    });
+};
+
+export const addCommentService = (postId, userId, content) => {
+  return postModel.findByIdAndUpdate(
+    postId,
+    { $push: { comments: { userId, content, upVotes: [], downVotes: [], replies: [] } } },
+    { new: true }
+  );
+};
+
+export const addReplyService = (postId, commentId, userId, content) => {
+  return postModel.findOneAndUpdate(
+    { _id: postId, "comments._id": commentId },
+    { $push: { "comments.$.replies": { userId, content, upVotes: [], downVotes: [] } } },
+    { new: true }
+  );
+};
+
+export const toggleCommentUpvoteService = async (postId, commentId, userId) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  
+  const comment = post.comments.id(commentId);
+  const upvoteIndex = comment.upVotes.indexOf(userId);
+  const downvoteIndex = comment.downVotes.indexOf(userId);
+  
+  if (upvoteIndex === -1) {
+    comment.upVotes.push(userId);
+    if (downvoteIndex !== -1) comment.downVotes.splice(downvoteIndex, 1);
+  } else {
+    comment.upVotes.splice(upvoteIndex, 1);
+  }
+  
+  return post.save();
+};
+
+export const toggleReplyUpvoteService = async (postId, commentId, replyId, userId) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  
+  const comment = post.comments.id(commentId);
+  const reply = comment.replies.id(replyId);
+  if (!reply) throw new Error("Reply not found");
+  
+  const upvoteIndex = reply.upVotes.indexOf(userId);
+  const downvoteIndex = reply.downVotes.indexOf(userId);
+
+  if (upvoteIndex === -1) {
+    reply.upVotes.push(userId);
+    if (downvoteIndex !== -1) reply.downVotes.splice(downvoteIndex, 1);
+  } else {
+    reply.upVotes.splice(upvoteIndex, 1);
+  }
+  
+  return post.save();
+};
+
+export const toggleCommentDownvoteService = async (postId, commentId, userId) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  
+  const comment = post.comments.id(commentId);
+  const downvoteIndex = comment.downVotes.indexOf(userId);
+  const upvoteIndex = comment.upVotes.indexOf(userId);
+  
+  if (downvoteIndex === -1) {
+    comment.downVotes.push(userId);
+    if (upvoteIndex !== -1) comment.upVotes.splice(upvoteIndex, 1);
+  } else {
+    comment.downVotes.splice(downvoteIndex, 1);
+  }
+  
+  return post.save();
+};
+
+export const toggleReplyDownvoteService = async (postId, commentId, replyId, userId) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  
+  const comment = post.comments.id(commentId);
+  const reply = comment.replies.id(replyId);
+  if (!reply) throw new Error("Reply not found");
+  
+  const downvoteIndex = reply.downVotes.indexOf(userId);
+  const upvoteIndex = reply.upVotes.indexOf(userId);
+  
+  if (downvoteIndex === -1) {
+    reply.downVotes.push(userId);
+    if (upvoteIndex !== -1) reply.upVotes.splice(upvoteIndex, 1);
+  } else {
+    reply.downVotes.splice(downvoteIndex, 1);
+  }
+  
+  return post.save();
+};
+

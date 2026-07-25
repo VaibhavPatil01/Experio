@@ -187,3 +187,38 @@ export function downVotePost(postId) {
     .post(url, {}, { headers: { token: getAuthToken() } })
     .then((response) => response.data);
 }
+
+export function getPostComments(postId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments`;
+  return axios.get(url, { headers: { token: getAuthToken() } }).then((res) => res.data.comments);
+}
+
+export function addComment(postId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments`;
+  return axios.post(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function addReply(postId, commentId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies`;
+  return axios.post(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleCommentUpvote(postId, commentId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/upvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleReplyUpvote(postId, commentId, replyId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}/upvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleCommentDownvote(postId, commentId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/downvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleReplyDownvote(postId, commentId, replyId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}/downvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}

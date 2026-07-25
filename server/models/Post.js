@@ -3,11 +3,15 @@ import mongoose from "mongoose";
 const replySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   content: { type: String, required: true },
+  upVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  downVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: true });
 
 const commentSchema = new mongoose.Schema({ 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   content: { type: String, required: true },
+  upVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  downVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   replies: [replySchema],
 }, { timestamps: true }); 
 
