@@ -1,10 +1,17 @@
 import React from 'react';
 import DisplayQuill from '../../components/DisplayQuill';
-import { Clock, Tag, MessageSquare, AlertCircle, BookOpen, Banknote, Gift, TrendingUp, Briefcase } from 'lucide-react';
+import { Clock, Tag, MessageSquare, AlertCircle, BookOpen, Banknote, Gift, TrendingUp, Briefcase, Star, Gauge } from 'lucide-react';
 import greenTickSvg from '../../assets/images/icons/greentick.svg';
 
 const PostContent = ({ activeTab, post }) => {
   if (!post) return null;
+
+  const getDifficultyColor = (diff) => {
+    if (diff === 'Easy') return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+    if (diff === 'Medium') return 'bg-orange-50 text-orange-600 border-orange-100';
+    if (diff === 'Hard') return 'bg-red-50 text-red-500 border-red-100';
+    return 'bg-gray-50 text-gray-600 border-gray-100';
+  };
 
   switch (activeTab) {
     case 'experience':
@@ -12,12 +19,48 @@ const PostContent = ({ activeTab, post }) => {
         <div className="flex flex-col gap-8">
           <section>
             <h3 className="text-lg font-bold text-gray-900 mb-3">About the Role & Experience</h3>
-            <div className="text-gray-700 leading-relaxed text-base">
+            <div className="text-gray-700 leading-relaxed text-base mb-8">
               {post.content ? (
                 <DisplayQuill content={post.content} />
               ) : (
                 <p className="text-gray-500 italic">No overall experience description provided.</p>
               )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-100">
+              <section className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500" /> Overall Experience
+                </h4>
+                {post?.rating ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star 
+                          key={star} 
+                          className={`w-5 h-5 ${post?.rating >= star ? 'text-yellow-400 fill-current' : 'text-gray-200 fill-current'}`} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-700 font-bold ml-1">{post?.rating} / 5</span>
+                  </div>
+                ) : (
+                  <span className="text-gray-500 italic text-[15px]">Not specified</span>
+                )}
+              </section>
+              
+              <section className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <Gauge className="w-5 h-5 text-red-500" /> Overall Difficulty
+                </h4>
+                {post?.difficulty ? (
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border ${getDifficultyColor(post?.difficulty)}`}>
+                    {post?.difficulty}
+                  </span>
+                ) : (
+                  <span className="text-gray-500 italic text-[15px]">Not specified</span>
+                )}
+              </section>
             </div>
           </section>
         </div>

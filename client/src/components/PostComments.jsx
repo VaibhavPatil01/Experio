@@ -340,7 +340,7 @@ const CommentItem = ({
 
 
 const PostComments = ({ postId }) => {
-  const [activeTab, setActiveTab] = useState('Most Helpful');
+  const [activeTab, setActiveTab] = useState('Newest');
   const [newComment, setNewComment] = useState('');
   const editorRef = useRef(null);
   
@@ -365,10 +365,11 @@ const PostComments = ({ postId }) => {
   const initial = user?.username ? user.username[0].toUpperCase() : 'A';
   const authorName = user?.username || 'Anonymous';
   
-  const tabs = ['Most Helpful', 'Newest', 'Trending'];
+  const tabs = ['Newest', 'Most Helpful'];
 
   const commentsList = dbComments.map(c => ({
     id: c._id,
+    originalCreatedAt: c.createdAt,
     userId: c.userId?._id,
     author: c.userId?.username || 'Anonymous',
     role: c.userId?.role || 'User',
@@ -382,6 +383,7 @@ const PostComments = ({ postId }) => {
     hasDownvoted: c.downVotes?.includes(user?.userId),
     replies: c.replies?.map(r => ({
       id: r._id,
+      originalCreatedAt: r.createdAt,
       userId: r.userId?._id,
       author: r.userId?.username || 'Anonymous',
       role: r.userId?.role || 'User',
@@ -395,6 +397,16 @@ const PostComments = ({ postId }) => {
       hasDownvoted: r.downVotes?.includes(user?.userId),
     })) || []
   }));
+
+  const sortedCommentsList = [...commentsList].sort((a, b) => {
+    if (activeTab === 'Newest') {
+      return new Date(b.originalCreatedAt) - new Date(a.originalCreatedAt);
+    } else {
+      const aScore = a.upvotes - a.downvotes;
+      const bScore = b.upvotes - b.downvotes;
+      return bScore - aScore;
+    }
+  });
 
   const addCommentMutation = useMutation({
     mutationFn: (content) => addComment(postId, content),
@@ -535,10 +547,10 @@ const PostComments = ({ postId }) => {
       <div>
         {isLoading ? (
           <p className="text-gray-500 text-sm text-center py-4">Loading comments...</p>
-        ) : commentsList.length === 0 ? (
+        ) : sortedCommentsList.length === 0 ? (
           <p className="text-gray-500 text-sm text-center py-4">No comments yet. Be the first to share your thoughts!</p>
         ) : (
-          commentsList.map(comment => (
+          sortedCommentsList.map(comment => (
             <CommentItem 
               key={comment.id} 
               comment={comment}

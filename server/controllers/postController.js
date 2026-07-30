@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLContent.js';
-import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService } from '../services/postService.js';
+import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
 import { findUserById } from '../services/userService.js';
 import { eventBus, EVENTS } from '../events/index.js';
 
@@ -21,6 +21,14 @@ export async function getPost(req, res) {
     const postAuthor = post.userId?.username;
     const postAuthorId = post.userId?._id?.toString();
     const postAuthorProfilePicture = post.userId?.profilePicture;
+    const authorWorkExperiences = post.userId?.workExperiences || [];
+    const authorJoinedDate = post.userId?.createdAt;
+    
+    // fetch author contributions (total posts)
+    let authorContributions = 0;
+    if (post.userId?._id) {
+      authorContributions = await getPostCountByUserIdService(post.userId._id);
+    }
 
     // get the userId
     const userId = req.body.authTokenData.id;
@@ -58,6 +66,9 @@ export async function getPost(req, res) {
         isBookmarked,
         postAuthor,
         postAuthorProfilePicture,
+        authorWorkExperiences,
+        authorJoinedDate,
+        authorContributions,
         _id: post._id,
         isUpVoted,
         isDownVoted,
@@ -75,6 +86,7 @@ export async function getPost(req, res) {
         preparationResources: post.preparationResources,
         overallTips: post.overallTips,
         salary: post.salary,
+        difficulty: post.difficulty,
       },
     });
   } catch (error) {

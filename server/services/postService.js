@@ -276,7 +276,11 @@ export const deletePostUsingAuthorId = (postId, userId) => {
 export const getPostService = (postId) => {
   return postModel
     .findByIdAndUpdate({ _id: postId }, { $inc: { views: 1 } }, { new: true })
-    .populate('userId', 'username profilePicture');
+    .populate('userId', 'username profilePicture workExperiences createdAt');
+};
+
+export const getPostCountByUserIdService = (userId) => {
+  return postModel.countDocuments({ userId });
 };
 
 

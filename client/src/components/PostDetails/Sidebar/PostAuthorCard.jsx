@@ -1,10 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { SquarePen, Calendar } from 'lucide-react';
 
 const PostAuthorCard = ({ post }) => {
   const authorName = post?.postAuthor || 'Deleted User';
   const profilePicture = post?.postAuthorProfilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
   const authorId = post?.postAuthorId;
+
+  const primaryExp = post?.authorWorkExperiences?.find(exp => exp.isCurrentlyWorking) || post?.authorWorkExperiences?.[0];
+  const secondaryExp = post?.authorWorkExperiences?.find(exp => exp._id !== primaryExp?._id);
+
+  const joinedDate = post?.authorJoinedDate 
+    ? new Date(post.authorJoinedDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : 'Recently';
+  
+  const contributions = post?.authorContributions || 0;
 
   return (
     <div className="bg-white rounded-lg border border-gray-100 p-5 mb-4">
@@ -20,17 +30,35 @@ const PostAuthorCard = ({ post }) => {
           <h4 className="font-bold text-gray-900 text-lg leading-tight mb-1">
             {authorName}
           </h4>
-          <p className="text-gray-600 text-[14px] leading-tight mb-1">
-            SDE at Microsoft
+          <p className={`text-gray-600 text-[14px] font-medium leading-tight ${secondaryExp ? 'mb-1' : ''}`}>
+            {primaryExp?.jobTitle || 'Fresher'}
           </p>
-          <p className="text-gray-400 text-[13px] leading-tight">
-            (Ex- Google Intern)
-          </p>
+          {secondaryExp && (
+            <p className="text-gray-400 text-[13px] leading-tight">
+              (Ex- {secondaryExp.jobTitle} at {secondaryExp.company})
+            </p>
+          )}
         </div>
       </div>
       
-      <div className="text-center text-xs font-medium text-gray-500 mb-4">
-        20 contributions • Joined Jan 2023
+      <div className="flex items-center justify-center gap-5 py-2 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-[#ecfdf3] flex items-center justify-center shrink-0">
+            <SquarePen className="w-3.5 h-3.5 text-[#039855]" strokeWidth={2.5} />
+          </div>
+          <span className="text-[12.5px] text-[#475467] font-medium leading-tight">
+            <span className="text-[#039855] font-bold text-[13.5px]">{contributions}</span> contributions
+          </span>
+        </div>
+        <div className="w-px h-6 bg-gray-200"></div>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-[#ecfdf3] flex items-center justify-center shrink-0">
+            <Calendar className="w-3.5 h-3.5 text-[#039855]" strokeWidth={2.5} />
+          </div>
+          <span className="text-[12.5px] text-[#475467] font-medium leading-tight whitespace-nowrap">
+            Joined <span className="text-[#039855] font-bold text-[13.5px]">{joinedDate}</span>
+          </span>
+        </div>
       </div>
       
       {authorId ? (

@@ -412,7 +412,7 @@ function PostForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Company <span className="text-red-500">*</span></label>
                           <input type="text" name="company" list="companies" placeholder="e.g., Amazon"
-                            className={`w-full mt-2 p-3 border ${formik.errors.company ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.company ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none`}
                             value={formik.values.company} onChange={formik.handleChange}
                           />
                           <datalist id="companies">{companyAndRoleQuery?.data?.company.map(c => <option key={c} value={c} />)}</datalist>
@@ -421,7 +421,7 @@ function PostForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Job Role <span className="text-red-500">*</span></label>
                           <input type="text" name="role" list="roles" placeholder="e.g., SDE Intern"
-                            className={`w-full mt-2 p-3 border ${formik.errors.role ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.role ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none`}
                             value={formik.values.role} onChange={formik.handleChange}
                           />
                           <datalist id="roles">{companyAndRoleQuery?.data?.role.map(r => <option key={r} value={r} />)}</datalist>
@@ -430,7 +430,7 @@ function PostForm() {
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Hiring Type <span className="text-red-500">*</span></label>
-                          <select name="hiringType" className={`w-full mt-2 p-3 border ${formik.errors.hiringType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer`}
+                          <select name="hiringType" className={`w-full mt-2 p-3 border ${formik.errors.hiringType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
                             value={formik.values.hiringType} onChange={formik.handleChange}>
                             <option value="">Select</option>
                             {hiringTypes.map(h => <option key={h} value={h}>{h}</option>)}
@@ -439,7 +439,7 @@ function PostForm() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Interview Mode <span className="text-red-500">*</span></label>
-                          <select name="interviewMode" className={`w-full mt-2 p-3 border ${formik.errors.interviewMode ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer`}
+                          <select name="interviewMode" className={`w-full mt-2 p-3 border ${formik.errors.interviewMode ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
                             value={formik.values.interviewMode} onChange={formik.handleChange}>
                             <option value="">Select</option>
                             {interviewModes.map(m => <option key={m} value={m}>{m}</option>)}
@@ -462,13 +462,13 @@ function PostForm() {
                             }}
                             dateFormat="dd MMM yyyy"
                             placeholderText="Select Interview Date"
-                            className={`w-full mt-2 p-3 border ${formik.errors.interviewDate ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none cursor-pointer`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.interviewDate ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none cursor-pointer`}
                           />
                           {formik.errors.interviewDate && <span className="text-red-500 text-xs mt-1">{formik.errors.interviewDate}</span>}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Result <span className="text-red-500">*</span></label>
-                          <select name="result" className={`w-full mt-2 p-3 border ${formik.errors.result ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer`}
+                          <select name="result" className={`w-full mt-2 p-3 border ${formik.errors.result ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
                             value={formik.values.result} onChange={formik.handleChange}>
                             <option value="">Select</option>
                             {results.map(r => <option key={r} value={r}>{r}</option>)}
@@ -481,7 +481,7 @@ function PostForm() {
                           <textarea
                             name="content"
                             placeholder="Share some details about the role, team, or overall experience..."
-                            className={`w-full mt-2 p-3 border ${formik.errors.content && formik.touched.content ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none resize-y`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.content && formik.touched.content ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none resize-y`}
                             rows="4"
                             value={formik.values.content}
                             onChange={formik.handleChange}
@@ -594,7 +594,7 @@ function PostForm() {
                                             list="round-type-options" 
                                             name={`rounds.${index}.roundType`} 
                                             placeholder="Select or type (e.g., Online Assessment...)" 
-                                            className={`w-full mt-2 p-3 border ${roundError?.roundType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white`}
+                                            className={`w-full mt-2 p-3 border ${roundError?.roundType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none bg-white`}
                                             value={round.roundType} 
                                             onChange={formik.handleChange} 
                                             autoComplete="off"
@@ -608,11 +608,11 @@ function PostForm() {
                                           <label className="block text-sm font-medium text-gray-700">Duration <span className="text-red-500">*</span></label>
                                           <div className="flex gap-2 mt-2">
                                             <div className="flex-1 relative">
-                                              <input type="number" name={`rounds.${index}.durationHr`} min="0" placeholder="0" className={`w-full p-3 border ${roundError?.durationHr ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none pr-10`} value={round.durationHr} onChange={formik.handleChange} />
+                                              <input type="number" name={`rounds.${index}.durationHr`} min="0" placeholder="0" className={`w-full p-3 border ${roundError?.durationHr ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none pr-10`} value={round.durationHr} onChange={formik.handleChange} />
                                               <span className="absolute right-3 top-3.5 text-gray-500 text-sm">hr</span>
                                             </div>
                                             <div className="flex-1 relative">
-                                              <input type="number" name={`rounds.${index}.durationMin`} min="0" max="59" placeholder="0" className={`w-full p-3 border ${roundError?.durationMin ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none pr-12`} value={round.durationMin} onChange={formik.handleChange} />
+                                              <input type="number" name={`rounds.${index}.durationMin`} min="0" max="59" placeholder="0" className={`w-full p-3 border ${roundError?.durationMin ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none pr-12`} value={round.durationMin} onChange={formik.handleChange} />
                                               <span className="absolute right-3 top-3.5 text-gray-500 text-sm">min</span>
                                             </div>
                                           </div>
@@ -656,7 +656,7 @@ function PostForm() {
                                                     Q{qIndex + 1}
                                                   </div>
                                                   <input type="text" name={`rounds.${index}.questionsAsked.${qIndex}`} placeholder="Enter the question asked in this round..."
-                                                    className={`flex-1 h-12 p-3 border ${questionError && typeof questionError === 'string' ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none`}
+                                                    className={`flex-1 h-12 p-3 border ${questionError && typeof questionError === 'string' ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none`}
                                                     value={question} onChange={formik.handleChange} />
                                                   <button type="button" onClick={() => removeQuestion(qIndex)} className="w-12 h-12 flex items-center justify-center border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition cursor-pointer shrink-0" disabled={round.questionsAsked.length === 1}>
                                                     <Trash2 size={18} />
@@ -678,7 +678,7 @@ function PostForm() {
                                   <div className="mb-6">
                                     <label className="block text-sm font-medium text-gray-700">Experience & Tips <span className="text-red-500">*</span></label>
                                     <textarea name={`rounds.${index}.experienceAndTips`} rows={4} placeholder="Share your experience, what was discussed, important tips for others..."
-                                      className={`w-full mt-2 p-3 border ${roundError?.experienceAndTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none resize-y`}
+                                      className={`w-full mt-2 p-3 border ${roundError?.experienceAndTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none resize-y`}
                                       value={round.experienceAndTips} onChange={formik.handleChange}></textarea>
                                     {roundError?.experienceAndTips && <span className="text-red-500 text-xs mt-1">{roundError.experienceAndTips}</span>}
                                   </div>
@@ -750,28 +750,28 @@ function PostForm() {
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Base Salary</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.base" placeholder="e.g. 15" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.base" placeholder="e.g. 15" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Bonus / Sign-on</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.bonus" placeholder="e.g. 2" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.bonus" placeholder="e.g. 2" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Stocks / RSUs</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.stocks" placeholder="e.g. 10" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.stocks" placeholder="e.g. 10" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Total CTC</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.totalCTC" placeholder="e.g. 27" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.totalCTC" placeholder="e.g. 27" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
@@ -790,7 +790,7 @@ function PostForm() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Preparation Duration</label>
-                          <select name="preparationDuration" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer"
+                          <select name="preparationDuration" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer"
                             value={formik.values.preparationDuration} onChange={formik.handleChange}>
                             <option value="">Select duration</option>
                             {durations.map(d => <option key={d} value={d}>{d}</option>)}
@@ -799,7 +799,7 @@ function PostForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Preparation Resources <span className="text-gray-400 font-normal">(Optional)</span></label>
                           <input type="text" name="preparationResources" placeholder="e.g., LeetCode, GeeksforGeeks, Striver Sheet"
-                            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none"
                             value={formik.values.preparationResources} onChange={formik.handleChange}
                           />
                         </div>
@@ -808,7 +808,7 @@ function PostForm() {
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Overall Tips for Future Aspirants <span className="text-red-500">*</span></label>
                         <textarea name="overallTips" rows={4} placeholder="Share your overall tips and advice..."
-                          className={`w-full mt-2 p-3 border ${formik.errors.overallTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none resize-y`}
+                          className={`w-full mt-2 p-3 border ${formik.errors.overallTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none resize-y`}
                           value={formik.values.overallTips} onChange={formik.handleChange}></textarea>
                         {formik.errors.overallTips && <span className="text-red-500 text-xs mt-1">{formik.errors.overallTips}</span>}
                       </div>

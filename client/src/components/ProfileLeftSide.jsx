@@ -129,9 +129,25 @@ const ProfileLeftSide = ({ profileData }) => {
           <h2 className="text-[22px] font-bold text-gray-900 mb-1 leading-tight">
             {profileData?.username || 'Vaibhav Patil'}
           </h2>
-          <p className="text-gray-900 font-medium text-[15px] mb-1">
-            {profileData?.workExperiences?.find(exp => exp.isCurrentlyWorking)?.jobTitle || profileData?.workExperiences?.[0]?.jobTitle || 'Fresher'}
-          </p>
+          
+          {(() => {
+            const primaryExp = profileData?.workExperiences?.find(exp => exp.isCurrentlyWorking) || profileData?.workExperiences?.[0];
+            const secondaryExp = profileData?.workExperiences?.find(exp => exp._id !== primaryExp?._id);
+
+            return (
+              <>
+                <p className={`text-gray-900 font-medium text-[15px] ${secondaryExp ? '' : 'mb-1'}`}>
+                  {primaryExp?.jobTitle || 'Fresher'}
+                </p>
+                {secondaryExp && (
+                  <p className="text-gray-400 text-[13px] mb-1 mt-0.5">
+                    (Ex- {secondaryExp.jobTitle} at {secondaryExp.company})
+                  </p>
+                )}
+              </>
+            );
+          })()}
+
           <p className="text-blue-700 text-[14px] font-medium mb-1 tracking-wide">
             Total exp: {profileData?.experienceYears || 0} yrs {profileData?.experienceMonths || 0} mos
           </p>

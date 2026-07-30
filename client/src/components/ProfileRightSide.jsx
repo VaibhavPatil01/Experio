@@ -1324,24 +1324,26 @@ const ProfileRightSide = ({ profileData }) => {
                 </div>
               )}
 
-              <div>
-                <div className="mb-2 flex items-center gap-1">
-                  <label className="text-[14.5px] font-medium text-gray-700">Notice Period</label>
-                  <span className="text-red-500">*</span>
+              {workExpForm.isCurrentlyWorking && (
+                <div>
+                  <div className="mb-2 flex items-center gap-1">
+                    <label className="text-[14.5px] font-medium text-gray-700">Notice Period</label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <select 
+                    value={workExpForm.noticePeriod}
+                    onChange={(e) => setWorkExpForm({...workExpForm, noticePeriod: e.target.value})}
+                    className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
+                  >
+                    <option value="" disabled>Select Notice Period</option>
+                    <option value="15 Days">15 Days or less</option>
+                    <option value="1 Month">1 Month</option>
+                    <option value="2 Months">2 Months</option>
+                    <option value="3 Months">3 Months</option>
+                    <option value="More than 3 Months">More than 3 Months</option>
+                  </select>
                 </div>
-                <select 
-                  value={workExpForm.noticePeriod}
-                  onChange={(e) => setWorkExpForm({...workExpForm, noticePeriod: e.target.value})}
-                  className="w-full border border-gray-200 rounded-md px-3.5 py-2.5 text-[15px] text-gray-800 focus:outline-none focus:border-gray-400 transition-colors appearance-none bg-white"
-                >
-                  <option value="" disabled>Select Notice Period</option>
-                  <option value="15 Days">15 Days or less</option>
-                  <option value="1 Month">1 Month</option>
-                  <option value="2 Months">2 Months</option>
-                  <option value="3 Months">3 Months</option>
-                  <option value="More than 3 Months">More than 3 Months</option>
-                </select>
-              </div>
+              )}
 
               <div>
                 <div className="mb-2 flex items-center gap-1">
