@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLContent.js';
-import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService } from '../services/postService.js';
+import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService } from '../services/postService.js';
 import { findUserById } from '../services/userService.js';
+import { eventBus, EVENTS } from '../events/index.js';
 
 
 export async function getPost(req, res) {
@@ -57,8 +58,11 @@ export async function getPost(req, res) {
         isBookmarked,
         postAuthor,
         postAuthorProfilePicture,
+        _id: post._id,
         isUpVoted,
         isDownVoted,
+        upVoteCount: post.upVotes.length,
+        downVoteCount: post.downVotes.length,
         hiringType: post.hiringType,
         interviewMode: post.interviewMode,
         interviewDate: post.interviewDate,
@@ -161,6 +165,10 @@ export async function createPost(req, res) {
   // Create post using the post services
   try {
     const post = await createPostService(postData);
+    
+    // AI Layer Sync
+    eventBus.emit(EVENTS.POST_CREATED, { postId: post._id });
+
     return res
       .status(200)
       .json({ message: 'Post Created Successfully', postId: post._id });
@@ -208,6 +216,9 @@ export async function deletePost(req, res) {
   if (postDeleteResponse.deletedCount === 0) {
     return res.status(404).json({ message: 'Post Could not be Delete' });
   }
+
+  // AI Layer Sync
+  eventBus.emit(EVENTS.POST_DELETED, { postId: postId });
 
   return res.status(200).json({ message: 'Post Deleted Successfully' });
 }
@@ -370,6 +381,9 @@ export async function editPost(req, res) {
       });
     }
 
+    // AI Layer Sync
+    eventBus.emit(EVENTS.POST_UPDATED, { postId: postId });
+
     return res
       .status(200)
       .json({ message: 'Post edited succesfully', data: post });
@@ -400,6 +414,21 @@ export async function getCompanyAndRole(req, res) {
         company: data[0].company ? data[0].company : [],
         role: data[0].role ? data[0].role : [],
       },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong.....' });
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------- //
+
+export async function getTopCompanies(req, res) {
+  try {
+    const data = await getTopCompaniesService();
+    return res.status(200).json({
+      message: 'Top companies fetched successfully',
+      data,
     });
   } catch (error) {
     console.log(error);
@@ -503,7 +532,7 @@ export async function getAllPost(req, res) {
     if (sortBy === 'new') sort = '-createdAt';
     else if (sortBy === 'old') sort = 'createdAt';
     else if (sortBy === 'views') sort = '-views';
-    // else if (sortBy === 'top') sort.voteCount = 'desc';
+    else if (sortBy === 'top') sort = 'top';
   }
 
   // Adding search filter

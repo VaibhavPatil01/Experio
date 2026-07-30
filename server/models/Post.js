@@ -56,6 +56,7 @@ const postSchema = new mongoose.Schema({
     currency: { type: String, default: 'INR' }
   },
   rounds: [roundSchema],
+  difficulty: { type: String, required: false },
   technologies: [{ type: String }],
   dsaTopics: [{ type: String }],
   coreSubjects: [{ type: String }],

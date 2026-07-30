@@ -99,6 +99,19 @@ export const getCompanyAndRoleService = () => {
   ]);
 };
 
+export const getTopCompaniesService = () => {
+  return postModel.aggregate([
+    {
+      $group: {
+        _id: '$company',
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1 } },
+    { $limit: 5 }
+  ]);
+};
+
 export const addUserToBookmark = (postId, userId) => {
   const conditions = {
     _id: postId,
@@ -121,7 +134,38 @@ export const removeUserFromBookmark = (postId, userId) => {
   return postModel.updateOne(conditions, update);
 };
 
-export const getAllPostsService = (filter, sort, limit, skip) => {
+export const getAllPostsService = async (filter, sort, limit, skip) => {
+  if (sort === 'top') {
+    return postModel.aggregate([
+      { $match: filter },
+      { $addFields: { 
+          voteCount: { 
+            $subtract: [
+              { $size: { $ifNull: ["$upVotes", []] } }, 
+              { $size: { $ifNull: ["$downVotes", []] } }
+            ] 
+          } 
+      }},
+      { $sort: { voteCount: -1, createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      { $project: { comments: 0, status: 0, tags: 0, voteCount: 0 } },
+      { $lookup: { 
+          from: 'users', 
+          localField: 'userId', 
+          foreignField: '_id', 
+          as: 'userId' 
+      }},
+      { $unwind: "$userId" },
+      { $project: {
+          "userId.password": 0,
+          "userId.email": 0,
+          "userId.isAdmin": 0,
+          "userId.isEmailVerified": 0
+      }}
+    ]);
+  }
+
   return postModel
     .find(filter)
     .sort(sort)

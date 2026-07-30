@@ -8,7 +8,7 @@ import { createPost, editPost, getPost, getCompanyAndRoleList } from '../service
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import postFormImage from '../assets/images/pages/post-form.png';
-import { ChevronDown, ChevronUp, X, Plus, Trash2, CheckCircle2, MessageSquare, BookOpen, PenTool, ShieldAlert, Eye, Clock, GripVertical } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, Plus, Trash2, CheckCircle2, MessageSquare, BookOpen, PenTool, ShieldAlert, Eye, Clock, GripVertical, Star } from 'lucide-react';
 import { useAppSelector } from '../redux/store.js';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -27,33 +27,81 @@ const durations = ['< 1 Month', '1-2 Months', '3-6 Months', '> 6 Months'];
 
 const MultiSelect = ({ options, value, onChange, placeholder, error }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const toggle = (opt) => {
-    if (value.includes(opt)) onChange(value.filter(v => v !== opt));
-    else onChange([...value, opt]);
+  const [inputValue, setInputValue] = useState('');
+  const containerRef = useRef(null);
+
+  React.useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const handleAdd = (opt) => {
+    if (!value.includes(opt)) {
+      onChange([...value, opt]);
+    }
+    setInputValue('');
   };
+
+  const handleRemove = (opt) => {
+    onChange(value.filter(v => v !== opt));
+  };
+
+  const filteredOptions = options.filter(opt => 
+    opt.toLowerCase().includes(inputValue.toLowerCase()) && !value.includes(opt)
+  );
+
+  const showAddButton = inputValue.trim() !== '' && !options.some(opt => opt.toLowerCase() === inputValue.trim().toLowerCase()) && !value.includes(inputValue.trim());
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <div
-        className={`w-full min-h-[50px] mt-2 p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex flex-wrap gap-2 cursor-pointer bg-white items-center`}
-        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full min-h-[50px] mt-2 p-2 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex flex-wrap gap-2 cursor-text bg-white items-center`}
+        onClick={() => setIsOpen(true)}
       >
-        {value.length === 0 && <span className="text-gray-400">{placeholder}</span>}
         {value.map(v => (
           <span key={v} className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm flex items-center gap-1">
             {v}
-            <button type="button" className="cursor-pointer" onClick={(e) => { e.stopPropagation(); toggle(v); }}><X size={14} /></button>
+            <button type="button" className="cursor-pointer hover:text-green-900" onClick={(e) => { e.stopPropagation(); handleRemove(v); }}><X size={14} /></button>
           </span>
         ))}
-        <ChevronDown className="absolute right-3 text-gray-400" size={20} />
+        <input 
+          type="text" 
+          value={inputValue}
+          onChange={(e) => { setInputValue(e.target.value); setIsOpen(true); }}
+          onFocus={() => setIsOpen(true)}
+          placeholder={value.length === 0 ? placeholder : ''}
+          className="flex-1 min-w-[120px] outline-none bg-transparent"
+        />
+        <ChevronDown className="text-gray-400 cursor-pointer ml-auto" size={20} onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }} />
       </div>
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
-          {options.map(opt => (
-            <label key={opt} className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer">
-              <input type="checkbox" className="mr-2 rounded text-green-600 focus:ring-green-500 cursor-pointer" checked={value.includes(opt)} onChange={() => toggle(opt)} />
-              {opt}
-            </label>
-          ))}
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map(opt => (
+              <div 
+                key={opt} 
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-700"
+                onClick={() => handleAdd(opt)}
+              >
+                {opt}
+              </div>
+            ))
+          ) : (
+            !showAddButton && <div className="px-4 py-2 text-gray-500 italic text-sm">No options found</div>
+          )}
+          {showAddButton && (
+            <div 
+              className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-green-600 font-medium flex items-center gap-2 border-t border-gray-100"
+              onClick={() => handleAdd(inputValue.trim())}
+            >
+              <Plus size={16} /> Add "{inputValue.trim()}"
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -83,15 +131,16 @@ const SingleSelect = ({ options, value, onChange, placeholder, error }) => {
 
   return (
     <div className="relative mt-2" ref={containerRef}>
-      <div
-        className={`w-full p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex gap-2 cursor-pointer bg-white items-center justify-between ${isOpen ? 'ring-2 ring-green-500 border-transparent' : ''}`}
+      <button
+        type="button"
+        className={`w-full p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex gap-2 cursor-pointer bg-white items-center justify-between focus:outline-none focus:ring-0 ${isOpen ? 'border-green-500 shadow-sm' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className={value ? "text-gray-900" : "text-gray-400"}>
           {selectedOpt ? selectedOpt.label : placeholder}
         </span>
         <ChevronDown className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} size={20} />
-      </div>
+      </button>
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {options.map(opt => (
@@ -191,6 +240,8 @@ function PostForm() {
     preparationDuration: postToEdit.preparationDuration || '',
     preparationResources: postToEdit.preparationResources || '',
     overallTips: postToEdit.overallTips || '',
+    rating: postToEdit.rating || 0,
+    difficulty: postToEdit.difficulty || '',
     isAnonymous: postToEdit.isAnonymous || false,
   } : {
     company: '',
@@ -225,6 +276,8 @@ function PostForm() {
     preparationDuration: '',
     preparationResources: '',
     overallTips: '',
+    rating: 0,
+    difficulty: '',
     isAnonymous: false,
   };
 
@@ -537,11 +590,18 @@ function PostForm() {
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                         <div>
                                           <label className="block text-sm font-medium text-gray-700">Round Type <span className="text-red-500">*</span></label>
-                                          <select name={`rounds.${index}.roundType`} className={`w-full mt-2 p-3 border ${roundError?.roundType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none appearance-none bg-white cursor-pointer`}
-                                            value={round.roundType} onChange={formik.handleChange}>
-                                            <option value="">Select (e.g., Online Assessment...)</option>
-                                            {roundTypes.map(r => <option key={r} value={r}>{r}</option>)}
-                                          </select>
+                                          <input 
+                                            list="round-type-options" 
+                                            name={`rounds.${index}.roundType`} 
+                                            placeholder="Select or type (e.g., Online Assessment...)" 
+                                            className={`w-full mt-2 p-3 border ${roundError?.roundType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white`}
+                                            value={round.roundType} 
+                                            onChange={formik.handleChange} 
+                                            autoComplete="off"
+                                          />
+                                          <datalist id="round-type-options">
+                                            {roundTypes.map(r => <option key={r} value={r} />)}
+                                          </datalist>
                                           {roundError?.roundType && <span className="text-red-500 text-xs mt-1">{roundError.roundType}</span>}
                                         </div>
                                         <div>
@@ -745,12 +805,43 @@ function PostForm() {
                         </div>
                       </div>
 
-                      <div className="mb-8">
+                      <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Overall Tips for Future Aspirants <span className="text-red-500">*</span></label>
                         <textarea name="overallTips" rows={4} placeholder="Share your overall tips and advice..."
                           className={`w-full mt-2 p-3 border ${formik.errors.overallTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-green-500 outline-none resize-y`}
                           value={formik.values.overallTips} onChange={formik.handleChange}></textarea>
                         {formik.errors.overallTips && <span className="text-red-500 text-xs mt-1">{formik.errors.overallTips}</span>}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5 items-center">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Overall Difficulty</label>
+                          <SingleSelect 
+                            options={difficulties.map(opt => ({ value: opt, label: opt }))}
+                            value={formik.values.difficulty}
+                            onChange={(val) => formik.setFieldValue('difficulty', val)}
+                            placeholder="Select difficulty"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Rate your Overall Experience</label>
+                          <div className="flex items-center gap-2 mt-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => formik.setFieldValue('rating', star)}
+                                className={`cursor-pointer transition-colors ${formik.values.rating >= star ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-200'}`}
+                              >
+                                <Star className="w-8 h-8" fill={formik.values.rating >= star ? 'currentColor' : 'none'} strokeWidth={1.5} />
+                              </button>
+                            ))}
+                            <span className="ml-3 text-sm font-medium text-gray-500">
+                              {formik.values.rating > 0 ? `${formik.values.rating} out of 5` : 'Select a rating'}
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-6 border-t border-gray-200">

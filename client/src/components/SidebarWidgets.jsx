@@ -37,15 +37,16 @@ export const PopularSubjectsWidget = () => {
   );
 };
 
+import { useQuery } from '@tanstack/react-query';
+import { getTopCompanies } from '../services/postServices.js';
+
 export const TopCompaniesWidget = () => {
-  // We can use generic colored squares or initial letter for mock logos if actual logos aren't available
-  const companies = [
-    { name: 'Google', count: '6.2K', color: 'bg-red-100 text-red-500' },
-    { name: 'Microsoft', count: '5.1K', color: 'bg-blue-100 text-blue-500' },
-    { name: 'Amazon', count: '4.8K', color: 'bg-yellow-100 text-yellow-600' },
-    { name: 'Flipkart', count: '2.3K', color: 'bg-blue-100 text-blue-600' },
-    { name: 'Adobe', count: '1.8K', color: 'bg-red-100 text-red-600' },
-  ];
+  const { data, isLoading } = useQuery({
+    queryKey: ['top-companies'],
+    queryFn: () => getTopCompanies()
+  });
+
+  const companies = data?.data || [];
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6">
@@ -55,19 +56,24 @@ export const TopCompaniesWidget = () => {
           View all
         </button>
       </div>
-      <div className="space-y-4">
-        {companies.map((company, index) => (
-          <div key={index} className="flex justify-between items-center group cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${company.color}`}>
-                {company.name.charAt(0)}
+      
+      {isLoading ? (
+        <div className="flex justify-center p-4"><div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>
+      ) : (
+        <div className="space-y-4">
+          {companies.map((company, index) => (
+            <div key={index} className="flex justify-between items-center group cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-gray-100 text-gray-700">
+                  {company._id ? company._id.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <span className="text-sm font-medium text-gray-800 group-hover:text-primary transition-colors">{company._id || 'Unknown'}</span>
               </div>
-              <span className="text-sm font-medium text-gray-800 group-hover:text-primary transition-colors">{company.name}</span>
+              <span className="text-xs text-gray-400 font-medium">{company.count} posts</span>
             </div>
-            <span className="text-xs text-gray-400 font-medium">{company.count} posts</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

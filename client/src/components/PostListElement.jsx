@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import generateSlug from '../utils/generateSlug.js';
 import getFormattedDate from '../utils/getFormatedDate.js';
-import { BadgeCheck, Bookmark, MoreVertical, ArrowBigUp, MessageSquare, Eye, MapPin, Calendar, Clock, Share2, Flag, Link2 } from 'lucide-react';
+import { BadgeCheck, Bookmark, MoreVertical, ThumbsUp, MessageSquare, Eye, MapPin, Calendar, Clock, Share2, Flag, Link2 } from 'lucide-react';
 import LoginRequiredLink from './LoginRequiredLink';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleBookmark } from '../services/postServices.js';
@@ -62,13 +62,25 @@ function PostListElement({ post, openModal, openDeleteModal }) {
   const displayTags = tags.slice(0, 4);
   const extraTags = tags.length > 4 ? tags.length - 4 : 0;
 
-  // Mocked match score
-  const matchScore = Math.floor(Math.random() * (98 - 70 + 1) + 70); 
+  // Real match score if available, otherwise null
+  const matchScore = post.matchPercentage || null;
+  const matchPercentageNum = matchScore ? parseInt(matchScore.split('%')[0], 10) : 0;
+  
+  let matchColorClass = 'text-emerald-600 bg-emerald-50';
+  if (matchScore) {
+    if (matchPercentageNum >= 75) {
+      matchColorClass = 'text-emerald-600 bg-emerald-50'; // Green
+    } else if (matchPercentageNum >= 40) {
+      matchColorClass = 'text-amber-600 bg-amber-50'; // Yellow
+    } else {
+      matchColorClass = 'text-gray-500 bg-gray-100'; // Gray
+    }
+  }
 
   // Counts
-  const upvotes = post.upVotes?.length || post.votes || Math.floor(Math.random() * 200) + 10;
-  const commentsCount = post.comments?.length || Math.floor(Math.random() * 50);
-  const views = post.views || Math.floor(Math.random() * 5000) + 100;
+  const upvotes = post.upVotes?.length || post.votes || 0;
+  const commentsCount = post.comments?.length || 0;
+  const views = post.views || 0;
   const formatCount = (num) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num;
@@ -136,9 +148,11 @@ function PostListElement({ post, openModal, openDeleteModal }) {
         
         {/* Top Right Actions */}
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
-            {matchScore}% Match
-          </span>
+          {matchScore && (
+            <span className={`text-xs font-semibold px-2 py-1 rounded-md ${matchColorClass}`}>
+              {matchScore}
+            </span>
+          )}
           <button 
             className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
             onClick={handleBookmarkClick}
@@ -224,7 +238,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
         <div className="flex items-center gap-8 text-gray-500 text-base">
           <button className="flex items-center gap-1.5 hover:text-primary transition-colors">
-            <ArrowBigUp className="w-6 h-6" />
+            <ThumbsUp className="w-5 h-5" />
             <span className="font-medium">{formatCount(upvotes)}</span>
           </button>
           <button className="flex items-center gap-1.5 hover:text-primary transition-colors">

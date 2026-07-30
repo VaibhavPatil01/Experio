@@ -1,7 +1,7 @@
 import express from 'express';
 import tokenDataParser from '../middleware/tokenDataParser.js';
 import isUserAuth from '../middleware/isUserAuth.js';
-import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAllPost, getCompanyAndRole, getPost, getRelatedPosts, getUserBookmarkedPost, getUserPost, removeUserBookmark, upVotePost, getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote } from '../controllers/postController.js';
+import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAllPost, getCompanyAndRole, getTopCompanies, getPost, getRelatedPosts, getUserBookmarkedPost, getUserPost, removeUserBookmark, upVotePost, getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote } from '../controllers/postController.js';
 
 const postRouter = express.Router(); 
 
@@ -13,6 +13,7 @@ postRouter.post('/upvote/:id', isUserAuth, upVotePost);
 postRouter.post('/downvote/:id', isUserAuth, downVotePost);
 postRouter.put('/edit', isUserAuth, editPost);
 postRouter.get('/data/company-roles', getCompanyAndRole);
+postRouter.get('/data/top-companies', getTopCompanies);
 postRouter.post('/bookmark/:id', isUserAuth, addUserBookmark);
 postRouter.delete('/bookmark/:id', isUserAuth, removeUserBookmark); 
 postRouter.get('', tokenDataParser, getAllPost);

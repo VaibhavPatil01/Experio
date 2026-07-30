@@ -110,6 +110,23 @@ export function getRelatedPosts(postId, limit) {
     .then((data) => data.relatedPosts);
 }
 
+export function getRecommendedFeedPaginated(page, limit) {
+  const url = new URL(`${BASE_API_URL}/recommendations/feed`);
+  url.searchParams.set('limit', limit.toString());
+  // The backend might not support page for vector search yet, but we pass limit
+
+  return axios
+    .get(url.href, { headers: { token: getAuthToken() } })
+    .then((res) => res.data)
+    .then((data) => {
+      // Mock page object since recommendation API doesn't paginate yet
+      return {
+        data: data.data,
+        page: { nextPage: undefined }
+      };
+    });
+}
+
 export function getUserPostPaginated(userId, page, limit) {
   const url = new URL(`${BASE_API_URL}/posts/user/all/${userId}`);
   url.searchParams.set('page', page.toString());
@@ -153,6 +170,12 @@ export function toggleBookmark(postId, isBookmarked) {
 
 export function getCompanyAndRoleList() {
   const url = new URL(`${BASE_API_URL}/posts/data/company-roles`);
+
+  return axios.get(url.href).then((res) => res.data);
+}
+
+export function getTopCompanies() {
+  const url = new URL(`${BASE_API_URL}/posts/data/top-companies`);
 
   return axios.get(url.href).then((res) => res.data);
 }

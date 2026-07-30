@@ -7,6 +7,7 @@ import generateAuthToken from '../utils/token/generateAuthToken.js';
 import generateEmailVerificationToken from '../utils/token/generateEmailVerificationToken.js';
 import generateForgotPasswordToken from '../utils/token/generateForgotPasswordToken.js';
 import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, getUserProfileService, updateUserService } from '../services/userService.js';
+import { eventBus, EVENTS } from '../events/index.js';
 
 
 export async function loginUser(req, res) { 
@@ -344,6 +345,10 @@ export async function editUserProfile(req, res) {
   const userId = req.body.authTokenData.id;
   try {
     const user = await editProfile(userId, updatedProfile);
+    
+    // AI Layer Sync
+    eventBus.emit(EVENTS.USER_UPDATED, { userId: userId });
+
     return res
       .status(200)
       .json({ message: 'User Profile Edited Successfully', data: user });
@@ -540,6 +545,10 @@ export async function updateUserProfile(req, res) {
     }
 
     const updatedUser = await updateUserService(user._id, req.body);
+
+    // AI Layer Sync
+    eventBus.emit(EVENTS.USER_UPDATED, { userId: user._id });
+
     return res.status(200).json({ message: 'Profile updated successfully', data: updatedUser });
   } catch (error) {
     console.log(error);

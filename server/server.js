@@ -9,12 +9,14 @@ import passport from 'passport';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Import custom modules
 import './configs/passport.js';
 import connectDB from './configs/db.js';
+import { initQdrant } from './configs/qdrant.js';
+import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
 import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
+import recommendationRouter from './routes/recommendationRoutes.js';
 import preventServerSleep from './utils/preventServerSleep.js'; 
 
 import Sentiment from 'sentiment';
@@ -77,6 +79,7 @@ app.post('/test-sentiment', (req, res) => {
 app.use('/user', userRouter);
 app.use('/posts', postRouter);
 app.use('/comments', commentRouter);
+app.use('/recommendations', recommendationRouter);
 
 // --------------------- Home Route ---------------------
 app.get('/', (req, res) => {
@@ -86,8 +89,14 @@ app.get('/', (req, res) => {
 // --------------------- Start Server ---------------------
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅ Server is running on PORT ${PORT}`);
+  
+  // Initialize AI Knowledge Layer
+  await initQdrant();
+  initEmbeddingSyncWorker();
+  console.log('✅ AI Knowledge Layer Initialized');
+
   preventServerSleep(); // Schedule background task
 });
 

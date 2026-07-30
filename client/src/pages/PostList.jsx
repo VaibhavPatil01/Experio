@@ -6,9 +6,9 @@ import { postTypes } from '../assets/assets.js';
 import PostListElement from '../components/PostListElement';
 import PostSkeleton from '../components/PostSkeleton';
 import PostFilters from '../components/PostFilters';
-import { PopularSubjectsWidget, TopCompaniesWidget } from '../components/SidebarWidgets';
+import { TopCompaniesWidget } from '../components/SidebarWidgets';
 import { Sparkles, Info } from 'lucide-react';
-import { getCompanyAndRoleList, getPostsPaginated, getBookmarkedPostsPaginated } from '../services/postServices.js';
+import { getCompanyAndRoleList, getPostsPaginated, getBookmarkedPostsPaginated, getRecommendedFeedPaginated } from '../services/postServices.js';
 import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
 import { useAppSelector } from '../redux/store.js';
 import DeletePostModal from '../components/DeletePostModal.jsx';
@@ -43,11 +43,25 @@ function PostList() {
     queryKey: ['posts', filter, activeTab],
     getNextPageParam: (prevData) => prevData.page?.nextPage,
     queryFn: ({ pageParam = 1, signal }) => {
+      if (activeTab === 'For You') {
+        if (!user) return Promise.resolve({ data: [], page: {} });
+        return getRecommendedFeedPaginated(pageParam, 10);
+      }
       if (activeTab === 'Bookmarks') {
         if (!user) return Promise.resolve({ data: [], page: {} }); 
         return getBookmarkedPostsPaginated(user.userId, pageParam, 10);
       }
-      return getPostsPaginated(pageParam, 10, filter, signal);
+      
+      const currentFilter = { ...filter };
+      if (activeTab === 'Recent') {
+        currentFilter.sortBy = 'new';
+      } else if (activeTab === 'Most Upvoted') {
+        currentFilter.sortBy = 'top';
+      } else if (activeTab === 'Trending') {
+        currentFilter.sortBy = 'views';
+      }
+
+      return getPostsPaginated(pageParam, 10, currentFilter, signal);
     }
   });
 
@@ -176,7 +190,7 @@ function PostList() {
                   <button 
                     key={tab} 
                     onClick={() => {
-                      if (tab === 'Bookmarks' && !user) {
+                      if ((tab === 'Bookmarks' || tab === 'For You') && !user) {
                         openLoginModal(window.location.pathname);
                         return;
                       }
@@ -211,7 +225,6 @@ function PostList() {
 
             {/* Right Sidebar */}
             <div className="hidden lg:block">
-              <PopularSubjectsWidget />
               <TopCompaniesWidget />
             </div>
 
