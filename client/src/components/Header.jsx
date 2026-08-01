@@ -230,30 +230,12 @@ const Navbar = () => {
         <Link to="/posts" className="hover:text-green-600">
           Experiences
         </Link>
-        <div className="group relative">
-          <button
-            type="button"
-            className="inline-flex cursor-pointer items-center gap-1 hover:text-green-600"
-          >
-            AI Tools
-            <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
-          </button>
-
-          <div className="invisible absolute left-1/2 top-full z-50 mt-3 w-52 -translate-x-1/2 translate-y-2 rounded-md border border-slate-200 bg-white py-2 text-slate-800 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-            {aiTools.map((tool) => (
-              <Link
-                key={tool.label}
-                to={tool.path}
-                className="block px-4 py-2.5 text-sm transition hover:bg-green-50 hover:text-green-600 dark:hover:bg-gray-800"
-              >
-                {tool.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <a href="#cta" className="hover:text-green-600">
-          Contact
-        </a>
+        <Link to="/resume" className="hover:text-green-600">
+          Resume
+        </Link>
+        <Link to="/assistant" className="hover:text-green-600">
+          Assistant
+        </Link>
       </div>
 
       <div className="flex items-center gap-2">
@@ -491,44 +473,20 @@ const Navbar = () => {
         >
           Experiences
         </Link>
-        <div className="px-2 py-3">
-          <button
-            type="button"
-            onClick={() => setIsAiToolsOpen(!isAiToolsOpen)}
-            className="flex w-full cursor-pointer items-center justify-between font-medium hover:text-green-600"
-            aria-expanded={isAiToolsOpen}
-          >
-            <span>AI Tools</span>
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${isAiToolsOpen ? 'rotate-180' : ''
-                }`}
-            />
-          </button>
-          <div
-            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${isAiToolsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-              }`}
-          >
-            <div className="mt-2 flex min-h-0 flex-col gap-1 pl-3">
-              {aiTools.map((tool) => (
-                <Link
-                  key={tool.label}
-                  to={tool.path}
-                  onClick={handleCloseNavbar}
-                  className="rounded-md py-2 text-sm text-slate-600 hover:text-green-600 dark:text-gray-300"
-                >
-                  {tool.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-        <a
-          href="#cta"
+        <Link
+          to="/resume"
           onClick={handleCloseNavbar}
           className="rounded-md px-2 py-3 hover:text-green-600"
         >
-          Contact
-        </a>
+          Resume
+        </Link>
+        <Link
+          to="/assistant"
+          onClick={handleCloseNavbar}
+          className="rounded-md px-2 py-3 hover:text-green-600"
+        >
+          Assistant
+        </Link>
         {isLoggedIn && (
           <Link
             to="/post"

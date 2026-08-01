@@ -24,6 +24,7 @@ const ProfileEdit = lazy(() => import('./pages/ProfileEdit'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const UserSearch = lazy(() => import('./pages/UserSearch'));
 const Login = lazy(() => import('./pages/Login'));
+const Assistant = lazy(() => import('./pages/Assistant'));
 
 const App = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -66,6 +67,7 @@ const App = () => {
             <Route path="/posts" element={<PostList />} />
             <Route path="/token/google/:token" element={<GoogleTokenSetter />} />
             <Route path="/user/search" element={<UserSearch />} />
+            <Route path="/assistant" element={<Assistant />} />
             <Route element={<AuthRouteLayout />}>
               <Route path="/post" element={<PostForm />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
@@ -99,7 +101,7 @@ const App = () => {
           }
         `}
       </style>
-      {!isChatOpen && (
+      {!isChatOpen && pathname !== '/assistant' && (
         <div 
           onClick={() => setIsChatOpen(true)}
           className="fixed bottom-6 right-6 w-[60px] h-[60px] bg-primary rounded-full flex items-center justify-center cursor-pointer z-[9999] transition-all duration-300 shadow-xl text-primary group"
@@ -125,7 +127,9 @@ const App = () => {
         </div>
       )}
 
-      <ChatbotModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      {pathname !== '/assistant' && (
+        <ChatbotModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      )}
     </>
   );
 };
