@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 export const Banner = () => {
   const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [isVisible]);
 
   return (
     <div

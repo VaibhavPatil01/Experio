@@ -1,29 +1,78 @@
 import React, { useState } from 'react';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX } from 'lucide-react';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap } from 'lucide-react';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isSoundOn, setIsSoundOn] = useState(true);
-
-  if (!isOpen) return null;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [messages, setMessages] = useState([
+    { id: 1, sender: 'user', content: 'Hello' },
+    { id: 2, sender: 'system', content: <>Hello and welcome! How can we assist you today? If you have any questions about ChatBot, <span className="underline decoration-gray-400 underline-offset-2 cursor-pointer">Text.com</span>, or our suite of solutions, just let us know—I'm here to help!</> },
+    { id: 3, sender: 'user', content: 'Tell me a joke' },
+    { id: 4, sender: 'system', content: <>I'm here to assist you with any questions about ChatBot, <span className="underline decoration-gray-400 underline-offset-2 cursor-pointer">Text.com</span>, or our services. If you have a business-related inquiry or want to learn more about our products, please let me know!</> },
+    { id: 5, sender: 'user', content: 'Hii' },
+    { id: 6, sender: 'system', content: <>Hi there! How can we help you today? If you have any questions about ChatBot, <span className="underline decoration-gray-400 underline-offset-2 cursor-pointer">Text.com</span>, or our services, feel free to ask!</> }
+  ]);
 
   return (
-    <div className="fixed bottom-6 right-6 w-[420px] h-[calc(100vh-48px)] max-h-[800px] bg-[#f7f7f8] rounded-[24px] shadow-2xl flex flex-col z-[9999] overflow-hidden border border-gray-100 font-sans">
+    <>
+      <style>
+        {`
+          .chat-scroll::-webkit-scrollbar {
+            width: 14px;
+          }
+          .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #a1a1aa;
+            border-radius: 10px;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+          }
+          .chat-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: #71717a;
+          }
+          .chat-scroll::-webkit-scrollbar-button:vertical:decrement {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a1a1aa"><path d="M12 8l7 9H5z"/></svg>') no-repeat center center;
+            background-size: 10px;
+            height: 20px;
+          }
+          .chat-scroll::-webkit-scrollbar-button:vertical:increment {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a1a1aa"><path d="M12 16l-7-9h14z"/></svg>') no-repeat center center;
+            background-size: 10px;
+            height: 20px;
+          }
+        `}
+      </style>
+      <div className={`fixed bottom-4 right-4 ${isExpanded ? 'w-[800px]' : 'w-[420px]'} max-w-[calc(100%-32px)] h-[calc(100vh-32px)] max-h-[900px] bg-[#f7f7f8] rounded-[24px] shadow-2xl flex flex-col z-[9999] overflow-hidden border border-gray-100 font-sans transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-50 opacity-0 pointer-events-none'}`}>
       
       {/* Header Area */}
       <div className="relative pt-4 px-4 flex justify-between items-start z-10">
         
         {/* Expand Button */}
         <div className="relative flex">
-          <button className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors">
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800">
-              <polyline points="11 6 6 6 6 11" />
-              <polyline points="13 18 18 18 18 13" />
+              {isExpanded ? (
+                <>
+                  <polyline points="5 10 10 10 10 5" />
+                  <polyline points="19 14 14 14 14 19" />
+                </>
+              ) : (
+                <>
+                  <polyline points="11 6 6 6 6 11" />
+                  <polyline points="13 18 18 18 18 13" />
+                </>
+              )}
             </svg>
           </button>
           <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
-            Expand
+            {isExpanded ? 'Collapse' : 'Expand'}
             <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
           </div>
         </div>
@@ -101,7 +150,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       </div>
 
       {/* Chat Content Area */}
-      <div className="flex-1 overflow-y-auto px-5 pt-12 pb-4 flex flex-col gap-4 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto px-5 pt-12 pb-4 flex flex-col gap-4 chat-scroll">
         
         {/* Welcome Message */}
         <div className="flex gap-3">
@@ -111,20 +160,37 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <div className="flex-1"></div>
+        {messages.map((msg) => (
+          msg.sender === 'user' ? (
+            <div key={msg.id} className="flex justify-end mt-2">
+              <div className="bg-primary text-white text-[14px] px-4 py-2.5 rounded-2xl max-w-[85%] leading-relaxed">
+                {msg.content}
+              </div>
+            </div>
+          ) : (
+            <div key={msg.id} className="flex gap-3 mt-2">
+              <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mt-1" />
+              <div className="text-[14px] text-gray-700 leading-relaxed">
+                {msg.content}
+              </div>
+            </div>
+          )
+        ))}
 
         {/* Suggested Prompts */}
-        <div className="flex flex-col gap-2.5 items-start mt-4">
-          <button className="text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-            How does ChatBot improve customer support?
-          </button>
-          <button className="text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-            Can ChatBot handle sales and product recommendations?
-          </button>
-          <button className="text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-            Is technical knowledge required to set up ChatBot?
-          </button>
-        </div>
+        {messages.length === 0 && (
+          <div className="flex flex-col gap-2.5 items-start mt-4">
+            <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
+              How does ChatBot improve customer support?
+            </button>
+            <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
+              Can ChatBot handle sales and product recommendations?
+            </button>
+            <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
+              Is technical knowledge required to set up ChatBot?
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
@@ -148,15 +214,13 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       </div>
       
       {/* Footer Powered By */}
-      <div className="py-2.5 flex justify-center items-center gap-1.5 text-[11px] text-gray-400">
-        Powered by 
-        <div className="flex items-center gap-1 font-bold text-gray-500">
-          <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-          text.com
-        </div>
+      <div className="py-2.5 flex justify-center items-center text-[12.5px] text-gray-500">
+        <Zap className="w-3.5 h-3.5 text-primary mr-1" fill="currentColor" stroke="none" />
+        <span>Powered by</span>
+        <span className="font-bold text-gray-700 ml-0.5 tracking-tight">Mozify</span>
       </div>
-
     </div>
+    </>
   );
 };
 
