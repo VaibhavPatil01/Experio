@@ -371,7 +371,7 @@ const Assistant = () => {
 
                   {msg.sender === 'user' ? (
                     <div className="flex flex-col items-end group mt-2">
-                      <div className="bg-gray-100 dark:bg-[#2f2f2f] text-gray-900 dark:text-gray-100 px-5 py-2.5 rounded-3xl max-w-[80%]">
+                      <div className="bg-primary text-white px-5 py-2.5 rounded-2xl max-w-[80%] leading-relaxed">
                         {msg.text}
                       </div>
                       <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
