@@ -112,9 +112,7 @@ const AIResumeAnalyser = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Left Column: Form */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div 
               className="lg:col-span-5 space-y-6"
             >
                 <div className="space-y-5">
@@ -237,19 +235,13 @@ const AIResumeAnalyser = () => {
                   </button>
                 </div>
 
-            </motion.div>
+            </div>
 
             {/* Right Column: Results */}
             <div className="lg:col-span-7">
-              <AnimatePresence mode="wait">
                 
-                {/* Empty State */}
-                {!isAnalyzing && !result && (
-                  <motion.div 
-                    key="empty"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                {/* Instructions */}
+                  <div 
                     className="h-full min-h-[500px] flex flex-col items-center justify-center text-center p-2 sm:p-8"
                   >
                     {/* Illustration Area */}
@@ -323,136 +315,22 @@ const AIResumeAnalyser = () => {
                         <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">In under 30 seconds you receive a detailed dashboard with scores, keyword gaps, red flags, bullet rewrites, and a step-by-step action plan.</p>
                       </div>
                     </div>
-                  </motion.div>
-                )}
+                  </div>
 
-                {/* Loading State */}
-                {isAnalyzing && (
-                  <motion.div 
-                    key="loading"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="h-full min-h-[500px] flex flex-col items-center justify-center bg-white dark:bg-[#1e1e1e] rounded-2xl border border-gray-100 dark:border-gray-800 p-8"
-                  >
-                    <div className="relative mb-8">
-                      <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Sparkles className="w-6 h-6 text-primary animate-pulse" />
-                      </div>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Analyzing your resume...</h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm mb-8">
-                      Cross-referencing with our database of successful interview experiences and company profiles.
-                    </p>
-
-                    <div className="w-full max-w-md space-y-4">
-                      <div className="h-16 bg-gray-100 dark:bg-[#252525] rounded-xl animate-pulse"></div>
-                      <div className="h-24 bg-gray-100 dark:bg-[#252525] rounded-xl animate-pulse"></div>
-                      <div className="h-24 bg-gray-100 dark:bg-[#252525] rounded-xl animate-pulse"></div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Results State */}
-                {!isAnalyzing && result && (
-                  <motion.div 
-                    key="results"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="space-y-6"
-                  >
-                    {/* Score Card */}
-                    <div className="bg-gradient-to-br from-primary to-green-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl shadow-primary/20">
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div>
-                          <h3 className="text-xl font-medium text-white/90 mb-1">Overall Match Score</h3>
-                          <p className="text-white/80 text-sm max-w-md">
-                            Based on your target role {targetCompany && `at ${targetCompany}`} and industry standards.
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="w-24 h-24 rounded-full border-4 border-white/30 flex items-center justify-center bg-white/10 backdrop-blur-sm">
-                            <span className="text-4xl font-bold">{result.overallScore}%</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Strengths */}
-                    <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
-                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-                        <CheckCircle2 className="w-6 h-6 text-green-500" />
-                        What looks good
-                      </h3>
-                      <ul className="space-y-3">
-                        {result.strengths.map((strength, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 shrink-0"></div>
-                            <span className="text-gray-700 dark:text-gray-300">{strength}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Actionable Improvements */}
-                    <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
-                      <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-900 dark:text-white">
-                        <AlertCircle className="w-6 h-6 text-amber-500" />
-                        Targeted Improvements
-                      </h3>
-                      
-                      <div className="space-y-6">
-                        {result.improvements.map((imp, index) => (
-                          <div key={index} className="bg-amber-50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/20 rounded-xl p-5">
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">{imp.title}</h4>
-                            <p className="text-gray-700 dark:text-gray-300 mb-4">{imp.description}</p>
-                            
-                            {/* AI Reasoning & Citation */}
-                            <div className="bg-white dark:bg-[#252525] rounded-lg p-4 border border-amber-100 dark:border-gray-700">
-                              <div className="flex items-start gap-2 mb-2">
-                                <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                                <span className="font-medium text-sm text-gray-900 dark:text-white">Why this matters:</span>
-                              </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 ml-6 mb-3 italic">
-                                "{imp.reason}"
-                              </p>
-                              <div className="ml-6 inline-flex items-center gap-1.5 text-xs font-medium bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-md">
-                                <BookOpen className="w-3.5 h-3.5" />
-                                <span>Source: {imp.citation}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Suggested Keywords */}
-                    <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
-                      <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Suggested Keywords to Add</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        Based on successful profiles for similar roles, consider incorporating these terms if you have the experience:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {result.suggestedKeywords.map((keyword, index) => (
-                          <span key={index} className="px-3 py-1.5 bg-gray-100 dark:bg-[#252525] text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-gray-700 font-medium hover:border-primary/50 hover:text-primary dark:hover:text-primary transition-colors cursor-default">
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
 
           </div>
 
           {/* Insights Placeholder (Below the two columns) */}
+          <AnimatePresence mode="wait">
           {!isAnalyzing && !result && (
-            <div className="mt-16 mb-8 flex flex-col items-center justify-center text-center">
+            <motion.div
+              key="placeholder"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-16 mb-8 flex flex-col items-center justify-center text-center"
+            >
               <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
                 <img src={starIcon} alt="Stars icon" className="w-8 h-8" />
               </div>
@@ -462,8 +340,126 @@ const AIResumeAnalyser = () => {
               <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed px-4">
                 Fill in what you're targeting on the left, upload your resume, and we'll compare it against your profile and real interview experiences.
               </p>
-            </div>
+            </motion.div>
           )}
+          {/* Loading State */}
+          {isAnalyzing && (
+            <motion.div 
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-16 mb-8 h-full min-h-[500px] flex flex-col items-center justify-center bg-white dark:bg-[#1e1e1e] rounded-2xl border border-gray-100 dark:border-gray-800 p-8"
+            >
+              <div className="relative mb-8">
+                <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Analyzing your resume...</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm mb-8">
+                Cross-referencing with our database of successful interview experiences and company profiles.
+              </p>
+
+              <div className="w-full max-w-md space-y-4">
+                <div className="h-16 bg-gray-100 dark:bg-[#252525] rounded-xl animate-pulse"></div>
+                <div className="h-24 bg-gray-100 dark:bg-[#252525] rounded-xl animate-pulse"></div>
+                <div className="h-24 bg-gray-100 dark:bg-[#252525] rounded-xl animate-pulse"></div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Results State */}
+          {!isAnalyzing && result && (
+            <motion.div 
+              key="results"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mt-16 mb-8 space-y-6"
+            >
+              {/* Score Card */}
+              <div className="bg-gradient-to-br from-primary to-green-600 rounded-xl p-8 text-white relative overflow-hidden shadow-md shadow-primary/10">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div>
+                    <h3 className="text-xl font-medium text-white/90 mb-1">Overall Match Score</h3>
+                    <p className="text-white/80 text-sm max-w-md">
+                      Based on your target role {targetCompany && `at ${targetCompany}`} and industry standards.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 h-24 rounded-full border-4 border-white/30 flex items-center justify-center bg-white/10 backdrop-blur-sm">
+                      <span className="text-4xl font-bold">{result.overallScore}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Strengths */}
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-gray-100 dark:border-gray-800">
+                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                  What looks good
+                </h3>
+                <ul className="space-y-3">
+                  {result.strengths.map((strength, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 shrink-0"></div>
+                      <span className="text-gray-700 dark:text-gray-300">{strength}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Actionable Improvements */}
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-gray-100 dark:border-gray-800">
+                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
+                  Targeted Improvements
+                </h3>
+                
+                <div className="space-y-6">
+                  {result.improvements.map((imp, index) => (
+                    <div key={index} className="bg-green-50 dark:bg-green-500/5 border border-green-100 dark:border-green-500/20 rounded-xl p-5">
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">{imp.title}</h4>
+                      <p className="text-gray-700 dark:text-gray-300 mb-4">{imp.description}</p>
+                      
+                      {/* AI Reasoning & Citation */}
+                      <div className="bg-white dark:bg-[#252525] rounded-lg p-4 border border-green-100 dark:border-gray-700">
+                        <div className="flex items-start gap-2 mb-2">
+                          <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                          <span className="font-medium text-sm text-gray-900 dark:text-white">Why this matters:</span>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 ml-6 mb-3 italic">
+                          "{imp.reason}"
+                        </p>
+                        <div className="ml-6 inline-flex items-center gap-1.5 text-xs font-medium bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-md">
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>Source: {imp.citation}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Suggested Keywords */}
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-gray-100 dark:border-gray-800">
+                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Suggested Keywords to Add</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Based on successful profiles for similar roles, consider incorporating these terms if you have the experience:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {result.suggestedKeywords.map((keyword, index) => (
+                    <span key={index} className="px-3 py-1.5 bg-gray-100 dark:bg-[#252525] text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-gray-700 font-medium hover:border-primary/50 hover:text-primary dark:hover:text-primary transition-colors cursor-default">
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+            </motion.div>
+          )}
+          </AnimatePresence>
         </div>
       </main>
     </>
