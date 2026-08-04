@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UploadCloud, FileText, Briefcase, Building, AlignLeft, 
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
-  BarChart, ArrowRight, Loader2, BookOpen
+  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3
 } from 'lucide-react';
 
 const AIResumeAnalyser = () => {
@@ -249,31 +249,77 @@ const AIResumeAnalyser = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="h-full min-h-[500px] flex flex-col items-center justify-center text-center p-8 bg-white/50 dark:bg-[#1e1e1e]/50 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800"
+                    className="h-full min-h-[500px] flex flex-col items-center justify-center text-center p-2 sm:p-8"
                   >
-                    <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                      <BarChart className="w-12 h-12 text-primary opacity-80" />
+                    {/* Illustration Area */}
+                    <div className="relative w-24 h-24 mb-6 mt-2">
+                      <div className="absolute inset-0 bg-green-500/10 rounded-full blur-2xl"></div>
+                      <div className="relative flex items-center justify-center w-full h-full">
+                        <div className="bg-white dark:bg-[#252525] p-3 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 transform -rotate-6 z-10 w-16 h-20 relative flex flex-col">
+                          <div className="w-6 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mb-1.5"></div>
+                          <div className="w-4 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mb-3"></div>
+                          <div className="flex items-end gap-1 mt-auto mx-auto">
+                            <div className="w-1.5 h-3 bg-green-500 rounded-t-sm"></div>
+                            <div className="w-1.5 h-5 bg-green-500 rounded-t-sm"></div>
+                            <div className="w-1.5 h-4 bg-green-500 rounded-t-sm"></div>
+                          </div>
+                        </div>
+                        <div className="absolute -bottom-1 -right-3 bg-green-500 text-white p-1.5 rounded-full shadow-lg z-20 transform rotate-6 border-4 border-white dark:border-[#121212]">
+                          <CheckCircle2 className="w-5 h-5" />
+                        </div>
+                        {/* Sparkles */}
+                        <Sparkles className="absolute -top-1 -left-3 w-4 h-4 text-green-400" />
+                        <Sparkles className="absolute top-6 -right-6 w-3 h-3 text-green-400" />
+                        <Sparkles className="absolute bottom-1 -left-4 w-2 h-2 text-green-400" />
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Ready for Analysis</h3>
-                    <p className="text-gray-500 dark:text-gray-400 max-w-md">
-                      Upload your resume and provide details to receive AI-generated insights backed by real interview experiences from our platform.
+
+
+
+                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                      Ready for <span className="text-green-600">Analysis</span>
+                    </h3>
+                    
+                    <p className="text-gray-500 dark:text-gray-400 text-base max-w-xl mx-auto mb-10 leading-relaxed">
+                      Upload your resume and provide a few details to get personalized, AI-generated insights backed by real interview experiences.
                     </p>
-                    <div className="mt-8 grid grid-cols-2 gap-4 text-left w-full max-w-md">
-                      <div className="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-600 dark:text-gray-300">ATS Keyword Matching</span>
+
+
+
+                    {/* Divider */}
+                    <div className="w-full max-w-3xl flex items-center gap-4 mb-8">
+                      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">What You'll Get</span>
+                      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
+                    </div>
+
+                    {/* Three Cards Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-4xl">
+                      {/* Card 1 */}
+                      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 p-6 rounded-2xl flex flex-col items-center text-center hover:shadow-lg transition-all duration-300">
+                        <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 flex items-center justify-center mb-4">
+                          <Target className="w-6 h-6" />
+                        </div>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">ATS Keyword Match</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Check how well your resume matches ATS and recruiter expectations.</p>
                       </div>
-                      <div className="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3">
-                        <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-600 dark:text-gray-300">Content Improvements</span>
+                      
+                      {/* Card 2 */}
+                      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 p-6 rounded-2xl flex flex-col items-center text-center hover:shadow-lg transition-all duration-300">
+                        <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
+                          <FileEdit className="w-6 h-6" />
+                        </div>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">Content Improvement</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Get AI suggestions to improve your content, structure & clarity.</p>
                       </div>
-                      <div className="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3">
-                        <Building className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-600 dark:text-gray-300">Company Targeting</span>
-                      </div>
-                      <div className="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3">
-                        <BookOpen className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-600 dark:text-gray-300">Data-backed advice</span>
+                      
+                      {/* Card 3 */}
+                      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 p-6 rounded-2xl flex flex-col items-center text-center hover:shadow-lg transition-all duration-300">
+                        <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4">
+                          <BarChart3 className="w-6 h-6" />
+                        </div>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">Targeted Insights</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Tailored recommendations backed by 10K+ real interview experiences.</p>
                       </div>
                     </div>
                   </motion.div>
