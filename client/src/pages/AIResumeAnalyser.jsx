@@ -296,7 +296,7 @@ const AIResumeAnalyser = () => {
                     {/* Three Cards Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-4xl">
                       {/* Card 1 */}
-                      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 p-6 rounded-2xl flex flex-col items-center text-center hover:shadow-lg transition-all duration-300">
+                      <div className="flex flex-col items-center text-center">
                         <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 flex items-center justify-center mb-4">
                           <Target className="w-6 h-6" />
                         </div>
@@ -305,7 +305,7 @@ const AIResumeAnalyser = () => {
                       </div>
                       
                       {/* Card 2 */}
-                      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 p-6 rounded-2xl flex flex-col items-center text-center hover:shadow-lg transition-all duration-300">
+                      <div className="flex flex-col items-center text-center">
                         <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
                           <FileEdit className="w-6 h-6" />
                         </div>
@@ -314,7 +314,7 @@ const AIResumeAnalyser = () => {
                       </div>
                       
                       {/* Card 3 */}
-                      <div className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 p-6 rounded-2xl flex flex-col items-center text-center hover:shadow-lg transition-all duration-300">
+                      <div className="flex flex-col items-center text-center">
                         <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4">
                           <BarChart3 className="w-6 h-6" />
                         </div>
