@@ -4,7 +4,6 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import ProfileLeftSide from '../components/ProfileLeftSide';
 import ProfileRightSide from '../components/ProfileRightSide';
-import Footer from '../components/Footer';
 import { useAppSelector } from '../redux/store.js';
 import { getUserProfileStats } from '../services/userServices.js';
 import { Helmet } from 'react-helmet';
@@ -96,7 +95,7 @@ const ProfilePage = () => {
         />
         <meta property="og:type" content="website" />
       </Helmet>
-    <div className="pt-4 pb-4 lg:pt-8 lg:pb-8 bg-slate-50 min-h-screen">
+    <div className="pt-4 pb-4 lg:pt-8 lg:pb-8 min-h-screen">
       <div className="lg:flex max-w-[1200px] mx-auto gap-6 px-4">
         <div className="w-full lg:w-[340px] shrink-0">
           <ProfileLeftSide profileData={profileData} />
@@ -106,7 +105,6 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
-    <Footer />
     </>
   );
 };
