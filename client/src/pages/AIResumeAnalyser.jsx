@@ -6,6 +6,7 @@ import {
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
   BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3
 } from 'lucide-react';
+import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
 
 const AIResumeAnalyser = () => {
   const [file, setFile] = useState(null);
@@ -448,6 +449,21 @@ const AIResumeAnalyser = () => {
             </div>
 
           </div>
+
+          {/* Insights Placeholder (Below the two columns) */}
+          {!isAnalyzing && !result && (
+            <div className="mt-16 mb-8 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
+                <img src={starIcon} alt="Stars icon" className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-green-600">insights</span> will show up here
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed px-4">
+                Fill in what you're targeting on the left, upload your resume, and we'll compare it against your profile and real interview experiences.
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </>
