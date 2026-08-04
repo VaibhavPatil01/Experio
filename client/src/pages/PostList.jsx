@@ -160,7 +160,7 @@ function PostList() {
           isLoading={isDeleting}
         />
       )}
-      <div className="min-h-screen bg-[#fafafa] py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_280px] xl:grid-cols-[260px_1fr_320px] gap-6">
             
