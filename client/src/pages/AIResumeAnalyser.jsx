@@ -89,7 +89,7 @@ const AIResumeAnalyser = () => {
         />
       </Helmet>
 
-      <main className="min-h-screen bg-gray-50 dark:bg-[#121212] text-slate-800 dark:text-gray-100 font-sans pb-20">
+      <main className="min-h-screen text-slate-800 dark:text-gray-100 font-sans pb-20">
         {/* Header Section */}
         <div className="pt-10 pb-6 px-6 relative overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10 text-center">
@@ -289,37 +289,37 @@ const AIResumeAnalyser = () => {
                     {/* Divider */}
                     <div className="w-full max-w-3xl flex items-center gap-4 mb-8">
                       <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">What You'll Get</span>
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">How It Works</span>
                       <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
                     </div>
 
-                    {/* Three Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-4xl">
-                      {/* Card 1 */}
+                    {/* How It Works Steps */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-5xl px-2">
+                      {/* Step 1 */}
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 flex items-center justify-center mb-4">
-                          <Target className="w-6 h-6" />
+                        <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mb-4 shadow-lg shadow-primary/20">
+                          1
                         </div>
-                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">ATS Keyword Match</h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Check how well your resume matches ATS and recruiter expectations.</p>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-base md:text-lg mb-3 whitespace-nowrap">Upload Your Resume</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Drag and drop your PDF or DOCX file. It is uploaded over HTTPS and stored as a private object for analysis.</p>
                       </div>
                       
-                      {/* Card 2 */}
+                      {/* Step 2 */}
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
-                          <FileEdit className="w-6 h-6" />
+                        <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mb-4 shadow-lg shadow-primary/20">
+                          2
                         </div>
-                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">Content Improvement</h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Get AI suggestions to improve your content, structure & clarity.</p>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-base md:text-lg mb-3 whitespace-nowrap">AI Analyzes Your Resume</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Our AI engine scans your resume against real ATS parsing rules — checking formatting, keywords, section order, content strength, and readability.</p>
                       </div>
                       
-                      {/* Card 3 */}
+                      {/* Step 3 */}
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4">
-                          <BarChart3 className="w-6 h-6" />
+                        <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl mb-4 shadow-lg shadow-primary/20">
+                          3
                         </div>
-                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">Targeted Insights</h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Tailored recommendations backed by 10K+ real interview experiences.</p>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-base md:text-lg mb-3 whitespace-nowrap">Get Your Report</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">In under 30 seconds you receive a detailed dashboard with scores, keyword gaps, red flags, bullet rewrites, and a step-by-step action plan.</p>
                       </div>
                     </div>
                   </motion.div>

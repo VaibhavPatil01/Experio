@@ -3,6 +3,7 @@ import {
   Menu, Plus, PenSquare, Sparkles, Search, PanelLeft,
   ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle
 } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const MOCK_MESSAGES = {
   1: [
@@ -119,6 +120,7 @@ const Assistant = () => {
   const isCurrentChatPinned = currentChat?.isPinned || false;
 
   return (
+    <>
     <div className="flex h-[calc(100vh-72px)] w-full bg-white dark:bg-[#212121] text-gray-900 dark:text-gray-100 font-sans overflow-hidden">
       
       {/* Mobile Sidebar Overlay */}
@@ -409,6 +411,8 @@ const Assistant = () => {
 
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

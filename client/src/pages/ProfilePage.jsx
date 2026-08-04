@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import ProfileLeftSide from '../components/ProfileLeftSide';
 import ProfileRightSide from '../components/ProfileRightSide';
+import Footer from '../components/Footer';
 import { useAppSelector } from '../redux/store.js';
 import { getUserProfileStats } from '../services/userServices.js';
 import { Helmet } from 'react-helmet';
@@ -104,7 +105,9 @@ const ProfilePage = () => {
           <ProfileRightSide profileData={profileData} />
         </div>
       </div>
-    </div></>
+    </div>
+    <Footer />
+    </>
   );
 };
 
