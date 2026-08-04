@@ -61,7 +61,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
             <Route path="/ai-resume-maker" element={<AIResumeMaker />} />
-            <Route path="/ai-resume-analyser" element={<AIResumeAnalyser />} />
+            <Route path="/resume" element={<AIResumeAnalyser />} />
             <Route path="/ai-mock-interview" element={<AIMockInterview />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/posts" element={<PostList />} />
