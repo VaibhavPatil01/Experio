@@ -91,14 +91,14 @@ const AIResumeAnalyser = () => {
 
       <main className="min-h-screen bg-gray-50 dark:bg-[#121212] text-slate-800 dark:text-gray-100 font-sans pb-20">
         {/* Header Section */}
-        <div className="bg-white dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-gray-800 pt-10 pb-16 px-6 relative overflow-hidden">
+        <div className="pt-10 pb-6 px-6 relative overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10 text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
               <span>AI-Powered</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white">
-              Smart Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-500">Analyser</span>
+              Smart Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-green-600">Analyser</span>
             </h1>
             <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Get personalized resume feedback based on real interview experiences and company-specific data from our platform.
@@ -107,7 +107,7 @@ const AIResumeAnalyser = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Left Column: Form */}
@@ -220,7 +220,7 @@ const AIResumeAnalyser = () => {
                   <button 
                     onClick={handleAnalyze}
                     disabled={isAnalyzing || !file}
-                    className="w-full py-4 px-6 bg-gradient-to-r from-primary to-green-600 hover:from-primary/90 hover:to-green-600/90 text-white rounded-xl font-semibold text-lg shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group mt-4"
+                    className="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group mt-4"
                   >
                     {isAnalyzing ? (
                       <>
