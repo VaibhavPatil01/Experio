@@ -40,7 +40,7 @@ export const streamChatGeneration = async (req, res) => {
     }
 
   } catch (error) {
-    logger.error('Fatal error in streamChatGeneration', { error: error.message });
+    logger.error('Fatal error in streamChatGeneration', { error: error.message, stack: error.stack });
     res.write(`data: ${JSON.stringify({ type: 'error', error: 'Internal streaming error' })}\n\n`);
   } finally {
     res.end(); // Always close the stream

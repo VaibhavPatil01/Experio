@@ -136,7 +136,12 @@ export default class GeminiChatService {
       } catch (error) {
         attempt++;
         this._recordFailure();
-        logger.error('Gemini generation failed', { category: 'ai', attempt, error: error.message });
+        logger.error('Gemini generation failed', { 
+          category: 'ai', 
+          attempt, 
+          error: error.message,
+          stack: error.stack 
+        });
 
         if (attempt >= maxRetries) {
           logger.error('Max retries reached. Failing gracefully.', { category: 'ai' });
