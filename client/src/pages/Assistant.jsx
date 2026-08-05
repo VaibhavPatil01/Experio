@@ -138,10 +138,10 @@ const Assistant = () => {
       // 1. If it's a new chat, create session first
       if (targetSessionId === 'new') {
         const newSession = await createSession(userPrompt);
-        targetSessionId = newSession.session._id;
+        targetSessionId = newSession._id;
         
         // Add to sidebar
-        setChatHistory([{ id: targetSessionId, label: newSession.session.title, isPinned: false }, ...chatHistory]);
+        setChatHistory([{ id: targetSessionId, label: newSession.title, isPinned: false }, ...chatHistory]);
         setActiveChatId(targetSessionId);
       }
 

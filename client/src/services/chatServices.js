@@ -22,12 +22,12 @@ export const createSession = async (initialPrompt = '') => {
 };
 
 export const renameSession = async (sessionId, title) => {
-  const response = await apiClient.patch(`/${sessionId}/rename`, { title });
+  const response = await apiClient.put(`/${sessionId}/rename`, { title });
   return response.data;
 };
 
 export const pinSession = async (sessionId, isPinned) => {
-  const response = await apiClient.patch(`/${sessionId}/pin`, { isPinned });
+  const response = await apiClient.put(`/${sessionId}/pin`, { isPinned });
   return response.data;
 };
 

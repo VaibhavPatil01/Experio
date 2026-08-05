@@ -7,12 +7,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, sender: 'user', content: 'Hello' },
-    { id: 2, sender: 'system', content: <>Hello and welcome! How can we assist you today? If you have any questions about ChatBot, <span className="underline decoration-gray-400 underline-offset-2 cursor-pointer">Text.com</span>, or our suite of solutions, just let us know—I'm here to help!</> },
-    { id: 3, sender: 'user', content: 'Tell me a joke' },
-    { id: 4, sender: 'system', content: <>I'm here to assist you with any questions about ChatBot, <span className="underline decoration-gray-400 underline-offset-2 cursor-pointer">Text.com</span>, or our services. If you have a business-related inquiry or want to learn more about our products, please let me know!</> },
-    { id: 5, sender: 'user', content: 'Hii' },
-    { id: 6, sender: 'system', content: <>Hi there! How can we help you today? If you have any questions about ChatBot, <span className="underline decoration-gray-400 underline-offset-2 cursor-pointer">Text.com</span>, or our services, feel free to ask!</> }
+    { id: 1, sender: 'system', content: 'Hello! I am your Mozify AI Assistant. How can I help you with your interview preparation today?' }
   ]);
 
   return (
@@ -156,7 +151,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         <div className="flex gap-3">
           <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mt-1" />
           <div className="text-[14px] text-gray-700 leading-relaxed">
-            Good morning! Welcome to Chatbot, powered by Text. It's a pleasure to have you here exploring the best AI chatbot software for your website. To assist you better, could you please share your <strong>name</strong> and <strong>email</strong> with me? This will help me provide you with the most relevant information and support. Looking forward to helping you!
+            Welcome to Mozify! I'm here to help you navigate through our interview experiences, resume building, and career guidance. Feel free to ask me anything!
           </div>
         </div>
 
