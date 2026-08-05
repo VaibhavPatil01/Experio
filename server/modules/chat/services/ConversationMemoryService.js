@@ -1,4 +1,4 @@
-import LLMFactory from '../../../ai/LLMFactory.js';
+import geminiClient from '../../../configs/gemini.js';
 import { CHAT_CONSTANTS } from '../utils/chatConstants.js';
 import ChatSessionRepository from '../repositories/ChatSessionRepository.js';
 import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
@@ -85,10 +85,11 @@ export default class ConversationMemoryService {
 
     promptText += `\nProvide a unified, highly dense, concise summary of the entire conversation. Retain critical facts, user preferences, and the main topics discussed. Do NOT use conversational filler. Return ONLY the summary string.`;
 
-    // 3. Call Gemini via Factory
-    const model = LLMFactory.getModel();
-    const result = await model.generateContent(promptText);
-    const response = await result.response;
+    // 3. Call Gemini via SDK
+    const response = await geminiClient.models.generateContent({
+      model: 'gemini-1.5-flash-latest',
+      contents: promptText
+    });
     let newSummary = response.text().trim();
 
     // 4. Update the DB atomically

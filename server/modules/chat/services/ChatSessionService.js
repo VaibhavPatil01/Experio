@@ -1,4 +1,4 @@
-import LLMFactory from '../../../ai/LLMFactory.js';
+import geminiClient from '../../../configs/gemini.js';
 import ChatSessionRepository from '../repositories/ChatSessionRepository.js';
 import logger from '../../../utils/logger.js';
 
@@ -12,11 +12,11 @@ export default class ChatSessionService {
    */
   async generateTitle(prompt) {
     try {
-      const model = LLMFactory.getModel();
       const promptText = `Generate a very short, concise title (max 5 words) summarizing this chat prompt. Do not use quotes or prefixes. Prompt: "${prompt}"`;
-      
-      const result = await model.generateContent(promptText);
-      const response = await result.response;
+      const response = await geminiClient.models.generateContent({
+        model: 'gemini-1.5-flash-latest',
+        contents: promptText
+      });
       let title = response.text().trim();
       
       // Clean up potential quotes

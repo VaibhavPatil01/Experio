@@ -1,4 +1,4 @@
-import LLMFactory from '../../../ai/LLMFactory.js';
+import geminiClient from '../../../configs/gemini.js';
 import logger from '../../../utils/logger.js';
 
 // --- In-Memory Resiliency Primitives ---
@@ -94,15 +94,16 @@ export default class GeminiChatService {
         logger.debug('Attempting Gemini generation', { category: 'ai', attempt, modelSelection, userId });
         const startTime = performance.now();
 
-        const model = LLMFactory.getModel(modelSelection);
-
         // Timeout race pattern
         const timeoutPromise = new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Gemini API Timeout')), timeoutMs)
         );
         
         // Only race the initial connection/stream establishment
-        const generatePromise = model.generateContentStream(prompt);
+        const generatePromise = geminiClient.models.generateContentStream({
+          model: modelSelection,
+          contents: prompt
+        });
         streamResult = await Promise.race([generatePromise, timeoutPromise]);
 
         // If we get here, connection was successful
@@ -118,9 +119,9 @@ export default class GeminiChatService {
         const latency = endTime - startTime;
 
         // Await the final response to gather exact token usage
-        const finalResponse = await streamResult.response;
+        // Note: New SDK includes usageMetadata directly in the final stream chunk or response wrapper
         const metadata = {
-          tokenUsage: finalResponse.usageMetadata?.totalTokenCount || 0,
+          tokenUsage: streamResult.usageMetadata?.totalTokenCount || 0,
           latencyMs: Math.round(latency),
           modelUsed: modelSelection
         };

@@ -65,8 +65,9 @@ const Assistant = () => {
       setIsLoadingMessages(true);
       try {
         const data = await fetchSessionMessages(activeChatId);
+        const messagesArray = Array.isArray(data) ? data : (data.messages || []);
         // Reverse because they come newest first from backend
-        setCurrentMessages(data.messages.reverse().map(m => ({
+        setCurrentMessages(messagesArray.reverse().map(m => ({
           id: m._id,
           sender: m.role,
           text: m.content,
