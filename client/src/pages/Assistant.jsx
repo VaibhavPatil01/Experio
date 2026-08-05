@@ -42,11 +42,12 @@ const Assistant = () => {
   const loadSessions = async () => {
     try {
       const data = await fetchSessions();
-      // Map backend _id to our local id for consistency in rendering
-      setChatHistory(data.sessions.map(s => ({
+      // The backend returns an array directly, not an object with a 'sessions' key
+      const sessionsArray = Array.isArray(data) ? data : (data.sessions || []);
+      setChatHistory(sessionsArray.map(s => ({
         id: s._id,
         label: s.title,
-        isPinned: s.isPinned
+        isPinned: s?.metadata?.isPinned || false
       })));
     } catch (error) {
       console.error("Failed to load sessions", error);
@@ -499,9 +500,17 @@ const Assistant = () => {
                   {isGenerating && (
                     <div className="flex flex-col items-start w-full mt-2">
                        <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {streamText + ' ⬤'}
-                          </ReactMarkdown>
+                          {streamText ? (
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {streamText}
+                            </ReactMarkdown>
+                          ) : (
+                            <div className="flex items-center gap-1.5 h-6 px-1">
+                              <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            </div>
+                          )}
                        </div>
                     </div>
                   )}
