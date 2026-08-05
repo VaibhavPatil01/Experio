@@ -17,7 +17,11 @@ import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import recommendationRouter from './routes/recommendationRoutes.js';
+import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
 import preventServerSleep from './utils/preventServerSleep.js'; 
+import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
+import { httpLogger } from './middlewares/httpLogger.js';
+import { globalLimiter } from './middlewares/rateLimiter.js';
 
 import Sentiment from 'sentiment';
 
@@ -54,6 +58,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
+app.use(httpLogger);
+app.use('/api', globalLimiter); // Apply global limit to all APIs
 
 // --------------------- Static Files ---------------------
 const __filename = fileURLToPath(import.meta.url);
@@ -80,6 +86,7 @@ app.use('/user', userRouter);
 app.use('/posts', postRouter);
 app.use('/comments', commentRouter);
 app.use('/recommendations', recommendationRouter);
+app.use('/api/chat/sessions', chatSessionRoutes);
 
 // --------------------- Home Route ---------------------
 app.get('/', (req, res) => {
@@ -99,5 +106,7 @@ app.listen(PORT, async () => {
 
   preventServerSleep(); // Schedule background task
 });
+
+app.use(globalErrorHandler);
 
 export default app;

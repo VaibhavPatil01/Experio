@@ -1,4 +1,8 @@
-import geminiClient from '../configs/gemini.js';
+import LLMFactory from './LLMFactory.js';
+import NodeCache from 'node-cache';
+
+// Cache embeddings for 1 hour to prevent redundant Gemini calls on common questions
+const embeddingCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 export class EmbeddingService {
   /**
@@ -8,7 +12,14 @@ export class EmbeddingService {
    */
   static async generateEmbedding(text) {
     try {
-      const model = geminiClient.getGenerativeModel({ model: "gemini-embedding-001" });
+      const cacheKey = `embed_${text}`;
+      const cachedVector = embeddingCache.get(cacheKey);
+
+      if (cachedVector) {
+        return cachedVector;
+      }
+
+      const model = LLMFactory.getEmbeddingModel();
       const response = await model.embedContent(text);
       
       const embedding = response.embedding;
@@ -17,6 +28,7 @@ export class EmbeddingService {
         throw new Error('No embedding returned from Gemini');
       }
 
+      embeddingCache.set(cacheKey, embedding.values);
       return embedding.values;
     } catch (error) {
       console.error('[EmbeddingService] Failed to generate embedding:', error);

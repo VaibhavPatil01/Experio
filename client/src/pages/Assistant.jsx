@@ -1,63 +1,186 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Plus, PenSquare, Sparkles, Search, PanelLeft,
-  ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle
+  ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle, Square, ExternalLink
 } from 'lucide-react';
 import Footer from '../components/Footer';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-const MOCK_MESSAGES = {
-  1: [
-    { id: 1, sender: 'user', text: 'Can you suggest some chatbot icons?', timestamp: 'Yesterday 10:28 PM' },
-    { id: 2, sender: 'assistant', text: 'Hi! 👋 Here are a few icon suggestions for a chatbot:\n\n1. **Robot Head:** Classic and friendly.\n2. **Speech Bubble with Sparkles:** Shows AI assistant capabilities.\n3. **Minimalist Waveform:** Good for voice-focused bots.\n\nWhich style do you prefer?', timestamp: 'Yesterday 10:29 PM' }
-  ],
-  2: [
-    { id: 1, sender: 'user', text: 'I need architecture advice for my MERN stack project.', timestamp: 'Today 10:00 AM' },
-    { id: 2, sender: 'assistant', text: 'Sure! For a scalable MERN app, consider a layered architecture:\n\n- **Routes Layer:** Express router definitions.\n- **Controllers:** Request validation and HTTP responses.\n- **Services:** Core business logic.\n- **Data Access:** Mongoose models and queries.\n\nThis keeps your code modular and testable.', timestamp: 'Today 10:02 AM' }
-  ]
-};
-
-const DEFAULT_MESSAGES = [
-  { id: 1, sender: 'user', text: 'This is test chat', timestamp: 'Yesterday 10:28 PM' },
-  { id: 2, sender: 'assistant', text: 'Hi! 👋 Test received successfully.\n\nHow can I help you today?', timestamp: 'Yesterday 10:28 PM' },
-  { id: 3, sender: 'user', text: 'This is the second test message', timestamp: 'Today 12:05 AM' },
-  { id: 4, sender: 'assistant', text: 'Second test message received successfully as well. ✅\n\nEverything seems to be working. If you\'re testing message delivery, context retention, or another feature, let me know what you\'d like to verify next.', timestamp: 'Today 12:05 AM' }
-];
+// Import our new services and hooks
+import { 
+  fetchSessions, 
+  createSession, 
+  renameSession, 
+  pinSession, 
+  deleteSession, 
+  fetchSessionMessages,
+  submitFeedback
+} from '../services/chatServices';
+import { useChatStream } from '../hooks/useChatStream';
 
 const Assistant = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [activeChatId, setActiveChatId] = useState('new');
   const [inputValue, setInputValue] = useState('');
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  
+  // Real State for Sessions and Messages
+  const [chatHistory, setChatHistory] = useState([]);
+  const [currentMessages, setCurrentMessages] = useState([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  
+  // Hooks
+  const { isGenerating, streamText, streamError, startStream, stopStream } = useChatStream();
+  const messagesEndRef = useRef(null);
 
+  // Initial Load of Sessions
+  useEffect(() => {
+    loadSessions();
+  }, []);
+
+  const loadSessions = async () => {
+    try {
+      const data = await fetchSessions();
+      // Map backend _id to our local id for consistency in rendering
+      setChatHistory(data.sessions.map(s => ({
+        id: s._id,
+        label: s.title,
+        isPinned: s.isPinned
+      })));
+    } catch (error) {
+      console.error("Failed to load sessions", error);
+    }
+  };
+
+  // Switch Chat Load Messages
+  useEffect(() => {
+    if (activeChatId === 'new') {
+      setCurrentMessages([]);
+      return;
+    }
+    
+    const loadMessages = async () => {
+      setIsLoadingMessages(true);
+      try {
+        const data = await fetchSessionMessages(activeChatId);
+        // Reverse because they come newest first from backend
+        setCurrentMessages(data.messages.reverse().map(m => ({
+          id: m._id,
+          sender: m.role,
+          text: m.content,
+          timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          citations: m.citations || [],
+          feedback: m.feedback
+        })));
+      } catch (error) {
+        console.error("Failed to load messages", error);
+      } finally {
+        setIsLoadingMessages(false);
+      }
+    };
+    
+    loadMessages();
+  }, [activeChatId]);
+
+  // Auto Scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentMessages, streamText]);
+
+  // Click outside dropdown handler
   useEffect(() => {
     const handleClickOutside = () => setOpenDropdownId(null);
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const [chatHistory, setChatHistory] = useState([
-    { id: 1, label: "Chatbot Icon Suggestions", isPinned: false },
-    { id: 2, label: "Project Architecture Advice", isPinned: false },
-    { id: 3, label: "Database choice for project", isPinned: false },
-    { id: 4, label: "Matrix Cut DP", isPinned: false },
-    { id: 5, label: "WFH Request Email", isPinned: false },
-    { id: 6, label: "Segmentation fault in DP", isPinned: false },
-    { id: 7, label: "MongoDB Atlas Auth Error", isPinned: false },
-    { id: 8, label: "Job Platforms for Developers", isPinned: false },
-    { id: 9, label: "Profile UI Redesign", isPinned: false }
-  ]);
-
-  const togglePin = (e, id) => {
+  // UI Handlers
+  const handleTogglePin = async (e, id) => {
     e.stopPropagation();
-    setChatHistory(prev => prev.map(chat => 
-      chat.id === id ? { ...chat, isPinned: !chat.isPinned } : chat
+    const chat = chatHistory.find(c => c.id === id);
+    if (!chat) return;
+
+    // Optimistic UI update
+    setChatHistory(prev => prev.map(c => 
+      c.id === id ? { ...c, isPinned: !c.isPinned } : c
     ));
+
+    try {
+      await pinSession(id, !chat.isPinned);
+    } catch (error) {
+      // Revert on failure
+      setChatHistory(prev => prev.map(c => 
+        c.id === id ? { ...c, isPinned: chat.isPinned } : c
+      ));
+    }
+  };
+
+  const handleDeleteSession = async (id) => {
+    try {
+      await deleteSession(id);
+      setChatHistory(prev => prev.filter(c => c.id !== id));
+      if (activeChatId === id) setActiveChatId('new');
+    } catch (error) {
+      console.error("Failed to delete session", error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!inputValue.trim() || isGenerating) return;
+
+    const userPrompt = inputValue.trim();
+    setInputValue(''); // Clear input instantly
+
+    let targetSessionId = activeChatId;
+
+    try {
+      // 1. If it's a new chat, create session first
+      if (targetSessionId === 'new') {
+        const newSession = await createSession(userPrompt);
+        targetSessionId = newSession.session._id;
+        
+        // Add to sidebar
+        setChatHistory([{ id: targetSessionId, label: newSession.session.title, isPinned: false }, ...chatHistory]);
+        setActiveChatId(targetSessionId);
+      }
+
+      // 2. Optimistically add user message to UI
+      const userMsg = {
+        id: Date.now().toString(),
+        sender: 'user',
+        text: userPrompt,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setCurrentMessages(prev => [...prev, userMsg]);
+
+      // 3. Start Stream
+      await startStream(targetSessionId, userPrompt, 'gemini-1.5-flash', (finalMessage) => {
+        // Stream completed successfully, add final assistant message to UI
+        setCurrentMessages(prev => [...prev, {
+          id: finalMessage._id,
+          sender: finalMessage.role,
+          text: finalMessage.content,
+          timestamp: new Date(finalMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          citations: finalMessage.citations || [],
+          feedback: finalMessage.feedback
+        }]);
+      });
+
+    } catch (error) {
+      console.error("Chat generation error", error);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const pinnedChats = chatHistory.filter(c => c.isPinned);
   const recentChats = chatHistory.filter(c => !c.isPinned);
-
-  const currentMessages = MOCK_MESSAGES[activeChatId] || DEFAULT_MESSAGES;
 
   const renderInputBar = () => (
     <div className="w-full max-w-[760px] relative">
@@ -71,6 +194,8 @@ const Assistant = () => {
           className="flex-1 bg-transparent border-none outline-none text-base px-2 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 min-w-0"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={isGenerating}
         />
         <div className="flex items-center gap-3 flex-shrink-0 pr-1">
           <div className="relative flex items-center justify-center">
@@ -81,7 +206,6 @@ const Assistant = () => {
                 <line x1="12" y1="19" x2="12" y2="22"></line>
               </svg>
             </button>
-            {/* Tooltip */}
             <div className="pointer-events-none absolute left-1/2 top-full mt-3 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
               Dictate
               <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
@@ -89,26 +213,36 @@ const Assistant = () => {
           </div>
 
           <div className="relative flex items-center justify-center">
-            <button className="peer cursor-pointer flex items-center justify-center">
-              <div className="w-[42px] h-[42px] bg-primary text-white rounded-full flex items-center justify-center shadow-sm">
-                {inputValue.trim() ? (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <polyline points="5 11 12 4 19 11"></polyline>
-                  </svg>
-                ) : (
-                  <svg width="28" height="28" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4.5 8.5v4"/>
-                    <path d="M8.5 4.5v12"/>
-                    <path d="M12.5 6.5v8"/>
-                    <path d="M16.5 8.5v4"/>
-                  </svg>
-                )}
-              </div>
-            </button>
-            {/* Tooltip */}
+            {isGenerating ? (
+              // Stop Generation Button
+              <button onClick={stopStream} className="peer cursor-pointer flex items-center justify-center">
+                <div className="w-[42px] h-[42px] bg-red-500 text-white rounded-full flex items-center justify-center shadow-sm">
+                  <Square className="w-5 h-5 fill-current" />
+                </div>
+              </button>
+            ) : (
+              // Normal Submit Button
+              <button onClick={handleSubmit} className="peer cursor-pointer flex items-center justify-center">
+                <div className="w-[42px] h-[42px] bg-primary text-white rounded-full flex items-center justify-center shadow-sm">
+                  {inputValue.trim() ? (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <polyline points="5 11 12 4 19 11"></polyline>
+                    </svg>
+                  ) : (
+                    <svg width="28" height="28" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4.5 8.5v4"/>
+                      <path d="M8.5 4.5v12"/>
+                      <path d="M12.5 6.5v8"/>
+                      <path d="M16.5 8.5v4"/>
+                    </svg>
+                  )}
+                </div>
+              </button>
+            )}
+            
             <div className="pointer-events-none absolute left-1/2 top-full mt-3 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-              {inputValue.trim() ? "Send Message" : "Start Voice"}
+              {isGenerating ? "Stop Generation" : (inputValue.trim() ? "Send Message" : "Start Voice")}
               <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
             </div>
           </div>
@@ -116,6 +250,7 @@ const Assistant = () => {
       </div>
     </div>
   );
+
   const currentChat = chatHistory.find(c => c.id === activeChatId);
   const isCurrentChatPinned = currentChat?.isPinned || false;
 
@@ -143,10 +278,6 @@ const Assistant = () => {
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="pointer-events-none absolute left-full top-1/2 ml-2 z-50 -translate-y-1/2 -translate-x-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-x-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                Open sidebar
-                <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
             </div>
 
             <div className="relative flex items-center justify-center w-full">
@@ -156,48 +287,7 @@ const Assistant = () => {
               >
                 <PenSquare className="w-5 h-5" />
               </button>
-              <div className="pointer-events-none absolute left-full top-1/2 ml-2 z-50 -translate-y-1/2 -translate-x-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-x-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                New chat
-                <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
             </div>
-
-            <div className="relative flex items-center justify-center w-full">
-              <button 
-                className="peer p-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors cursor-pointer w-full flex justify-center"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-              <div className="pointer-events-none absolute left-full top-1/2 ml-2 z-50 -translate-y-1/2 -translate-x-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-x-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                Search
-                <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
-            </div>
-
-            <div className="relative flex items-center justify-center w-full">
-              <button 
-                className="peer p-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors cursor-pointer w-full flex justify-center"
-              >
-                <Pin className="w-5 h-5 rotate-45" />
-              </button>
-              <div className="pointer-events-none absolute left-full top-1/2 ml-2 z-50 -translate-y-1/2 -translate-x-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-x-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                Pinned chats
-                <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
-            </div>
-
-            <div className="relative flex items-center justify-center w-full">
-              <button 
-                className="peer p-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors cursor-pointer w-full flex justify-center"
-              >
-                <MessageCircle className="w-5 h-5" />
-              </button>
-              <div className="pointer-events-none absolute left-full top-1/2 ml-2 z-50 -translate-y-1/2 -translate-x-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-x-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                Recent chats
-                <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
-            </div>
-
           </div>
         </div>
       )}
@@ -211,24 +301,12 @@ const Assistant = () => {
       `}>
         <div className="p-3">
           <div className="flex items-center justify-between px-1 mb-2">
-            <div className="relative flex items-center justify-center">
-              <button className="peer p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors cursor-pointer">
-                <Search className="w-5 h-5" />
-              </button>
-              <div className="pointer-events-none absolute left-1/2 top-full mt-2 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                Search
-                <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
-            </div>
-            <div className="relative flex items-center justify-center">
-              <button onClick={() => setIsSidebarOpen(false)} className="peer p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors cursor-pointer">
-                <PanelLeft className="w-5 h-5" />
-              </button>
-              <div className="pointer-events-none absolute right-0 top-full mt-2 z-50 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-                Close sidebar
-                <div className="absolute right-3.5 top-0 h-2 w-2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
-              </div>
-            </div>
+            <button className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors">
+              <Search className="w-5 h-5" />
+            </button>
+            <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors">
+              <PanelLeft className="w-5 h-5" />
+            </button>
           </div>
           <button 
             onClick={() => setActiveChatId('new')}
@@ -253,12 +331,13 @@ const Assistant = () => {
                     isActive={activeChatId === chat.id} 
                     onClick={() => setActiveChatId(chat.id)}
                     isPinned={chat.isPinned}
-                    onTogglePin={(e) => togglePin(e, chat.id)}
+                    onTogglePin={(e) => handleTogglePin(e, chat.id)}
                     isDropdownOpen={openDropdownId === chat.id}
                     onToggleDropdown={(e) => {
                       e.stopPropagation();
                       setOpenDropdownId(openDropdownId === chat.id ? null : chat.id);
                     }}
+                    onDelete={() => handleDeleteSession(chat.id)}
                   />
                 ))}
               </div>
@@ -276,12 +355,13 @@ const Assistant = () => {
                     isActive={activeChatId === chat.id} 
                     onClick={() => setActiveChatId(chat.id)}
                     isPinned={chat.isPinned}
-                    onTogglePin={(e) => togglePin(e, chat.id)}
+                    onTogglePin={(e) => handleTogglePin(e, chat.id)}
                     isDropdownOpen={openDropdownId === chat.id}
                     onToggleDropdown={(e) => {
                       e.stopPropagation();
                       setOpenDropdownId(openDropdownId === chat.id ? null : chat.id);
                     }}
+                    onDelete={() => handleDeleteSession(chat.id)}
                   />
                 ))}
               </div>
@@ -304,52 +384,47 @@ const Assistant = () => {
           </div>
           <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             {activeChatId !== 'new' && (
-              <>
-                <button className="cursor-pointer flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors text-[14px] font-medium text-gray-700 dark:text-gray-200">
-                  <Upload className="w-4 h-4" strokeWidth={2.5} />
-                  <span>Share</span>
+              <div className="relative">
+                <button 
+                  className="cursor-pointer p-1.5 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors text-gray-700 dark:text-gray-200"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenDropdownId(openDropdownId === 'header' ? null : 'header');
+                  }}
+                >
+                  <MoreHorizontal className="w-5 h-5" />
                 </button>
-                <div className="relative">
-                  <button 
-                    className="cursor-pointer p-1.5 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors text-gray-700 dark:text-gray-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDropdownId(openDropdownId === 'header' ? null : 'header');
-                    }}
-                  >
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
 
-                  {openDropdownId === 'header' && (
-                    <div 
-                      className="absolute right-0 top-full mt-1 w-[160px] bg-white dark:bg-[#2f2f2f] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] rounded-xl border border-gray-100 dark:border-gray-700 z-[100] py-1.5 flex flex-col cursor-default font-normal" 
-                      onClick={e => e.stopPropagation()}
+                {openDropdownId === 'header' && (
+                  <div 
+                    className="absolute right-0 top-full mt-1 w-[160px] bg-white dark:bg-[#2f2f2f] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] rounded-xl border border-gray-100 dark:border-gray-700 z-[100] py-1.5 flex flex-col cursor-default font-normal" 
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <button 
+                      className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
+                      onClick={(e) => {
+                        handleTogglePin(e, activeChatId);
+                        setOpenDropdownId(null);
+                      }}
                     >
-                      <button 
-                        className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
-                        onClick={(e) => {
-                          if (activeChatId !== 'new') {
-                            togglePin(e, activeChatId);
-                          }
-                          setOpenDropdownId(null);
-                        }}
-                      >
-                        {isCurrentChatPinned ? (
-                          <UnpinIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                        ) : (
-                          <Pin className="w-4 h-4 text-gray-500 dark:text-gray-400 rotate-45" strokeWidth={2} />
-                        )}
-                        {isCurrentChatPinned ? 'Unpin chat' : 'Pin chat'}
-                      </button>
-                      <div className="h-px w-full bg-gray-100 dark:bg-gray-700/50 my-1.5" />
-                      <button className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left w-full">
-                        <Trash2 className="w-4 h-4" strokeWidth={2} />
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
+                      {isCurrentChatPinned ? (
+                        <UnpinIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      ) : (
+                        <Pin className="w-4 h-4 text-gray-500 dark:text-gray-400 rotate-45" strokeWidth={2} />
+                      )}
+                      {isCurrentChatPinned ? 'Unpin chat' : 'Pin chat'}
+                    </button>
+                    <div className="h-px w-full bg-gray-100 dark:bg-gray-700/50 my-1.5" />
+                    <button 
+                      onClick={() => handleDeleteSession(activeChatId)}
+                      className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left w-full"
+                    >
+                      <Trash2 className="w-4 h-4" strokeWidth={2} />
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -363,40 +438,83 @@ const Assistant = () => {
             </div>
           ) : (
             <div className="flex-1 w-full max-w-[760px] p-4 flex flex-col gap-6 pb-6">
-              {currentMessages.map((msg, index) => (
-                <div key={msg.id} className="flex flex-col">
-                  {(index === 0 || msg.timestamp !== currentMessages[index-1].timestamp) && (
-                    <div className="text-center text-xs text-gray-400 dark:text-gray-500 my-4 font-medium">
-                      {msg.timestamp}
+              {isLoadingMessages ? (
+                <div className="flex justify-center my-8 text-gray-400">Loading messages...</div>
+              ) : (
+                <>
+                  {currentMessages.map((msg, index) => (
+                    <div key={msg.id} className="flex flex-col">
+                      {(index === 0 || msg.timestamp !== currentMessages[index-1].timestamp) && (
+                        <div className="text-center text-xs text-gray-400 dark:text-gray-500 my-4 font-medium">
+                          {msg.timestamp}
+                        </div>
+                      )}
+
+                      {msg.sender === 'user' ? (
+                        <div className="flex flex-col items-end group mt-2">
+                          <div className="bg-primary text-white px-5 py-2.5 rounded-2xl max-w-[80%] leading-relaxed whitespace-pre-wrap">
+                            {msg.text}
+                          </div>
+                          <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"><Copy className="w-4 h-4" /></button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-start group w-full mt-2">
+                          <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {msg.text}
+                            </ReactMarkdown>
+                          </div>
+
+                          {/* Render Citation Cards */}
+                          {msg.citations && msg.citations.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3 mb-2">
+                              {msg.citations.map((cite, i) => (
+                                <a 
+                                  key={i} 
+                                  href={cite.url} 
+                                  target="_blank" 
+                                  rel="noreferrer"
+                                  className="flex items-center gap-2 bg-gray-100 dark:bg-[#2f2f2f] hover:bg-gray-200 dark:hover:bg-[#3f3f3f] px-3 py-1.5 rounded-full text-[13px] font-medium text-gray-700 dark:text-gray-300 transition-colors border border-gray-200 dark:border-gray-700"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  <span>{cite.company} • {cite.role}</span>
+                                </a>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-1 mt-2 text-gray-400">
+                            <button className={`p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors ${msg.feedback === 'like' ? 'text-primary' : ''}`}><ThumbsUp className="w-4 h-4" /></button>
+                            <button className={`p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors ${msg.feedback === 'dislike' ? 'text-red-500' : ''}`}><ThumbsDown className="w-4 h-4" /></button>
+                            <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><Copy className="w-4 h-4" /></button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Streaming Active Message */}
+                  {isGenerating && (
+                    <div className="flex flex-col items-start w-full mt-2">
+                       <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {streamText + ' ⬤'}
+                          </ReactMarkdown>
+                       </div>
                     </div>
                   )}
 
-                  {msg.sender === 'user' ? (
-                    <div className="flex flex-col items-end group mt-2">
-                      <div className="bg-primary text-white px-5 py-2.5 rounded-2xl max-w-[80%] leading-relaxed">
-                        {msg.text}
-                      </div>
-                      <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"><Copy className="w-4 h-4" /></button>
-                        <button className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"><Edit2 className="w-4 h-4" /></button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-start group w-full mt-2">
-                      <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] whitespace-pre-wrap leading-relaxed">
-                        {msg.text}
-                      </div>
-                      <div className="flex items-center gap-1 mt-2 text-gray-400">
-                        <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><ThumbsUp className="w-4 h-4" /></button>
-                        <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><ThumbsDown className="w-4 h-4" /></button>
-                        <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><Copy className="w-4 h-4" /></button>
-                        <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><RotateCw className="w-4 h-4" /></button>
-                        <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><MoreHorizontal className="w-4 h-4" /></button>
-                      </div>
+                  {streamError && (
+                    <div className="text-red-500 mt-2 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                      Error: {streamError}
                     </div>
                   )}
-                </div>
-              ))}
+
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
           )}
         </div>
@@ -405,7 +523,7 @@ const Assistant = () => {
         <div className="w-full flex flex-col items-center p-4 bg-gradient-to-t from-white via-white dark:from-[#212121] dark:via-[#212121] to-transparent pt-0 shrink-0">
           {activeChatId !== 'new' && renderInputBar()}
           <div className="text-center text-[11px] text-gray-500 mt-2 font-medium">
-            ChatGPT can make mistakes. Check important info.
+            AI can make mistakes. Check important info.
           </div>
         </div>
 
@@ -424,8 +542,8 @@ const UnpinIcon = ({ className }) => (
   </svg>
 );
 
-const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdownOpen, onToggleDropdown }) => (
-  <button 
+const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdownOpen, onToggleDropdown, onDelete }) => (
+  <div 
     onClick={onClick}
     className={`group relative cursor-pointer flex items-center w-full px-2.5 py-2 rounded-lg transition-colors text-sm text-gray-700 dark:text-gray-200 text-left
       ${isActive ? 'bg-gray-200 dark:bg-[#2f2f2f]' : 'hover:bg-gray-200 dark:hover:bg-[#2f2f2f]'}
@@ -457,14 +575,6 @@ const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdow
             className="absolute right-0 top-full mt-1 w-[160px] bg-white dark:bg-[#2f2f2f] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] rounded-xl border border-gray-100 dark:border-gray-700 z-[100] py-1.5 flex flex-col cursor-default font-normal" 
             onClick={e => e.stopPropagation()}
           >
-            <button className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full">
-              <Upload className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={2} />
-              Share
-            </button>
-            <button className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full">
-              <Edit2 className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={2} />
-              Rename
-            </button>
             <button 
               className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
               onClick={(e) => { onTogglePin(e); onToggleDropdown(e); }}
@@ -477,7 +587,14 @@ const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdow
               {isPinned ? 'Unpin chat' : 'Pin chat'}
             </button>
             <div className="h-px w-full bg-gray-100 dark:bg-gray-700/50 my-1.5" />
-            <button className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left w-full">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+                onToggleDropdown(e);
+              }}
+              className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left w-full"
+            >
               <Trash2 className="w-4 h-4" strokeWidth={2} />
               Delete
             </button>
@@ -485,7 +602,7 @@ const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdow
         )}
       </div>
     </div>
-  </button>
+  </div>
 );
 
 export default Assistant;
