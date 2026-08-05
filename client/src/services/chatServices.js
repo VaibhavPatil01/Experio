@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { BASE_API_URL } from './serverConfig';
-import { getAuthToken } from '../utils/token/authToken.js';
+import getAuthToken from '../utils/getAuthToken.js';
 
 const apiClient = axios.create({
   baseURL: `${BASE_API_URL}/api/chat/sessions`

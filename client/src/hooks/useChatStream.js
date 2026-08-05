@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { BASE_API_URL } from '../services/serverConfig';
-import { getAuthToken } from '../utils/token/authToken.js';
+import getAuthToken from '../utils/getAuthToken.js';
 
 export const useChatStream = () => {
   const [isGenerating, setIsGenerating] = useState(false);
