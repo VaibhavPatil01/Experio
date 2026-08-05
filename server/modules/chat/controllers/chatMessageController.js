@@ -7,7 +7,7 @@ const chatMessageService = new ChatMessageService();
 export const saveUserMessage = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { content } = req.body;
-  const userId = req.user._id;
+  const userId = req.authTokenData.id;
 
   if (!content || typeof content !== 'string' || content.trim() === '') {
     return res.status(400).json({ message: 'Valid content is required' });
@@ -31,7 +31,7 @@ export const saveAssistantMessage = asyncHandler(async (req, res) => {
 
 export const getSessionMessages = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
-  const userId = req.user._id;
+  const userId = req.authTokenData.id;
   const limit = parseInt(req.query.limit) || 50;
   const beforeCursor = req.query.beforeCursor || null;
 
@@ -41,7 +41,7 @@ export const getSessionMessages = asyncHandler(async (req, res) => {
 
 export const deleteMessage = asyncHandler(async (req, res) => {
   const { sessionId, messageId } = req.params;
-  const userId = req.user._id;
+  const userId = req.authTokenData.id;
 
   await chatMessageService.deleteMessage(messageId, sessionId, userId);
   res.status(200).json({ message: 'Message deleted successfully' });

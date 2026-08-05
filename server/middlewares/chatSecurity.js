@@ -25,7 +25,7 @@ export const sanitizeInput = (req, res, next) => {
  */
 export const verifySessionOwnership = async (req, res, next) => {
   const { sessionId } = req.params;
-  const userId = req.user._id;
+  const userId = req.authTokenData.id;
 
   if (!sessionId) {
     return next(); // Let standard validation handle missing params if any

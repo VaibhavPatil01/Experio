@@ -9,7 +9,7 @@ const pipelineService = new ChatPipelineService();
 export const streamChatGeneration = async (req, res) => {
   const { sessionId } = req.params;
   const { prompt, model } = req.body;
-  const userId = req.user._id;
+  const userId = req.authTokenData.id;
 
   if (!prompt || prompt.trim() === '') {
     return res.status(400).json({ message: 'Prompt is required' });
@@ -53,7 +53,7 @@ export const streamChatGeneration = async (req, res) => {
  */
 export const regenerateChat = async (req, res) => {
   const { sessionId, messageId } = req.params;
-  const userId = req.user._id;
+  const userId = req.authTokenData.id;
   
   // NOTE: A full regeneration implementation requires finding the message,
   // deleting everything after it, grabbing the *original* user prompt for that message,
