@@ -155,7 +155,7 @@ const Assistant = () => {
       setCurrentMessages(prev => [...prev, userMsg]);
 
       // 3. Start Stream
-      await startStream(targetSessionId, userPrompt, 'gemini-1.5-flash', (finalMessage) => {
+      await startStream(targetSessionId, userPrompt, 'gemini-flash-latest', (finalMessage) => {
         // Stream completed successfully, add final assistant message to UI
         setCurrentMessages(prev => [...prev, {
           id: finalMessage._id,

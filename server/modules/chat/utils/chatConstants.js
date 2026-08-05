@@ -1,8 +1,8 @@
 export const CHAT_CONSTANTS = {
   MODELS: {
-    FAST_TEXT: 'gemini-1.5-flash-latest',
+    FAST_TEXT: 'gemini-flash-latest',
     EMBEDDING: 'gemini-embedding-001',
-    REASONING: 'gemini-1.5-pro-latest'
+    REASONING: 'gemini-pro-latest'
   },
   MEMORY: {
     SUMMARY_THRESHOLD: 15, // Trigger summarization after this many new messages
