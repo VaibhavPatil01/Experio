@@ -1,9 +1,17 @@
 import axios from 'axios';
 import { BASE_API_URL } from './serverConfig';
+import { getAuthToken } from '../utils/token/authToken.js';
 
 const apiClient = axios.create({
-  baseURL: `${BASE_API_URL}/api/chat/sessions`,
-  withCredentials: true // Assuming auth cookies/tokens
+  baseURL: `${BASE_API_URL}/api/chat/sessions`
+});
+
+apiClient.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token) {
+    config.headers['token'] = token;
+  }
+  return config;
 });
 
 export const fetchSessions = async (page = 1, limit = 20) => {

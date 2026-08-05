@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { BASE_API_URL } from '../services/serverConfig';
+import { getAuthToken } from '../utils/token/authToken.js';
 
 export const useChatStream = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -20,7 +21,7 @@ export const useChatStream = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Assuming token is in cookies/withCredentials, or pass Authorization header if needed
+          'token': getAuthToken() || ''
         },
         body: JSON.stringify({ prompt, model }),
         signal: abortControllerRef.current.signal
