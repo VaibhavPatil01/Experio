@@ -3,7 +3,7 @@ import {
   Menu, Plus, PenSquare, Sparkles, Search, PanelLeft,
   ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle, Square, ExternalLink
 } from 'lucide-react';
-import Footer from '../components/Footer';
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -529,7 +529,7 @@ const Assistant = () => {
 
       </div>
     </div>
-    <Footer />
+
     </>
   );
 };
