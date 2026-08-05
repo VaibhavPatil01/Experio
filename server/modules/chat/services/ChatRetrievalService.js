@@ -154,7 +154,7 @@ export default class ChatRetrievalService {
         author: post.userId ? post.userId.username : 'Anonymous',
         authorDetails: post.userId ? `${post.userId.designation || 'Student'} in ${post.userId.branch || 'Unknown'}` : '',
         score: scoreObj ? scoreObj.score : 0,
-        url: `/interview/${post._id}` // Citation reference link
+        url: `/post/${post._id}` // Citation reference link
       };
     });
 
