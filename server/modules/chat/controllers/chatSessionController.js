@@ -41,7 +41,7 @@ export const renameSession = asyncHandler(async (req, res) => {
   res.status(200).json(session);
 });
 
-export const pinSession = asyncHandler(async (req, res) => {
+export const togglePinSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { isPinned } = req.body;
   const userId = req.user._id;
@@ -50,7 +50,7 @@ export const pinSession = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'isPinned must be a boolean' });
   }
 
-  const session = await chatSessionService.pinSession(sessionId, userId, isPinned);
+  const session = await chatSessionService.togglePinSession(sessionId, userId, isPinned);
   res.status(200).json(session);
 });
 
