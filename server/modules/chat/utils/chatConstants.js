@@ -1,6 +1,6 @@
 export const CHAT_CONSTANTS = {
   MODELS: {
-    FAST_TEXT: 'gemini-flash-latest',
+    FAST_TEXT: 'gemini-1.5-flash',
     EMBEDDING: 'gemini-embedding-001',
     REASONING: 'gemini-pro-latest'
   },

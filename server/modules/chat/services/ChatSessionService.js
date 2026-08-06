@@ -14,7 +14,7 @@ export default class ChatSessionService {
     try {
       const promptText = `Generate a very short, concise title (max 5 words) summarizing this chat prompt. Do not use quotes or prefixes. Prompt: "${prompt}"`;
       const response = await geminiClient.models.generateContent({
-        model: 'gemini-1.5-flash-latest',
+        model: 'gemini-1.5-flash',
         contents: promptText
       });
       let title = response.text().trim();
