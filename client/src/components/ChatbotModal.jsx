@@ -345,12 +345,12 @@ const ChatbotModal = ({ isOpen, onClose }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
             <Mic className="w-5 h-5" />
           </button>
           <button 
             className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors mr-0.5 ${
-              inputValue.trim() ? 'bg-primary hover:bg-primary/90' : 'bg-gray-100 hover:bg-gray-200'
+              inputValue.trim() ? 'bg-primary hover:bg-primary/90 cursor-pointer' : 'bg-gray-100 hover:bg-gray-200 cursor-default'
             }`}
           >
             <ArrowUp className={`w-4 h-4 ${inputValue.trim() ? 'text-white' : 'text-gray-500'}`} />
