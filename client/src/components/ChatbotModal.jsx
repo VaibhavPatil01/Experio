@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2 } from 'lucide-react';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles } from 'lucide-react';
 import { fetchSessions, fetchSessionMessages } from '../services/chatServices';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
@@ -15,6 +15,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState(null);
+  const [inputValue, setInputValue] = useState('');
 
   const handleNewChat = () => {
     setActiveSessionId(null);
@@ -335,18 +336,24 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       <div className="px-4 pb-2">
         <div className="bg-white rounded-full flex items-center gap-3 px-2 py-2 shadow-sm border border-gray-100">
           <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 hover:bg-gray-200 transition-colors">
-            <Plus className="w-5 h-5 text-gray-600" />
+            <Sparkles className="w-5 h-5 text-gray-600" />
           </button>
           <input 
             type="text" 
             placeholder="Write a message..." 
             className="flex-1 bg-transparent outline-none text-[14px] text-gray-800 placeholder-gray-400"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
           />
           <button className="text-gray-400 hover:text-gray-600 transition-colors">
             <Mic className="w-5 h-5" />
           </button>
-          <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 hover:bg-gray-200 transition-colors mr-0.5">
-            <ArrowUp className="w-4 h-4 text-gray-500" />
+          <button 
+            className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors mr-0.5 ${
+              inputValue.trim() ? 'bg-primary hover:bg-primary/90' : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
+            <ArrowUp className={`w-4 h-4 ${inputValue.trim() ? 'text-white' : 'text-gray-500'}`} />
           </button>
         </div>
       </div>
