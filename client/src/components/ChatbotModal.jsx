@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2 } from 'lucide-react';
-import { fetchSessions } from '../services/chatServices';
+import { fetchSessions, fetchSessionMessages } from '../services/chatServices';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
@@ -23,6 +24,26 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       setHistorySessions(sessionsArray);
     } catch (e) {
       console.error('Failed to fetch history', e);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const handleSessionSelect = async (sessionId) => {
+    try {
+      setIsLoadingHistory(true);
+      const messagesData = await fetchSessionMessages(sessionId);
+      const formattedMessages = (Array.isArray(messagesData) ? messagesData : messagesData.messages || [])
+        .reverse()
+        .map(msg => ({
+          id: msg._id,
+          sender: msg.role === 'user' ? 'user' : 'system',
+          content: msg.content
+        }));
+      setMessages(formattedMessages);
+      setIsHistoryOpen(false);
+    } catch (error) {
+      console.error('Failed to load session messages', error);
     } finally {
       setIsLoadingHistory(false);
     }
@@ -69,6 +90,57 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           }
           .chat-scroll::-webkit-scrollbar-thumb:hover {
             background-color: #71717a;
+          }
+
+          /* Markdown Styles */
+          .markdown-body {
+            font-size: 14px;
+            line-height: 1.6;
+          }
+          .markdown-body p {
+            margin-bottom: 0.5em;
+          }
+          .markdown-body p:last-child {
+            margin-bottom: 0;
+          }
+          .markdown-body strong {
+            font-weight: 600;
+            color: inherit;
+          }
+          .markdown-body ul {
+            list-style-type: disc;
+            padding-left: 1.5em;
+            margin-bottom: 0.5em;
+          }
+          .markdown-body ol {
+            list-style-type: decimal;
+            padding-left: 1.5em;
+            margin-bottom: 0.5em;
+          }
+          .markdown-body li {
+            margin-bottom: 0.25em;
+          }
+          .markdown-body a {
+            color: #2563eb;
+            text-decoration: underline;
+          }
+          .markdown-body code {
+            background-color: rgba(0,0,0,0.05);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+          }
+          .markdown-body pre {
+            background-color: #f4f4f5;
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 0.5em;
+          }
+          .markdown-body pre code {
+            background-color: transparent;
+            padding: 0;
           }
           .chat-scroll::-webkit-scrollbar-button:vertical:decrement {
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a1a1aa"><path d="M12 8l7 9H5z"/></svg>') no-repeat center center;
@@ -226,8 +298,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           ) : (
             <div key={msg.id} className="flex gap-3 mt-2">
               <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mt-1" />
-              <div className="text-[14px] text-gray-700 leading-relaxed">
-                {msg.content}
+              <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%]">
+                <ReactMarkdown className="markdown-body text-gray-700">
+                  {msg.content}
+                </ReactMarkdown>
               </div>
             </div>
           )
@@ -308,11 +382,21 @@ const ChatbotModal = ({ isOpen, onClose }) => {
                 historySessions
                   .filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()))
                   .map((session) => (
-                  <div key={session._id} className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200">
+                  <div 
+                    key={session._id} 
+                    onClick={() => handleSessionSelect(session._id)}
+                    className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200"
+                  >
                     <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
                     <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
                       <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
-                      <button className="text-gray-400 hover:text-red-500 transition-colors">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation(); // Don't trigger session load when clicking delete
+                          // Add delete handler here if implemented
+                        }}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                      >
                         <Trash2 className="w-[14px] h-[14px]" />
                       </button>
                     </div>
