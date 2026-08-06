@@ -276,44 +276,47 @@ const ChatbotModal = ({ isOpen, onClose }) => {
 
       {/* History Modal Overlay */}
       {isHistoryOpen && (
-        <div className="absolute inset-0 z-[10000] bg-[#f7f7f8] flex flex-col items-center pt-8 px-4 rounded-[24px]">
-          {/* Search Input */}
-          <div className="w-full max-w-[600px] relative shadow-sm rounded-md">
-            <input 
-              type="text"
-              placeholder="Search all convos..."
-              className="w-full bg-white text-gray-800 text-[13px] border border-gray-200 outline-none px-3 py-2.5 rounded-md focus:border-primary transition-colors placeholder-gray-400"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              autoFocus
-            />
-            <button 
-              onClick={() => setIsHistoryOpen(false)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+        <div 
+          className="absolute inset-0 z-[10000] bg-black/20 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 rounded-[24px]"
+          onClick={() => setIsHistoryOpen(false)}
+        >
+          {/* Inner Modal Box */}
+          <div 
+            className="w-full max-w-[600px] max-h-[65%] bg-[#f7f7f8] rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Input */}
+            <div className="w-full relative rounded-t-xl bg-white border-b border-gray-100">
+              <input 
+                type="text"
+                placeholder="Search all convos..."
+                className="w-full bg-transparent text-gray-800 text-[13px] outline-none px-4 py-3 focus:bg-gray-50 transition-colors placeholder-gray-400"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+            </div>
 
-          {/* List */}
-          <div className="w-full max-w-[600px] mt-4 flex-1 overflow-y-auto chat-scroll flex flex-col gap-1 pb-4">
-            {isLoadingHistory ? (
-              <div className="text-gray-400 text-sm text-center mt-4">Loading...</div>
-            ) : (
-              historySessions
-                .filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()))
-                .map((session) => (
-                <div key={session._id} className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200">
-                  <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
-                  <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
-                    <button className="text-gray-400 hover:text-red-500 transition-colors">
-                      <Trash2 className="w-[14px] h-[14px]" />
-                    </button>
+            {/* List */}
+            <div className="w-full flex-1 overflow-y-auto chat-scroll flex flex-col p-2">
+              {isLoadingHistory ? (
+                <div className="text-gray-400 text-sm text-center mt-4">Loading...</div>
+              ) : (
+                historySessions
+                  .filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map((session) => (
+                  <div key={session._id} className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200">
+                    <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
+                    <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
+                      <button className="text-gray-400 hover:text-red-500 transition-colors">
+                        <Trash2 className="w-[14px] h-[14px]" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}
