@@ -18,6 +18,12 @@ import {
   submitFeedback
 } from '../services/chatServices';
 import { useChatStream } from '../hooks/useChatStream';
+import chatRobotIcon from '../assets/images/icons/chatroboticon.png';
+const AIAvatar = () => (
+  <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
+    <img src={chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />
+  </div>
+);
 
 const Assistant = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
@@ -29,6 +35,7 @@ const Assistant = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessages, setCurrentMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
   
   // Hooks
   const { isGenerating, streamText, streamError, startStream, stopStream } = useChatStream();
@@ -148,7 +155,9 @@ const Assistant = () => {
 
       // 2. If it's a new chat, create session first
       if (targetSessionId === 'new') {
+        setIsCreatingSession(true);
         const newSession = await createSession(userPrompt);
+        setIsCreatingSession(false);
         targetSessionId = newSession._id;
         
         // Add to sidebar
@@ -171,6 +180,7 @@ const Assistant = () => {
 
     } catch (error) {
       console.error("Chat generation error", error);
+      setIsCreatingSession(false);
     }
   };
 
@@ -197,7 +207,7 @@ const Assistant = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isGenerating}
+          disabled={isGenerating || isCreatingSession}
         />
         <div className="flex items-center gap-3 flex-shrink-0 pr-1">
           <div className="relative flex items-center justify-center">
@@ -215,7 +225,7 @@ const Assistant = () => {
           </div>
 
           <div className="relative flex items-center justify-center">
-            {isGenerating ? (
+            {isGenerating || isCreatingSession ? (
               // Stop Generation Button
               <button onClick={stopStream} className="peer cursor-pointer flex items-center justify-center">
                 <div className="w-[42px] h-[42px] bg-red-500 text-white rounded-full flex items-center justify-center shadow-sm">
@@ -244,7 +254,7 @@ const Assistant = () => {
             )}
             
             <div className="pointer-events-none absolute left-1/2 top-full mt-3 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100 dark:bg-white dark:text-gray-900">
-              {isGenerating ? "Stop Generation" : (inputValue.trim() ? "Send Message" : "Start Voice")}
+              {isGenerating || isCreatingSession ? "Stop Generation" : (inputValue.trim() ? "Send Message" : "Start Voice")}
               <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900 dark:bg-white" />
             </div>
           </div>
@@ -462,9 +472,11 @@ const Assistant = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-start group w-full mt-2">
-                          <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <div className="flex items-start gap-3 w-full mt-2 group">
+                          <AIAvatar />
+                          <div className="flex flex-col items-start w-full min-w-0">
+                            <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {msg.text}
                             </ReactMarkdown>
                           </div>
@@ -493,15 +505,18 @@ const Assistant = () => {
                             <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><Copy className="w-4 h-4" /></button>
                           </div>
                         </div>
+                      </div>
                       )}
                     </div>
                   ))}
 
                   {/* Streaming Active Message */}
-                  {isGenerating && (
-                    <div className="flex flex-col items-start w-full mt-2">
-                       <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
-                          {streamText ? (
+                  {(isGenerating || isCreatingSession) && (
+                    <div className="flex items-start gap-3 w-full mt-2">
+                       <AIAvatar />
+                       <div className="flex flex-col items-start w-full min-w-0">
+                         <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
+                            {streamText ? (
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {streamText}
                             </ReactMarkdown>
@@ -513,7 +528,8 @@ const Assistant = () => {
                             </div>
                           )}
                        </div>
-                    </div>
+                     </div>
+                   </div>
                   )}
 
                   {streamError && (
