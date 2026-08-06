@@ -17,7 +17,7 @@ export default class ChatSessionService {
         model: 'gemini-3.5-flash',
         contents: promptText
       });
-      let title = response.text().trim();
+      let title = (response.text || '').trim();
       
       // Clean up potential quotes
       title = title.replace(/^["'](.*)["']$/, '$1');

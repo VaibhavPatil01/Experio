@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Plus, PenSquare, Sparkles, Search, PanelLeft,
-  ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle, Square, ExternalLink
+  ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle, Square, ExternalLink, Share2
 } from 'lucide-react';
 
 import ReactMarkdown from 'react-markdown';
@@ -132,6 +132,17 @@ const Assistant = () => {
       if (activeChatId === id) setActiveChatId('new');
     } catch (error) {
       console.error("Failed to delete session", error);
+    }
+  };
+
+  const handleRenameSession = async (id, newTitle) => {
+    try {
+      await renameSession(id, newTitle);
+      setChatHistory(prev => prev.map(c => 
+        c.id === id ? { ...c, label: newTitle } : c
+      ));
+    } catch (error) {
+      console.error("Failed to rename session", error);
     }
   };
 
@@ -350,6 +361,7 @@ const Assistant = () => {
                       setOpenDropdownId(openDropdownId === chat.id ? null : chat.id);
                     }}
                     onDelete={() => handleDeleteSession(chat.id)}
+                    onRename={(newTitle) => handleRenameSession(chat.id, newTitle)}
                   />
                 ))}
               </div>
@@ -374,6 +386,7 @@ const Assistant = () => {
                       setOpenDropdownId(openDropdownId === chat.id ? null : chat.id);
                     }}
                     onDelete={() => handleDeleteSession(chat.id)}
+                    onRename={(newTitle) => handleRenameSession(chat.id, newTitle)}
                   />
                 ))}
               </div>
@@ -412,6 +425,26 @@ const Assistant = () => {
                     className="absolute right-0 top-full mt-1 w-[160px] bg-white dark:bg-[#2f2f2f] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] rounded-xl border border-gray-100 dark:border-gray-700 z-[100] py-1.5 flex flex-col cursor-default font-normal" 
                     onClick={e => e.stopPropagation()}
                   >
+                    <button 
+                      className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenDropdownId(null);
+                      }}
+                    >
+                      <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      Share
+                    </button>
+                    <button 
+                      className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenDropdownId(null);
+                      }}
+                    >
+                      <Edit2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      Rename
+                    </button>
                     <button 
                       className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
                       onClick={(e) => {
@@ -568,67 +601,136 @@ const UnpinIcon = ({ className }) => (
   </svg>
 );
 
-const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdownOpen, onToggleDropdown, onDelete }) => (
-  <div 
-    onClick={onClick}
-    className={`group relative cursor-pointer flex items-center w-full px-2.5 py-2 rounded-lg transition-colors text-sm text-gray-700 dark:text-gray-200 text-left
-      ${isActive ? 'bg-gray-200 dark:bg-[#2f2f2f]' : 'hover:bg-gray-200 dark:hover:bg-[#2f2f2f]'}
-      ${isDropdownOpen ? 'overflow-visible' : 'overflow-hidden'}
-    `}
-  >
-    <span className="truncate block w-full pr-8 group-hover:pr-12 transition-all">{label}</span>
-    <div className={`absolute right-2 flex items-center gap-1.5 transition-opacity ${isDropdownOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-      <div 
-        className="p-0.5 hover:text-gray-900 dark:hover:text-gray-100 text-gray-400"
-        onClick={onTogglePin}
-      >
-        {isPinned ? (
-          <UnpinIcon className="w-4 h-4" />
-        ) : (
-          <Pin className="w-4 h-4 rotate-45" />
-        )}
-      </div>
-      <div className="relative">
-        <div 
-          className="p-0.5 hover:text-gray-900 dark:hover:text-gray-100 text-gray-400"
-          onClick={onToggleDropdown}
-        >
-          <MoreHorizontal className="w-[18px] h-[18px]" />
-        </div>
+  </svg>
+);
 
-        {isDropdownOpen && (
+const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdownOpen, onToggleDropdown, onDelete, onRename }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(label);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      // Optionally place cursor at end
+      inputRef.current.selectionStart = inputRef.current.selectionEnd = inputRef.current.value.length;
+    }
+  }, [isEditing]);
+
+  const handleRenameSubmit = () => {
+    setIsEditing(false);
+    const newTitle = editTitle.trim();
+    if (newTitle !== '' && newTitle !== label) {
+      if (onRename) onRename(newTitle);
+    } else {
+      setEditTitle(label);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleRenameSubmit();
+    if (e.key === 'Escape') {
+      setIsEditing(false);
+      setEditTitle(label);
+    }
+  };
+
+  return (
+    <div 
+      onClick={!isEditing ? onClick : undefined}
+      className={`group relative flex items-center w-full px-2.5 py-2 rounded-lg transition-colors text-sm text-gray-700 dark:text-gray-200 text-left
+        ${isActive ? 'bg-gray-200 dark:bg-[#2f2f2f]' : 'hover:bg-gray-200 dark:hover:bg-[#2f2f2f]'}
+        ${isDropdownOpen ? 'overflow-visible' : 'overflow-hidden'}
+        ${!isEditing ? 'cursor-pointer' : ''}
+      `}
+    >
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          onBlur={handleRenameSubmit}
+          onKeyDown={handleKeyDown}
+          onClick={(e) => e.stopPropagation()}
+          className="w-full bg-white dark:bg-[#3f3f3f] text-gray-900 dark:text-gray-100 px-1.5 py-0.5 rounded border border-primary outline-none text-sm -ml-1.5"
+        />
+      ) : (
+        <span className="truncate block w-full pr-8 group-hover:pr-12 transition-all">{label}</span>
+      )}
+      <div className={`absolute right-2 flex items-center gap-1.5 transition-opacity ${(isDropdownOpen || isEditing) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+        {!isEditing && (
           <div 
-            className="absolute right-0 top-full mt-1 w-[160px] bg-white dark:bg-[#2f2f2f] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] rounded-xl border border-gray-100 dark:border-gray-700 z-[100] py-1.5 flex flex-col cursor-default font-normal" 
-            onClick={e => e.stopPropagation()}
+            className="p-0.5 hover:text-gray-900 dark:hover:text-gray-100 text-gray-400 cursor-pointer"
+            onClick={(e) => { e.stopPropagation(); onTogglePin(e); }}
           >
-            <button 
-              className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
-              onClick={(e) => { onTogglePin(e); onToggleDropdown(e); }}
-            >
-              {isPinned ? (
-                <UnpinIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              ) : (
-                <Pin className="w-4 h-4 text-gray-500 dark:text-gray-400 rotate-45" strokeWidth={2} />
-              )}
-              {isPinned ? 'Unpin chat' : 'Pin chat'}
-            </button>
-            <div className="h-px w-full bg-gray-100 dark:bg-gray-700/50 my-1.5" />
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-                onToggleDropdown(e);
-              }}
-              className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left w-full"
-            >
-              <Trash2 className="w-4 h-4" strokeWidth={2} />
-              Delete
-            </button>
+            {isPinned ? (
+              <UnpinIcon className="w-4 h-4" />
+            ) : (
+              <Pin className="w-4 h-4 rotate-45" />
+            )}
           </div>
         )}
+        <div className="relative">
+          <div 
+            className="p-0.5 hover:text-gray-900 dark:hover:text-gray-100 text-gray-400 cursor-pointer"
+            onClick={(e) => { e.stopPropagation(); onToggleDropdown(e); }}
+          >
+            <MoreHorizontal className="w-[18px] h-[18px]" />
+          </div>
+
+          {isDropdownOpen && (
+            <div 
+              className="absolute right-0 top-full mt-1 w-[160px] bg-white dark:bg-[#2f2f2f] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] rounded-xl border border-gray-100 dark:border-gray-700 z-[100] py-1.5 flex flex-col cursor-default font-normal" 
+              onClick={e => e.stopPropagation()}
+            >
+              <button 
+                className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
+                onClick={(e) => { e.stopPropagation(); onToggleDropdown(e); }}
+              >
+                <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                Share
+              </button>
+              <button 
+                className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  onToggleDropdown(e); 
+                  setEditTitle(label);
+                  setIsEditing(true);
+                }}
+              >
+                <Edit2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                Rename
+              </button>
+              <button 
+                className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors text-left w-full"
+                onClick={(e) => { e.stopPropagation(); onTogglePin(e); onToggleDropdown(e); }}
+              >
+                {isPinned ? (
+                  <UnpinIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                ) : (
+                  <Pin className="w-4 h-4 text-gray-500 dark:text-gray-400 rotate-45" strokeWidth={2} />
+                )}
+                {isPinned ? 'Unpin chat' : 'Pin chat'}
+              </button>
+              <div className="h-px w-full bg-gray-100 dark:bg-gray-700/50 my-1.5" />
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                  onToggleDropdown(e);
+                }}
+                className="cursor-pointer flex items-center gap-3 px-3 py-1.5 text-[14px] text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left w-full"
+              >
+                <Trash2 className="w-4 h-4" strokeWidth={2} />
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Assistant;
