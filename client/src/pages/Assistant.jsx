@@ -20,7 +20,7 @@ import {
 import { useChatStream } from '../hooks/useChatStream';
 import chatRobotIcon from '../assets/images/icons/chatroboticon.png';
 const AIAvatar = () => (
-  <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
+  <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
     <img src={chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />
   </div>
 );
@@ -477,7 +477,7 @@ const Assistant = () => {
                           <div className="flex flex-col items-start w-full min-w-0">
                             <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {msg.text}
+                              {msg.text.replace(/\s*\[Source[^\]]*\]/gi, '')}
                             </ReactMarkdown>
                           </div>
 
@@ -518,7 +518,7 @@ const Assistant = () => {
                          <div className="text-gray-900 dark:text-gray-100 pr-4 py-2 max-w-[100%] leading-relaxed markdown-body w-full">
                             {streamText ? (
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {streamText}
+                              {streamText.replace(/\s*\[Source[^\]]*\]/gi, '')}
                             </ReactMarkdown>
                           ) : (
                             <div className="flex items-center gap-1.5 h-6 px-1">
