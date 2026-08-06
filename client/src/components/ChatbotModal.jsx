@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap } from 'lucide-react';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap, History } from 'lucide-react';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
@@ -85,6 +85,32 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="flex gap-2">
+          {/* New Chat Button */}
+          <div className="relative flex">
+            <button 
+              className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
+            >
+              <Plus className="w-[18px] h-[18px]" strokeWidth={2.5} />
+            </button>
+            <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
+              New Chat
+              <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
+            </div>
+          </div>
+
+          {/* History Button */}
+          <div className="relative flex">
+            <button 
+              className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
+            >
+              <History className="w-[18px] h-[18px]" strokeWidth={2.5} />
+            </button>
+            <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
+              History
+              <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
+            </div>
+          </div>
+
           {/* Options Button */}
           <div className="relative flex">
             <button 
