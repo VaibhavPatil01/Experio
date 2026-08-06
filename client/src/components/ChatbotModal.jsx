@@ -335,8 +335,8 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       {/* Input Area */}
       <div className="px-4 pb-2">
         <div className="bg-white rounded-full flex items-center gap-3 px-2 py-2 shadow-sm border border-gray-100">
-          <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 hover:bg-gray-200 transition-colors">
-            <Sparkles className="w-5 h-5 text-gray-600" />
+          <button className="text-gray-400 hover:text-gray-600 transition-colors pl-1">
+            <Sparkles className="w-5 h-5" strokeWidth={2} />
           </button>
           <input 
             type="text" 
