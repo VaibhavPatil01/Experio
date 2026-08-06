@@ -298,8 +298,8 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           ) : (
             <div key={msg.id} className="flex gap-3 mt-2">
               <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mt-1" />
-              <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%]">
-                <ReactMarkdown className="markdown-body text-gray-700">
+              <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%] markdown-body">
+                <ReactMarkdown>
                   {msg.content}
                 </ReactMarkdown>
               </div>

@@ -9,7 +9,11 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
-    config.headers['token'] = token;
+    if (config.headers && typeof config.headers.set === 'function') {
+      config.headers.set('token', token);
+    } else {
+      config.headers['token'] = token;
+    }
   }
   return config;
 });
