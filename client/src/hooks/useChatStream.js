@@ -8,7 +8,7 @@ export const useChatStream = () => {
   const [streamError, setStreamError] = useState(null);
   const abortControllerRef = useRef(null);
 
-  const startStream = useCallback(async (sessionId, prompt, model = 'gemini-flash-latest', onComplete = null) => {
+  const startStream = useCallback(async (sessionId, prompt, model = 'gemini-1.5-flash', onComplete = null) => {
     setIsGenerating(true);
     setStreamText('');
     setStreamError(null);
