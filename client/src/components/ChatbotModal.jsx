@@ -14,6 +14,12 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [historySessions, setHistorySessions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState(null);
+
+  const handleNewChat = () => {
+    setActiveSessionId(null);
+    setMessages([]);
+  };
 
   const openHistory = async () => {
     setIsHistoryOpen(true);
@@ -41,6 +47,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           content: msg.content
         }));
       setMessages(formattedMessages);
+      setActiveSessionId(sessionId);
       setIsHistoryOpen(false);
     } catch (error) {
       console.error('Failed to load session messages', error);
@@ -201,9 +208,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           {/* New Chat Button */}
           <div className="relative flex">
             <button 
+              onClick={handleNewChat}
               className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
             >
-              <Plus className="w-[18px] h-[18px]" strokeWidth={2.5} />
+              <Plus className="w-[18px] h-[18px]" />
             </button>
             <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
               New Chat
@@ -217,7 +225,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               onClick={openHistory}
               className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
             >
-              <History className="w-[18px] h-[18px]" strokeWidth={2.5} />
+              <History className="w-[18px] h-[18px]" />
             </button>
             <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
               Past Conversations
@@ -379,29 +387,51 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               {isLoadingHistory ? (
                 <div className="text-gray-400 text-sm text-center mt-4">Loading...</div>
               ) : (
-                historySessions
-                  .filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()))
-                  .map((session) => (
-                  <div 
-                    key={session._id} 
-                    onClick={() => handleSessionSelect(session._id)}
-                    className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200"
-                  >
-                    <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
-                    <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation(); // Don't trigger session load when clicking delete
-                          // Add delete handler here if implemented
-                        }}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="w-[14px] h-[14px]" />
-                      </button>
+                (() => {
+                  const filtered = historySessions.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
+                  const currentSession = activeSessionId ? filtered.find(s => s._id === activeSessionId) : null;
+                  const previousSessions = activeSessionId ? filtered.filter(s => s._id !== activeSessionId) : filtered;
+
+                  const renderSession = (session) => (
+                    <div 
+                      key={session._id} 
+                      onClick={() => handleSessionSelect(session._id)}
+                      className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200"
+                    >
+                      <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
+                      <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation(); // Don't trigger session load when clicking delete
+                            // Add delete handler here if implemented
+                          }}
+                          className="text-gray-400 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 className="w-[14px] h-[14px]" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+
+                  return (
+                    <>
+                      {currentSession && (
+                        <div className="mb-4">
+                          <h3 className="text-[12px] font-semibold text-gray-400 mb-1 px-3 tracking-wider">Current</h3>
+                          {renderSession(currentSession)}
+                        </div>
+                      )}
+                      
+                      {previousSessions.length > 0 && (
+                        <div>
+                          <h3 className="text-[12px] font-semibold text-gray-400 mb-1 px-3 tracking-wider">Previous</h3>
+                          {previousSessions.map(session => renderSession(session))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
               )}
             </div>
           </div>
