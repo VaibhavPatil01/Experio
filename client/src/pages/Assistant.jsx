@@ -601,9 +601,6 @@ const UnpinIcon = ({ className }) => (
   </svg>
 );
 
-  </svg>
-);
-
 const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdownOpen, onToggleDropdown, onDelete, onRename }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(label);
@@ -657,8 +654,8 @@ const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdow
       ) : (
         <span className="truncate block w-full pr-8 group-hover:pr-12 transition-all">{label}</span>
       )}
-      <div className={`absolute right-2 flex items-center gap-1.5 transition-opacity ${(isDropdownOpen || isEditing) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        {!isEditing && (
+      {!isEditing && (
+        <div className={`absolute right-2 flex items-center gap-1.5 transition-opacity ${isDropdownOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
           <div 
             className="p-0.5 hover:text-gray-900 dark:hover:text-gray-100 text-gray-400 cursor-pointer"
             onClick={(e) => { e.stopPropagation(); onTogglePin(e); }}
@@ -669,7 +666,6 @@ const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdow
               <Pin className="w-4 h-4 rotate-45" />
             )}
           </div>
-        )}
         <div className="relative">
           <div 
             className="p-0.5 hover:text-gray-900 dark:hover:text-gray-100 text-gray-400 cursor-pointer"
@@ -729,6 +725,7 @@ const RecentItem = ({ label, isActive, onClick, isPinned, onTogglePin, isDropdow
           )}
         </div>
       </div>
+      )}
     </div>
   );
 };
