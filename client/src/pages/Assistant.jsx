@@ -137,7 +137,16 @@ const Assistant = () => {
     let targetSessionId = activeChatId;
 
     try {
-      // 1. If it's a new chat, create session first
+      // 1. Optimistically add user message to UI
+      const userMsg = {
+        id: Date.now().toString(),
+        sender: 'user',
+        text: userPrompt,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setCurrentMessages(prev => [...prev, userMsg]);
+
+      // 2. If it's a new chat, create session first
       if (targetSessionId === 'new') {
         const newSession = await createSession(userPrompt);
         targetSessionId = newSession._id;
@@ -146,15 +155,6 @@ const Assistant = () => {
         setChatHistory([{ id: targetSessionId, label: newSession.title, isPinned: false }, ...chatHistory]);
         setActiveChatId(targetSessionId);
       }
-
-      // 2. Optimistically add user message to UI
-      const userMsg = {
-        id: Date.now().toString(),
-        sender: 'user',
-        text: userPrompt,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setCurrentMessages(prev => [...prev, userMsg]);
 
       // 3. Start Stream
       await startStream(targetSessionId, userPrompt, 'gemini-3.5-flash', (finalMessage) => {
@@ -433,7 +433,7 @@ const Assistant = () => {
 
         {/* Chat Body & Input Area */}
         <div className="flex-1 flex flex-col items-center overflow-y-auto w-full relative">
-          {activeChatId === 'new' ? (
+          {activeChatId === 'new' && currentMessages.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-4 w-full max-w-[760px]">
               <h1 className="text-[32px] font-semibold mb-8 text-gray-800 dark:text-[#d1d5db]">Where should we begin?</h1>
               {renderInputBar()}
@@ -531,7 +531,7 @@ const Assistant = () => {
 
         {/* Fixed Input Area at Bottom */}
         <div className="w-full flex flex-col items-center p-4 bg-gradient-to-t from-white via-white dark:from-[#212121] dark:via-[#212121] to-transparent pt-0 shrink-0">
-          {activeChatId !== 'new' && renderInputBar()}
+          {(activeChatId !== 'new' || currentMessages.length > 0) && renderInputBar()}
           <div className="text-center text-[11px] text-gray-500 mt-2 font-medium">
             AI can make mistakes. Check important info.
           </div>
