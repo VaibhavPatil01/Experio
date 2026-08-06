@@ -23,7 +23,7 @@ export default class ChatPipelineService {
    * @param {string} prompt 
    * @param {string} modelSelection 
    */
-  async *executePipeline(sessionId, userId, prompt, modelSelection = 'gemini-1.5-flash') {
+  async *executePipeline(sessionId, userId, prompt, modelSelection = 'gemini-3.5-flash') {
     const pipelineId = Math.random().toString(36).substring(7); // Unique ID for logging correlation
     logger.info(`[Pipeline ${pipelineId}] Starting RAG Pipeline`, { sessionId, userId });
 

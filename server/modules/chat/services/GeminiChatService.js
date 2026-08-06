@@ -80,7 +80,7 @@ export default class GeminiChatService {
    * @param {string} modelSelection The Gemini model to use (defaults to flash)
    * @returns {AsyncGenerator<Object, Object, unknown>} Yields text chunks, returns final metadata object
    */
-  static async *streamChat(prompt, userId, modelSelection = 'gemini-1.5-flash') {
+  static async *streamChat(prompt, userId, modelSelection = 'gemini-3.5-flash') {
     this._checkRateLimit(userId);
     this._checkCircuitBreaker();
 
@@ -110,8 +110,8 @@ export default class GeminiChatService {
         this._recordSuccess();
         
         // Yield chunks to the consumer
-        for await (const chunk of streamResult.stream) {
-          const chunkText = chunk.text();
+        for await (const chunk of streamResult) {
+          const chunkText = chunk.text;
           yield { text: chunkText };
         }
 

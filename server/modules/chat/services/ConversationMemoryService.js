@@ -87,7 +87,7 @@ export default class ConversationMemoryService {
 
     // 3. Call Gemini via SDK
     const response = await geminiClient.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3.5-flash',
       contents: promptText
     });
     let newSummary = response.text().trim();
