@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2 } from 'lucide-react';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2 } from 'lucide-react';
 import { fetchSessions, fetchSessionMessages } from '../services/chatServices';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
@@ -343,7 +343,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
             className="flex-1 bg-transparent outline-none text-[14px] text-gray-800 placeholder-gray-400"
           />
           <button className="text-gray-400 hover:text-gray-600 transition-colors">
-            <Smile className="w-5 h-5" />
+            <Mic className="w-5 h-5" />
           </button>
           <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 hover:bg-gray-200 transition-colors mr-0.5">
             <ArrowUp className="w-4 h-4 text-gray-500" />
