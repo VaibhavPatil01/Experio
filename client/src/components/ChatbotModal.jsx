@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2 } from 'lucide-react';
 import { fetchSessions } from '../services/chatServices';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
@@ -7,9 +7,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'system', content: 'Hello! I am your Mozify AI Assistant. How can I help you with your interview preparation today?' }
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historySessions, setHistorySessions] = useState([]);
@@ -41,6 +39,17 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     if (diff < 31536000) return `${Math.floor(diff / 2592000)} mo ago`;
     return `${Math.floor(diff / 31536000)} yr ago`;
   };
+
+  useEffect(() => {
+    if (isHistoryOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isHistoryOpen]);
 
   return (
     <>
@@ -206,13 +215,6 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       {/* Chat Content Area */}
       <div className="flex-1 overflow-y-auto px-5 pt-24 pb-4 flex flex-col gap-4 chat-scroll">
         
-        {/* Welcome Message */}
-        <div className="flex gap-3">
-          <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mt-1" />
-          <div className="text-[14px] text-gray-700 leading-relaxed">
-            Welcome to Mozify! I'm here to help you navigate through our interview experiences, resume building, and career guidance. Feel free to ask me anything!
-          </div>
-        </div>
 
         {messages.map((msg) => (
           msg.sender === 'user' ? (
@@ -233,15 +235,15 @@ const ChatbotModal = ({ isOpen, onClose }) => {
 
         {/* Suggested Prompts */}
         {messages.length === 0 && (
-          <div className="flex flex-col gap-2.5 items-start mt-4">
+          <div className="flex flex-col gap-2.5 items-start mt-auto">
             <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-              How does ChatBot improve customer support?
+              Can you review my resume and suggest improvements?
             </button>
             <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-              Can ChatBot handle sales and product recommendations?
+              What are some common interview questions for a software engineer?
             </button>
             <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-              Is technical knowledge required to set up ChatBot?
+              Can we do a mock interview for a frontend developer role?
             </button>
           </div>
         )}
@@ -273,24 +275,25 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         <span>Powered by</span>
         <span className="font-bold text-gray-700 ml-0.5 tracking-tight">Mozify</span>
       </div>
+    </div>
 
-      {/* History Modal Overlay */}
+    {/* History Modal Overlay */}
       {isHistoryOpen && (
         <div 
-          className="absolute inset-0 z-[10000] bg-black/20 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 rounded-[24px]"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center p-4"
           onClick={() => setIsHistoryOpen(false)}
         >
           {/* Inner Modal Box */}
           <div 
-            className="w-full max-w-[600px] max-h-[65%] bg-[#f7f7f8] rounded-xl shadow-xl flex flex-col overflow-hidden border border-gray-200"
+            className="w-full max-w-[600px] h-[550px] max-h-[85vh] bg-[#f7f7f8] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search Input */}
-            <div className="w-full relative rounded-t-xl bg-white border-b border-gray-100">
+            <div className="w-full p-3 bg-white rounded-t-xl border-b border-gray-100">
               <input 
                 type="text"
                 placeholder="Search all convos..."
-                className="w-full bg-transparent text-gray-800 text-[13px] outline-none px-4 py-3 focus:bg-gray-50 transition-colors placeholder-gray-400"
+                className="w-full bg-white text-gray-800 text-[13px] outline-none px-4 py-2.5 rounded-md border border-gray-300 focus:border-primary transition-colors placeholder-gray-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
@@ -320,7 +323,6 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           </div>
         </div>
       )}
-    </div>
     </>
   );
 };
