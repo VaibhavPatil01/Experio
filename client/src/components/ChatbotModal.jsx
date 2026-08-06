@@ -276,20 +276,20 @@ const ChatbotModal = ({ isOpen, onClose }) => {
 
       {/* History Modal Overlay */}
       {isHistoryOpen && (
-        <div className="absolute inset-0 z-[10000] bg-[#1e1e1e] flex flex-col items-center pt-8 px-4 rounded-[24px]">
+        <div className="absolute inset-0 z-[10000] bg-[#f7f7f8] flex flex-col items-center pt-8 px-4 rounded-[24px]">
           {/* Search Input */}
-          <div className="w-full max-w-[600px] relative">
+          <div className="w-full max-w-[600px] relative shadow-sm rounded-md">
             <input 
               type="text"
               placeholder="Search all convos..."
-              className="w-full bg-[#252526] text-[#cccccc] text-[13px] border border-[#3c3c3c] outline-none px-3 py-2 rounded-md focus:border-[#007acc] transition-colors"
+              className="w-full bg-white text-gray-800 text-[13px] border border-gray-200 outline-none px-3 py-2.5 rounded-md focus:border-primary transition-colors placeholder-gray-400"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
             />
             <button 
               onClick={() => setIsHistoryOpen(false)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -303,11 +303,11 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               historySessions
                 .filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()))
                 .map((session) => (
-                <div key={session._id} className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#2a2d2e] cursor-pointer text-[#cccccc] transition-colors">
-                  <span className="text-[14px] truncate mr-4">{session.title}</span>
+                <div key={session._id} className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200">
+                  <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
                   <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[12px] text-[#808080]">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
-                    <button className="text-[#808080] hover:text-[#f48771] transition-colors">
+                    <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
+                    <button className="text-gray-400 hover:text-red-500 transition-colors">
                       <Trash2 className="w-[14px] h-[14px]" />
                     </button>
                   </div>
