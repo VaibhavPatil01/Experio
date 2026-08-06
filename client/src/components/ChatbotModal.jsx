@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap, History } from 'lucide-react';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2 } from 'lucide-react';
+import { fetchSessions } from '../services/chatServices';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
@@ -9,6 +10,37 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
     { id: 1, sender: 'system', content: 'Hello! I am your Mozify AI Assistant. How can I help you with your interview preparation today?' }
   ]);
+
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historySessions, setHistorySessions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  const openHistory = async () => {
+    setIsHistoryOpen(true);
+    setIsLoadingHistory(true);
+    try {
+      const data = await fetchSessions();
+      const sessionsArray = Array.isArray(data) ? data : (data.sessions || []);
+      setHistorySessions(sessionsArray);
+    } catch (e) {
+      console.error('Failed to fetch history', e);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const getRelativeTime = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
+    if (diff < 60) return `${Math.max(1, diff)} secs ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+    if (diff < 2592000) return `${Math.floor(diff / 604800)} wk ago`;
+    if (diff < 31536000) return `${Math.floor(diff / 2592000)} mo ago`;
+    return `${Math.floor(diff / 31536000)} yr ago`;
+  };
 
   return (
     <>
@@ -73,7 +105,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         </div>
         
         {/* Floating Header Pill */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-sm px-4 py-1.5 flex items-center gap-3">
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-sm px-4 py-1.5 flex items-center gap-3">
           <div className="relative">
             <img src={robotIcon} alt="AI" className="w-7 h-7 object-cover rounded-full" />
             <div className="absolute top-0 right-0 w-2 h-2 bg-emerald-500 rounded-full border border-white"></div>
@@ -101,6 +133,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           {/* History Button */}
           <div className="relative flex">
             <button 
+              onClick={openHistory}
               className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
             >
               <History className="w-[18px] h-[18px]" strokeWidth={2.5} />
@@ -171,7 +204,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       </div>
 
       {/* Chat Content Area */}
-      <div className="flex-1 overflow-y-auto px-5 pt-12 pb-4 flex flex-col gap-4 chat-scroll">
+      <div className="flex-1 overflow-y-auto px-5 pt-24 pb-4 flex flex-col gap-4 chat-scroll">
         
         {/* Welcome Message */}
         <div className="flex gap-3">
@@ -240,6 +273,50 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         <span>Powered by</span>
         <span className="font-bold text-gray-700 ml-0.5 tracking-tight">Mozify</span>
       </div>
+
+      {/* History Modal Overlay */}
+      {isHistoryOpen && (
+        <div className="absolute inset-0 z-[10000] bg-[#1e1e1e] flex flex-col items-center pt-8 px-4 rounded-[24px]">
+          {/* Search Input */}
+          <div className="w-full max-w-[600px] relative">
+            <input 
+              type="text"
+              placeholder="Search all convos..."
+              className="w-full bg-[#252526] text-[#cccccc] text-[13px] border border-[#3c3c3c] outline-none px-3 py-2 rounded-md focus:border-[#007acc] transition-colors"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+            <button 
+              onClick={() => setIsHistoryOpen(false)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* List */}
+          <div className="w-full max-w-[600px] mt-4 flex-1 overflow-y-auto chat-scroll flex flex-col gap-1 pb-4">
+            {isLoadingHistory ? (
+              <div className="text-gray-400 text-sm text-center mt-4">Loading...</div>
+            ) : (
+              historySessions
+                .filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()))
+                .map((session) => (
+                <div key={session._id} className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#2a2d2e] cursor-pointer text-[#cccccc] transition-colors">
+                  <span className="text-[14px] truncate mr-4">{session.title}</span>
+                  <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[12px] text-[#808080]">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
+                    <button className="text-[#808080] hover:text-[#f48771] transition-colors">
+                      <Trash2 className="w-[14px] h-[14px]" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
     </>
   );
