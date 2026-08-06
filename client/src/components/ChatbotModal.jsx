@@ -148,7 +148,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               <History className="w-[18px] h-[18px]" strokeWidth={2.5} />
             </button>
             <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
-              History
+              Past Conversations
               <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
             </div>
           </div>
@@ -237,7 +237,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         {messages.length === 0 && (
           <div className="flex flex-col gap-2.5 items-start mt-auto">
             <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
-              Can you review my resume and suggest improvements?
+              What are the top 5 most important skills one should have to crack Amazon?
             </button>
             <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
               What are some common interview questions for a software engineer?
