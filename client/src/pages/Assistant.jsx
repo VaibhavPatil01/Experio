@@ -18,6 +18,7 @@ import {
   submitFeedback
 } from '../services/chatServices';
 import { useChatStream } from '../hooks/useChatStream';
+import ChatHistoryModal from '../components/ChatHistoryModal';
 import chatRobotIcon from '../assets/images/icons/chatroboticon.png';
 const AIAvatar = () => (
   <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
@@ -37,6 +38,7 @@ const Assistant = () => {
   }, [activeChatId]);
   const [inputValue, setInputValue] = useState('');
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   
   // Real State for Sessions and Messages
   const [chatHistory, setChatHistory] = useState([]);
@@ -331,7 +333,10 @@ const Assistant = () => {
       `}>
         <div className="p-3">
           <div className="flex items-center justify-between px-1 mb-2">
-            <button className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors">
+            <button 
+              onClick={() => setIsHistoryModalOpen(true)}
+              className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors cursor-pointer"
+            >
               <Search className="w-5 h-5" />
             </button>
             <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-[#2f2f2f] transition-colors">
@@ -596,6 +601,12 @@ const Assistant = () => {
       </div>
     </div>
 
+    <ChatHistoryModal 
+      isOpen={isHistoryModalOpen} 
+      onClose={() => setIsHistoryModalOpen(false)} 
+      activeSessionId={activeChatId === 'new' ? null : activeChatId}
+      onSessionSelect={(id) => setActiveChatId(id)}
+    />
     </>
   );
 };

@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { fetchSessions, fetchSessionMessages, createSession } from '../services/chatServices';
 import { useChatStream } from '../hooks/useChatStream';
+import { createSession, fetchSessionMessages } from '../services/chatServices';
+import ChatHistoryModal from './ChatHistoryModal';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
@@ -13,9 +14,6 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([]);
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [historySessions, setHistorySessions] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState(() => {
     const stored = localStorage.getItem('sharedActiveChatId');
     return (stored === 'new' || !stored) ? null : stored;
@@ -118,23 +116,8 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const openHistory = async () => {
-    setIsHistoryOpen(true);
-    setIsLoadingHistory(true);
-    try {
-      const data = await fetchSessions();
-      const sessionsArray = Array.isArray(data) ? data : (data.sessions || []);
-      setHistorySessions(sessionsArray);
-    } catch (e) {
-      console.error('Failed to fetch history', e);
-    } finally {
-      setIsLoadingHistory(false);
-    }
-  };
-
   const handleSessionSelect = async (sessionId) => {
     try {
-      setIsLoadingHistory(true);
       const messagesData = await fetchSessionMessages(sessionId);
       const formattedMessages = (Array.isArray(messagesData) ? messagesData : messagesData.messages || [])
         .reverse()
@@ -148,33 +131,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       setIsHistoryOpen(false);
     } catch (error) {
       console.error('Failed to load session messages', error);
-    } finally {
-      setIsLoadingHistory(false);
     }
   };
 
-  const getRelativeTime = (dateStr) => {
-    if (!dateStr) return '';
-    const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
-    if (diff < 60) return `${Math.max(1, diff)} secs ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
-    if (diff < 2592000) return `${Math.floor(diff / 604800)} wk ago`;
-    if (diff < 31536000) return `${Math.floor(diff / 2592000)} mo ago`;
-    return `${Math.floor(diff / 31536000)} yr ago`;
-  };
 
-  useEffect(() => {
-    if (isHistoryOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isHistoryOpen]);
 
   return (
     <>
@@ -536,85 +496,13 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       </div>
     </div>
 
-    {/* History Modal Overlay */}
-      {isHistoryOpen && (
-        <div 
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center p-4"
-          onClick={() => setIsHistoryOpen(false)}
-        >
-          {/* Inner Modal Box */}
-          <div 
-            className="w-full max-w-[600px] h-[550px] max-h-[85vh] bg-[#f7f7f8] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Search Input */}
-            <div className="w-full p-3 bg-white rounded-t-xl border-b border-gray-100">
-              <input 
-                type="text"
-                placeholder="Search all convos..."
-                className="w-full bg-white text-gray-800 text-[13px] outline-none px-4 py-2.5 rounded-md border border-gray-300 focus:border-primary transition-colors placeholder-gray-400"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            {/* List */}
-            <div className="w-full flex-1 overflow-y-auto chat-scroll flex flex-col p-2 overscroll-contain">
-              {isLoadingHistory ? (
-                <div className="text-gray-400 text-sm text-center mt-4">Loading...</div>
-              ) : (
-                (() => {
-                  const filtered = historySessions.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
-                  const currentSession = activeSessionId ? filtered.find(s => s._id === activeSessionId) : null;
-                  const previousSessions = activeSessionId ? filtered.filter(s => s._id !== activeSessionId) : filtered;
-
-                  const renderSession = (session) => (
-                    <div 
-                      key={session._id} 
-                      onClick={() => handleSessionSelect(session._id)}
-                      className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors border border-transparent hover:border-gray-200"
-                    >
-                      <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
-                      <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation(); // Don't trigger session load when clicking delete
-                            // Add delete handler here if implemented
-                          }}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 className="w-[14px] h-[14px]" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-
-                  return (
-                    <>
-                      {currentSession && (
-                        <div className="mb-4">
-                          <h3 className="text-[12px] font-semibold text-gray-400 mb-1 px-3 tracking-wider">Current</h3>
-                          {renderSession(currentSession)}
-                        </div>
-                      )}
-                      
-                      {previousSessions.length > 0 && (
-                        <div>
-                          <h3 className="text-[12px] font-semibold text-gray-400 mb-1 px-3 tracking-wider">Previous</h3>
-                          {previousSessions.map(session => renderSession(session))}
-                        </div>
-                      )}
-                    </>
-                  );
-                })()
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <ChatHistoryModal 
+      isOpen={isHistoryOpen} 
+      onClose={() => setIsHistoryOpen(false)} 
+      activeSessionId={activeSessionId}
+      onSessionSelect={handleSessionSelect}
+    />
+  </>
   );
 };
 
