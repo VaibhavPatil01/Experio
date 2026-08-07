@@ -28,11 +28,12 @@ const AIAvatar = () => (
 const Assistant = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [activeChatId, setActiveChatId] = useState(() => {
-    return localStorage.getItem('assistantActiveChatId') || 'new';
+    const stored = localStorage.getItem('sharedActiveChatId');
+    return (stored === 'null' || !stored) ? 'new' : stored;
   });
 
   useEffect(() => {
-    localStorage.setItem('assistantActiveChatId', activeChatId);
+    localStorage.setItem('sharedActiveChatId', activeChatId);
   }, [activeChatId]);
   const [inputValue, setInputValue] = useState('');
   const [openDropdownId, setOpenDropdownId] = useState(null);

@@ -16,7 +16,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [historySessions, setHistorySessions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [activeSessionId, setActiveSessionId] = useState(null);
+  const [activeSessionId, setActiveSessionId] = useState(() => {
+    const stored = localStorage.getItem('sharedActiveChatId');
+    return (stored === 'new' || !stored) ? null : stored;
+  });
   const [inputValue, setInputValue] = useState('');
   const [isCreatingSession, setIsCreatingSession] = useState(false);
 
@@ -26,6 +29,39 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamText]);
+
+  useEffect(() => {
+    if (activeSessionId) {
+      localStorage.setItem('sharedActiveChatId', activeSessionId);
+    } else {
+      localStorage.setItem('sharedActiveChatId', 'new');
+    }
+  }, [activeSessionId]);
+
+  useEffect(() => {
+    const loadActiveSessionMessages = async () => {
+      if (!activeSessionId) return;
+      try {
+        const messagesData = await fetchSessionMessages(activeSessionId);
+        const formattedMessages = (Array.isArray(messagesData) ? messagesData : messagesData.messages || [])
+          .reverse()
+          .map(msg => ({
+            id: msg._id,
+            sender: msg.role === 'user' ? 'user' : 'system',
+            content: msg.content
+          }));
+        setMessages(formattedMessages);
+      } catch (error) {
+        console.error('Failed to load active session messages', error);
+        setActiveSessionId(null);
+      }
+    };
+    
+    if (activeSessionId && messages.length === 0) {
+      loadActiveSessionMessages();
+    }
+  }, [activeSessionId]); // Only fetch when activeSessionId changes and messages are empty
+
 
   const handleNewChat = () => {
     if (isGenerating || isCreatingSession) {
