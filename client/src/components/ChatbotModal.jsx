@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles } from 'lucide-react';
-import { fetchSessions, fetchSessionMessages } from '../services/chatServices';
+import remarkGfm from 'remark-gfm';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { fetchSessions, fetchSessionMessages, createSession } from '../services/chatServices';
+import { useChatStream } from '../hooks/useChatStream';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
@@ -16,10 +18,68 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [inputValue, setInputValue] = useState('');
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+
+  const { isGenerating, streamText, streamError, startStream, stopStream } = useChatStream();
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streamText]);
 
   const handleNewChat = () => {
+    if (isGenerating || isCreatingSession) {
+      stopStream();
+      setIsCreatingSession(false);
+    }
     setActiveSessionId(null);
     setMessages([]);
+  };
+
+  const handleSend = async (textToSend = inputValue) => {
+    if (!textToSend.trim() || isGenerating || isCreatingSession) return;
+    
+    const userPrompt = textToSend.trim();
+    const newUserMsg = {
+      id: Date.now().toString(),
+      sender: 'user',
+      content: userPrompt
+    };
+    
+    setMessages(prev => [...prev, newUserMsg]);
+    if (textToSend === inputValue) {
+      setInputValue('');
+    }
+
+    let targetSessionId = activeSessionId;
+
+    try {
+      if (!targetSessionId) {
+        setIsCreatingSession(true);
+        const newSession = await createSession(userPrompt);
+        setIsCreatingSession(false);
+        targetSessionId = newSession._id;
+        setActiveSessionId(targetSessionId);
+      }
+
+      await startStream(targetSessionId, userPrompt, 'gemini-3.5-flash', (finalMessage) => {
+        setMessages(prev => [...prev, {
+          id: finalMessage._id,
+          sender: finalMessage.role === 'user' ? 'user' : 'system',
+          content: finalMessage.content
+        }]);
+      });
+    } catch (error) {
+      console.error("Chat generation error", error);
+      setIsCreatingSession(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
   const openHistory = async () => {
@@ -210,7 +270,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           <div className="relative flex">
             <button 
               onClick={handleNewChat}
-              className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
+              disabled={isCreatingSession}
+              className={`peer cursor-pointer w-8 h-8 rounded-full flex items-center justify-center transition-colors text-gray-800 ${
+                isCreatingSession ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'bg-gray-200/50 hover:bg-gray-200'
+              }`}
             >
               <Plus className="w-[18px] h-[18px]" />
             </button>
@@ -294,38 +357,96 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       </div>
 
       {/* Chat Content Area */}
-      <div className="flex-1 overflow-y-auto px-5 pt-24 pb-4 flex flex-col gap-4 chat-scroll">
+      <div className="flex-1 overflow-y-auto px-5 pt-24 pb-4 flex flex-col gap-4 chat-scroll overscroll-contain">
         
 
         {messages.map((msg) => (
           msg.sender === 'user' ? (
-            <div key={msg.id} className="flex justify-end mt-2">
-              <div className="bg-primary text-white text-[14px] px-4 py-2.5 rounded-2xl max-w-[85%] leading-relaxed">
+            <div key={msg.id} className="flex flex-col items-end group mt-2">
+              <div className="bg-primary text-white text-[14px] px-4 py-2.5 rounded-2xl max-w-[85%] leading-relaxed whitespace-pre-wrap">
                 {msg.content}
+              </div>
+              <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => navigator.clipboard.writeText(msg.content)}
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           ) : (
-            <div key={msg.id} className="flex gap-3 mt-2">
-              <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mt-1" />
-              <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%] markdown-body">
-                <ReactMarkdown>
-                  {msg.content}
-                </ReactMarkdown>
+            <div key={msg.id} className="flex flex-col items-start mt-2">
+              <div className="flex gap-3 w-full">
+                <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0" />
+                <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%] markdown-body w-full">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content.replace(/\s*\[Source[^\]]*\]/gi, '')}
+                  </ReactMarkdown>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-1 mt-1 ml-9 text-gray-400">
+                <button className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><ThumbsUp className="w-3.5 h-3.5" /></button>
+                <button className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><ThumbsDown className="w-3.5 h-3.5" /></button>
+                <button 
+                  onClick={() => navigator.clipboard.writeText(msg.content)}
+                  className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           )
         ))}
 
+        {/* Streaming Active Message */}
+        {(isGenerating || isCreatingSession) && (
+          <div className="flex gap-3 mt-2">
+            <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0" />
+            <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%] markdown-body w-full">
+              {streamText ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {streamText.replace(/\s*\[Source[^\]]*\]/gi, '')}
+                </ReactMarkdown>
+              ) : (
+                <div className="flex items-center gap-1.5 h-6 px-1">
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {streamError && (
+          <div className="text-red-500 mt-2 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+            Error: {streamError}
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
+
         {/* Suggested Prompts */}
         {messages.length === 0 && (
           <div className="flex flex-col gap-2.5 items-start mt-auto">
-            <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
+            <button 
+              onClick={() => handleSend('What are the top 5 most important skills one should have to crack Amazon?')}
+              className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+            >
               What are the top 5 most important skills one should have to crack Amazon?
             </button>
-            <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
+            <button 
+              onClick={() => handleSend('What are some common interview questions for a software engineer?')}
+              className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+            >
               What are some common interview questions for a software engineer?
             </button>
-            <button className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]">
+            <button 
+              onClick={() => handleSend('Can we do a mock interview for a frontend developer role?')}
+              className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+            >
               Can we do a mock interview for a frontend developer role?
             </button>
           </div>
@@ -344,16 +465,29 @@ const ChatbotModal = ({ isOpen, onClose }) => {
             className="flex-1 bg-transparent outline-none text-[14px] text-gray-800 placeholder-gray-400"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <button className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
             <Mic className="w-5 h-5" />
           </button>
           <button 
+            onClick={() => {
+              if (isGenerating || isCreatingSession) {
+                stopStream();
+                setIsCreatingSession(false);
+              } else {
+                handleSend();
+              }
+            }}
             className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors mr-0.5 ${
-              inputValue.trim() ? 'bg-primary hover:bg-primary/90 cursor-pointer' : 'bg-gray-100 hover:bg-gray-200 cursor-default'
+              (inputValue.trim() || isGenerating || isCreatingSession) ? 'bg-primary hover:bg-primary/90 cursor-pointer' : 'bg-gray-100 hover:bg-gray-200 cursor-default'
             }`}
           >
-            <ArrowUp className={`w-4 h-4 ${inputValue.trim() ? 'text-white' : 'text-gray-500'}`} />
+            {isGenerating || isCreatingSession ? (
+              <Square className="w-3.5 h-3.5 fill-white text-white" />
+            ) : (
+              <ArrowUp className={`w-4 h-4 ${inputValue.trim() ? 'text-white' : 'text-gray-500'}`} />
+            )}
           </button>
         </div>
       </div>
@@ -390,7 +524,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
             </div>
 
             {/* List */}
-            <div className="w-full flex-1 overflow-y-auto chat-scroll flex flex-col p-2">
+            <div className="w-full flex-1 overflow-y-auto chat-scroll flex flex-col p-2 overscroll-contain">
               {isLoadingHistory ? (
                 <div className="text-gray-400 text-sm text-center mt-4">Loading...</div>
               ) : (
