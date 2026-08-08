@@ -47,7 +47,7 @@ const App = () => {
   useEffect(() => {
     const savedColor = localStorage.getItem('primaryColor') || 'green';
     const colorHex = savedColor === 'green' ? '#00a63e' : '#002E7D';
-    const dullColorHex = savedColor === 'green' ? '#dcfce7' : '#e0e7ff';
+    const dullColorHex = savedColor === 'green' ? '#dcfce7' : '#4586f5';
     document.documentElement.style.setProperty('--color-primary', colorHex);
     document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
   }, []);

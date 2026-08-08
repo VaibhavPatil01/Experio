@@ -19,7 +19,7 @@ function SettingsPage() {
   const handleThemeChange = (colorKey) => {
     setSelectedThemeColor(colorKey);
     const colorHex = colorKey === 'green' ? '#00a63e' : '#002E7D';
-    const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#e0e7ff'; // light green vs light blue
+    const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#4586f5';
     document.documentElement.style.setProperty('--color-primary', colorHex);
     document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
     localStorage.setItem('primaryColor', colorKey);
