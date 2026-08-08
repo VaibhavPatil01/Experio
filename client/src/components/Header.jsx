@@ -383,7 +383,7 @@ const Navbar = () => {
           <div className="relative hidden md:block">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="cursor-pointer flex items-center gap-2.5 h-[42px] pr-4 pl-1 bg-[#f0fdf4] dark:bg-gray-800 rounded-full border border-transparent"
+              className="cursor-pointer flex items-center gap-2.5 h-[42px] pr-4 pl-1 bg-primary/10 dark:bg-gray-800 rounded-full border border-transparent"
             >
               <div className="w-[34px] h-[34px] rounded-full bg-black flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
                 {profileData?.profilePicture || user?.profilePicture ? (

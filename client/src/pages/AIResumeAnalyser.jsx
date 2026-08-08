@@ -7,7 +7,7 @@ import {
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
   BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye, User, Trash2
 } from 'lucide-react';
-import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
+
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import getAuthToken from '../utils/getAuthToken';
@@ -219,7 +219,7 @@ const AIResumeAnalyser = () => {
               <span>AI-Powered</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white">
-              Smart Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-green-600">Analyser</span>
+              Smart Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-hero-grad-start)] to-[var(--color-hero-grad-end)]">Analyser</span>
             </h1>
             <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Get personalized resume feedback based on real interview experiences and company-specific data from our platform.
@@ -244,7 +244,7 @@ const AIResumeAnalyser = () => {
                         isDragActive 
                           ? 'border-primary bg-primary/5' 
                           : file 
-                            ? 'border-green-500 bg-green-50 dark:bg-green-500/10' 
+                            ? 'border-primary bg-primary/10' 
                             : 'border-gray-300 dark:border-gray-700 hover:border-primary/50 dark:hover:border-primary/50 bg-gray-50 dark:bg-[#252525]'
                       }`}
                       onDragEnter={handleDrag}
@@ -261,12 +261,12 @@ const AIResumeAnalyser = () => {
                       <div className="flex flex-col items-center justify-center gap-3 pointer-events-none">
                         {file ? (
                           <>
-                            <div className="w-12 h-12 bg-green-100 dark:bg-green-500/20 text-green-600 rounded-full flex items-center justify-center">
+                            <div className="w-12 h-12 bg-primary/20 text-primary rounded-full flex items-center justify-center">
                               <FileUp className="w-6 h-6" />
                             </div>
                             <div>
-                              <p className="font-medium text-green-700 dark:text-green-400">{file.name}</p>
-                              <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">Ready for analysis</p>
+                              <p className="font-medium text-primary">{file.name}</p>
+                              <p className="text-xs text-primary/80 mt-1">Ready for analysis</p>
                             </div>
                           </>
                         ) : (
@@ -338,8 +338,8 @@ const AIResumeAnalyser = () => {
                   {/* Submit Button */}
                   <button 
                     onClick={handleAnalyze}
-                    disabled={isAnalyzing || !file}
-                    className="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group mt-4"
+                    disabled={isAnalyzing}
+                    className={`w-full py-4 px-6 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 group mt-4 ${isAnalyzing ? 'opacity-70 cursor-not-allowed' : (!file || !targetRole) ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   >
                     {isAnalyzing ? (
                       <>
@@ -380,7 +380,7 @@ const AIResumeAnalyser = () => {
                               <p className="text-xs text-gray-500">{item.target.company || 'General'}</p>
                             </div>
                             {item.status === 'completed' && item.result?.scores?.overallScore && (
-                              <span className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded text-xs font-bold">
+                              <span className="bg-primary/10 text-primary dark:bg-primary/20 px-2 py-0.5 rounded text-xs font-bold">
                                 {item.result.scores.overallScore}%
                               </span>
                             )}
@@ -430,37 +430,36 @@ const AIResumeAnalyser = () => {
             {/* Right Column: Results */}
             <div className="lg:col-span-7">
                 
-                {/* Instructions */}
                   <div 
-                    className="h-full min-h-[500px] flex flex-col items-center justify-center text-center p-2 sm:p-8"
+                    className="h-full flex flex-col items-center justify-start pt-10 md:pt-16 text-center p-2 sm:p-8"
                   >
                     {/* Illustration Area */}
                     <div className="relative w-24 h-24 mb-6 mt-2">
-                      <div className="absolute inset-0 bg-green-500/10 rounded-full blur-2xl"></div>
+                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"></div>
                       <div className="relative flex items-center justify-center w-full h-full">
                         <div className="bg-white dark:bg-[#252525] p-3 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700 transform -rotate-6 z-10 w-16 h-20 relative flex flex-col">
                           <div className="w-6 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mb-1.5"></div>
                           <div className="w-4 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mb-3"></div>
                           <div className="flex items-end gap-1 mt-auto mx-auto">
-                            <div className="w-1.5 h-3 bg-green-500 rounded-t-sm"></div>
-                            <div className="w-1.5 h-5 bg-green-500 rounded-t-sm"></div>
-                            <div className="w-1.5 h-4 bg-green-500 rounded-t-sm"></div>
+                            <div className="w-1.5 h-3 bg-primary rounded-t-sm"></div>
+                            <div className="w-1.5 h-5 bg-primary rounded-t-sm"></div>
+                            <div className="w-1.5 h-4 bg-primary rounded-t-sm"></div>
                           </div>
                         </div>
-                        <div className="absolute -bottom-1 -right-3 bg-green-500 text-white p-1.5 rounded-full shadow-lg z-20 transform rotate-6 border-4 border-white dark:border-[#121212]">
+                        <div className="absolute -bottom-1 -right-3 bg-primary text-white p-1.5 rounded-full shadow-lg z-20 transform rotate-6 border-4 border-white dark:border-[#121212]">
                           <CheckCircle2 className="w-5 h-5" />
                         </div>
                         {/* Sparkles */}
-                        <Sparkles className="absolute -top-1 -left-3 w-4 h-4 text-green-400" />
-                        <Sparkles className="absolute top-6 -right-6 w-3 h-3 text-green-400" />
-                        <Sparkles className="absolute bottom-1 -left-4 w-2 h-2 text-green-400" />
+                        <Sparkles className="absolute -top-1 -left-3 w-4 h-4 text-primary" />
+                        <Sparkles className="absolute top-6 -right-6 w-3 h-3 text-primary" />
+                        <Sparkles className="absolute bottom-1 -left-4 w-2 h-2 text-primary" />
                       </div>
                     </div>
 
 
 
                     <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-                      Ready for <span className="text-green-600">Analysis</span>
+                      Ready for <span className="text-primary">Analysis</span>
                     </h3>
                     
                     <p className="text-gray-500 dark:text-gray-400 text-base max-w-xl mx-auto mb-10 leading-relaxed">
@@ -521,11 +520,16 @@ const AIResumeAnalyser = () => {
               exit={{ opacity: 0 }}
               className="mt-16 mb-8 flex flex-col items-center justify-center text-center"
             >
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
-                <img src={starIcon} alt="Stars icon" className="w-8 h-8" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
+                  <path d="M12.5497 3.43948C12.118 2.50904 11.9022 2.04382 11.5213 2.00452C11.1405 1.96522 10.8468 2.37786 10.2595 3.20314L10.1075 3.41665C9.9406 3.65117 9.85715 3.76843 9.73698 3.83908C9.61681 3.90973 9.47352 3.92577 9.18695 3.95785L8.92606 3.98706C7.91761 4.09997 7.41339 4.15643 7.26346 4.50779C7.11353 4.85916 7.41719 5.27274 8.0245 6.0999L8.18162 6.31389C8.3542 6.54895 8.44049 6.66647 8.4718 6.80408C8.5031 6.94169 8.47588 7.08381 8.42143 7.36804L8.37186 7.62681C8.18025 8.62703 8.08445 9.12714 8.37265 9.3836C8.66086 9.64006 9.1422 9.48302 10.1049 9.16895L10.3539 9.0877C10.6275 8.99845 10.7643 8.95383 10.9038 8.96823C11.0433 8.98262 11.1698 9.05441 11.4227 9.19799L11.653 9.32871C12.543 9.83397 12.988 10.0866 13.316 9.89374C13.6441 9.70087 13.6379 9.19024 13.6256 8.16897L13.6224 7.90476C13.6189 7.61455 13.6171 7.46944 13.672 7.34073C13.727 7.21202 13.8323 7.11427 14.0431 6.91878L14.235 6.7408C14.9767 6.05285 15.3475 5.70887 15.262 5.33322C15.1766 4.95756 14.6914 4.79901 13.7211 4.4819L13.4701 4.39986C13.1943 4.30975 13.0565 4.26469 12.9509 4.17074C12.8453 4.0768 12.784 3.9446 12.6613 3.6802L12.5497 3.43948Z" stroke="currentColor" strokeWidth="1.5"/> 
+                  <path d="M10.9998 22C10.6665 19.8333 10.1998 14.8 10.9998 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/> 
+                  <path d="M14.5 22C14.5 20.8748 14.6709 19.4838 15.1281 18M22 9.5C19.8009 10.7828 18.2063 12.3567 17.0685 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/> 
+                  <path d="M5.00012 13.2676C5.00012 13.2676 5.64973 14.0154 6.2227 14.1689C6.79567 14.3225 7.73217 13.9996 7.73217 13.9996C7.73217 13.9996 6.98434 14.6492 6.83081 15.2222C6.67729 15.7952 7.00012 16.7317 7.00012 16.7317C7.00012 16.7317 6.3505 15.9839 5.77753 15.8303C5.20457 15.6768 4.26807 15.9996 4.26807 15.9996C4.26807 15.9996 5.01589 15.35 5.16942 14.777C5.32295 14.2041 5.00012 13.2676 5.00012 13.2676Z" stroke="currentColor" strokeLinejoin="round"/>
+                </svg>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-green-600">insights</span> will show up here
+                Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-hero-grad-start)] to-[var(--color-hero-grad-end)]">insights</span> will show up here
               </h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed px-4">
                 Fill in what you're targeting on the left, upload your resume, and we'll compare it against your profile and real interview experiences.
@@ -569,7 +573,7 @@ const AIResumeAnalyser = () => {
               className="mt-16 mb-8 space-y-6"
             >
               {/* Score Header Card */}
-              <div className="bg-gradient-to-br from-primary to-green-600 rounded-xl p-6 md:p-8 text-white relative overflow-hidden shadow-md shadow-primary/10">
+              <div className="bg-primary rounded-xl p-6 md:p-8 text-white relative overflow-hidden shadow-md shadow-primary/10">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                   <div className="flex-1">
