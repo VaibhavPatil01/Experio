@@ -1,9 +1,8 @@
 import React from 'react';
-import { CodeXml, ShieldCheck, GitBranch, Lock, Users, ArrowUpRight, Star } from 'lucide-react';
+import { CodeXml, ShieldCheck, GitBranch, Lock, Users, ArrowUpRight, Star, Eye } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
-// import githubIllustration from '../assets/images/icons/github_illustration.png';
-import githubBlue from '../assets/images/icons/githubblue.png';
-import githubGreen from '../assets/images/icons/githubgreen.png';
+// import githubBlue from '../assets/images/icons/githubblue.png';
+// import githubGreen from '../assets/images/icons/githubgreen.png';
 
 const FeatureItem = ({ icon, title, description, isLast }) => (
   <div className={`flex items-start gap-4 ${!isLast ? 'border-b border-primary/20 pb-5' : ''}`}>
@@ -18,8 +17,8 @@ const FeatureItem = ({ icon, title, description, isLast }) => (
 );
 
 const GithubSection = () => {
-  const theme = localStorage.getItem('primaryColor') || 'green';
-  const currentIllustration = theme === 'darkblue' ? githubBlue : githubGreen;
+  // const theme = localStorage.getItem('primaryColor') || 'green';
+  // const currentIllustration = theme === 'darkblue' ? githubBlue : githubGreen;
   return (
     <section className="w-full pt-20 pb-12 px-4 text-center">
       <div className="max-w-5xl mx-auto flex flex-col items-center justify-center">
@@ -92,14 +91,101 @@ const GithubSection = () => {
               />
             </div>
 
-            {/* Right side Image */}
-            <div className="w-full md:w-[55%] flex justify-center mt-8 md:mt-0">
-                {/* <img src={githubIllustration} alt="GitHub Repository Overview" /> */}
-                <img
-                  src={currentIllustration}
-                  alt="GitHub Repository Overview"
-                className="w-full max-w-2xl object-contain drop-shadow-sm transform md:scale-110"
-              />
+            {/* Right side UI */}
+            <div className="w-full md:w-[55%] flex justify-center mt-8 md:mt-0 relative">
+              
+              <div className="relative w-full max-w-lg mx-auto">
+                {/* Dark Code Editor Window */}
+                <div className="bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-gray-800 transform -rotate-2 transition-transform hover:rotate-0 duration-500 w-[90%] md:w-[95%]">
+                  {/* Window Header */}
+                  <div className="bg-[#2d2d2d] px-4 py-3 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                  </div>
+                  {/* Code Area */}
+                  <div className="p-5 md:p-6 text-left font-mono text-[13px] md:text-sm leading-loose overflow-x-auto text-gray-300">
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">1</span>
+                      <span className="text-green-400">// Interview Experience Platform</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">2</span>
+                      <span><span className="text-purple-400">const</span> <span className="text-blue-300">experience</span> <span className="text-gray-300">=</span> {'{'}</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">3</span>
+                      <span className="pl-6"><span className="text-yellow-300">cleancode</span>: <span className="text-orange-300">true</span>,</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">4</span>
+                      <span className="pl-6"><span className="text-yellow-300">scalable</span>: <span className="text-orange-300">true</span>,</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">5</span>
+                      <span className="pl-6"><span className="text-yellow-300">maintainable</span>: <span className="text-orange-300">true</span>,</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">6</span>
+                      <span className="pl-6"><span className="text-yellow-300">performance</span>: <span className="text-green-300">'optimized'</span>,</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">7</span>
+                      <span className="pl-6"><span className="text-yellow-300">builtwith</span>: <span className="text-green-300">'precision'</span></span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">8</span>
+                      <span>{'}'};</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-gray-500 w-6 text-right select-none pr-4">9</span>
+                      <span><span className="text-purple-400">export default</span> <span className="text-blue-300">experience</span>;</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Repository Stats Card */}
+                <div className="absolute right-0 top-12 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-100 p-5 transform rotate-3 transition-transform hover:rotate-6 duration-500 w-[240px] md:w-64 z-10">
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                    <h4 className="font-bold text-gray-800 text-[15px]">Repository Stats</h4>
+                    <FaGithub className="text-gray-800 text-xl" />
+                  </div>
+                  
+                  <div className="flex flex-col gap-3.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 text-gray-600">
+                        <Star className="w-4 h-4 text-primary" />
+                        <span className="text-[14px] font-medium">Stars</span>
+                      </div>
+                      <span className="font-bold text-gray-800 text-[14px]">2.3k</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 text-gray-600">
+                        <GitBranch className="w-4 h-4 text-primary" />
+                        <span className="text-[14px] font-medium">Forks</span>
+                      </div>
+                      <span className="font-bold text-gray-800 text-[14px]">420</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 text-gray-600">
+                        <Eye className="w-4 h-4 text-primary" />
+                        <span className="text-[14px] font-medium">Watchers</span>
+                      </div>
+                      <span className="font-bold text-gray-800 text-[14px]">66</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 text-gray-600">
+                        <Users className="w-4 h-4 text-primary" />
+                        <span className="text-[14px] font-medium">Contributors</span>
+                      </div>
+                      <span className="font-bold text-gray-800 text-[14px]">25+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
