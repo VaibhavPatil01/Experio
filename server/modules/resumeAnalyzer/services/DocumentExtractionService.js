@@ -3,6 +3,7 @@ import DocxResumeParser from '../parsers/DocxResumeParser.js';
 import crypto from 'crypto';
 import fs from 'fs';
 import logger from '../../../utils/logger.js';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 
 export default class DocumentExtractionService {
   /**
@@ -49,14 +50,11 @@ export default class DocumentExtractionService {
 
       return result;
     } catch (error) {
-      const durationMs = performance.now() - startTime;
-      logger.error('Document extraction failed', {
-        userId,
-        mimetype,
-        durationMs: Math.round(durationMs),
-        error: error.message
-      });
-      throw error;
+      throw new ResumeAnalysisError(
+        ErrorCategories.FILE_PROCESSING_ERROR,
+        'Failed to process the uploaded resume document. Ensure it is a valid PDF or DOCX.',
+        { originalError: error.message, filePath, mimetype }
+      );
     }
   }
 }

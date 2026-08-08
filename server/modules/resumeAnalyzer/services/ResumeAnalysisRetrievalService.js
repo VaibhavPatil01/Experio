@@ -4,6 +4,7 @@ import { Post } from '../../../models/Post.js';
 import logger from '../../../utils/logger.js';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 
 // Cache generated embeddings for 24 hours to reduce Gemini API costs and latency
 const embeddingCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
@@ -124,14 +125,15 @@ export default class ResumeAnalysisRetrievalService {
         isUnavailable: false,
         experiences: structuredCitations
       };
-
     } catch (error) {
-      logger.error('Failed to retrieve relevant experiences for Resume Analyzer', { error: error.message });
-      return {
-        isUnavailable: true,
-        fallbackNote: "Platform knowledge retrieval failed or is unavailable. Proceed with general industry knowledge.",
-        experiences: []
-      };
+      if (error instanceof ResumeAnalysisError) {
+        throw error;
+      }
+      throw new ResumeAnalysisError(
+        ErrorCategories.QDRANT_ERROR,
+        'Failed to retrieve relevant interview experiences from the platform.',
+        { originalError: error.message }
+      );
     }
   }
 
@@ -156,16 +158,24 @@ export default class ResumeAnalysisRetrievalService {
   }
 
   static async _getCachedEmbedding(query) {
-    const hash = crypto.createHash('md5').update(query).digest('hex');
-    const cacheKey = `embed_${hash}`;
-    const cachedVector = embeddingCache.get(cacheKey);
-    
-    if (cachedVector) {
-      return cachedVector;
-    }
+    try {
+      const hash = crypto.createHash('md5').update(query).digest('hex');
+      const cacheKey = `embed_${hash}`;
+      const cachedVector = embeddingCache.get(cacheKey);
+      
+      if (cachedVector) {
+        return cachedVector;
+      }
 
-    const vector = await EmbeddingService.generateEmbedding(query);
-    embeddingCache.set(cacheKey, vector);
-    return vector;
+      const vector = await EmbeddingService.generateEmbedding(query);
+      embeddingCache.set(cacheKey, vector);
+      return vector;
+    } catch (error) {
+      throw new ResumeAnalysisError(
+        ErrorCategories.EMBEDDING_ERROR,
+        'Failed to generate semantic embeddings for retrieval.',
+        { originalError: error.message, query }
+      );
+    }
   }
 }

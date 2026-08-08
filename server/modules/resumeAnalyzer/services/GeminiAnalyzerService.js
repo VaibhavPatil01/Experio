@@ -1,6 +1,7 @@
 import { Type } from '@google/genai';
 import geminiClient from '../../../configs/gemini.js';
 import logger from '../../../utils/logger.js';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 
 export default class GeminiAnalyzerService {
   /**
@@ -90,34 +91,63 @@ export default class GeminiAnalyzerService {
         }
       };
 
-      const response = await geminiClient.models.generateContent({
-        model: 'gemini-1.5-pro',
-        contents: contents,
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: responseSchema,
-          temperature: 0.2, // Low temperature for consistent, analytical output
-        }
-      });
-
-      let jsonString = response.text;
-      
-      const parsedResponse = JSON.parse(jsonString);
-      
-      // Basic validation to ensure schema was adhered to
-      if (!parsedResponse.overallAssessment || !parsedResponse.scores) {
-         throw new Error("Invalid schema structure returned from Gemini");
+      let response;
+      try {
+        response = await geminiClient.models.generateContent({
+          model: 'gemini-1.5-pro',
+          contents: contents,
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: responseSchema,
+            temperature: 0.2, // Low temperature for consistent, analytical output
+          }
+        });
+      } catch (geminiError) {
+        throw new ResumeAnalysisError(
+          ErrorCategories.GEMINI_ERROR,
+          'Failed to connect to the AI analysis engine. Please try again later.',
+          { originalError: geminiError.message }
+        );
       }
-      
-      logger.info('Successfully generated structured analysis from Gemini');
-      return parsedResponse;
+
+      if (!response || !response.text) {
+        throw new ResumeAnalysisError(
+          ErrorCategories.OUTPUT_VALIDATION_ERROR,
+          'The AI analysis engine returned an empty response.'
+        );
+      }
+
+      try {
+        const parsedResponse = JSON.parse(response.text);
+        
+        // Basic validation to ensure schema was adhered to
+        if (!parsedResponse.overallAssessment || !parsedResponse.scores) {
+           throw new Error("Invalid schema structure returned from Gemini");
+        }
+        
+        logger.info('Successfully generated structured analysis from Gemini');
+        return parsedResponse;
+      } catch (jsonError) {
+        throw new ResumeAnalysisError(
+          ErrorCategories.OUTPUT_VALIDATION_ERROR,
+          'The AI analysis engine returned malformed data that could not be parsed.',
+          { originalError: jsonError.message }
+        );
+      }
     } catch (error) {
+      if (error instanceof ResumeAnalysisError) {
+        throw error;
+      }
       if (retries > 0) {
         logger.warn('Gemini parsing or validation failed, retrying...', { error: error.message });
         return this.generateStructuredAnalysis(prompt, retries - 1);
       }
       logger.error('Failed to generate analysis from Gemini after retries', { error: error.message, stack: error.stack });
-      throw new Error('AI Analysis failed due to invalid output format. Please try again.');
+      throw new ResumeAnalysisError(
+        ErrorCategories.GEMINI_ERROR,
+        'An unexpected error occurred during AI generation.',
+        { originalError: error.message }
+      );
     }
   }
 }

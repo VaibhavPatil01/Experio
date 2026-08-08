@@ -2,6 +2,7 @@ import User from '../../../models/User.js';
 import ResumeAnalysisRetrievalService from './ResumeAnalysisRetrievalService.js';
 import logger from '../../../utils/logger.js';
 import NodeCache from 'node-cache';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 
 // Cache profile payloads for 15 minutes to avoid redundant DB normalization on rapid re-analysis
 const profileCache = new NodeCache({ stdTTL: 900, checkperiod: 120 });
@@ -57,20 +58,19 @@ export default class ResumeAnalysisContextBuilder {
    * This is exported so the Orchestrator can call it concurrently with other operations.
    */
   static async buildUserProfileContext(userId) {
-    const cacheKey = `profile_${userId}`;
-    const cachedProfile = profileCache.get(cacheKey);
-    if (cachedProfile) {
-      logger.info('ContextBuilder: Profile loaded from cache', { userId });
-      return cachedProfile;
-    }
+    try {
+      const cacheKey = `profile_${userId}`;
+      const cachedProfile = profileCache.get(cacheKey);
+      if (cachedProfile) {
+        return cachedProfile;
+      }
 
-    const user = await User.findById(userId).lean();
-    if (!user) {
-      logger.warn(`ContextBuilder: User not found for ID ${userId}`);
-      return {};
-    }
+      const user = await User.findById(userId).lean();
+      if (!user) {
+        throw new Error(`User not found for ID ${userId}`);
+      }
 
-    const safeTruncate = (str, maxLength) => {
+      const safeTruncate = (str, maxLength) => {
       if (!str) return '';
       return str.length > maxLength ? str.substring(0, maxLength) + '...' : str;
     };
@@ -102,9 +102,16 @@ export default class ResumeAnalysisContextBuilder {
     if (profile.workExperience.length === 0) delete profile.workExperience;
     if (profile.projects.length === 0) delete profile.projects;
 
-    profileCache.set(cacheKey, profile);
+      profileCache.set(cacheKey, profile);
 
-    return profile;
+      return profile;
+    } catch (error) {
+      throw new ResumeAnalysisError(
+        ErrorCategories.PROFILE_CONTEXT_ERROR,
+        'Failed to load your user profile context. Please try again.',
+        { originalError: error.message, userId }
+      );
+    }
   }
 
 }

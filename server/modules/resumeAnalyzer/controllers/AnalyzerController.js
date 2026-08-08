@@ -2,6 +2,7 @@ import fs from 'fs';
 import ResumeAnalysisOrchestrator from '../services/ResumeAnalysisOrchestrator.js';
 import ResumeAnalysisRepository from '../repositories/ResumeAnalysisRepository.js';
 import logger from '../../../utils/logger.js';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 
 const repository = new ResumeAnalysisRepository();
 
@@ -64,8 +65,18 @@ export const analyzeResume = async (req, res) => {
       }
     }
   } catch (error) {
-    logger.error('Analyze Resume Error', { error: error.message });
-    res.status(500).json({ error: 'Failed to analyze resume. ' + error.message });
+    if (error instanceof ResumeAnalysisError) {
+      // Handle categorized errors gracefully
+      const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
+      return res.status(statusCode).json({ 
+        error: error.userMessage,
+        category: error.category
+      });
+    }
+
+    // Fallback for unhandled internal errors
+    logger.error('Unhandled Analyze Resume Error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'An unexpected internal error occurred. Please try again later.' });
   }
 };
 
@@ -182,13 +193,22 @@ export const reanalyzeResume = async (req, res) => {
       data: newAnalysis
     });
   } catch (error) {
-    logger.error('Reanalyze Resume Error', { error: error.message });
+    if (error instanceof ResumeAnalysisError) {
+      const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
+      return res.status(statusCode).json({ 
+        error: error.userMessage,
+        category: error.category
+      });
+    }
+
     if (error.message.includes('not store extracted text')) {
       return res.status(400).json({ error: error.message });
     }
     if (error.message === 'Analysis not found') {
       return res.status(404).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Failed to re-analyze resume. ' + error.message });
+    
+    logger.error('Unhandled Reanalyze Resume Error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'An unexpected internal error occurred. Please try again later.' });
   }
 };

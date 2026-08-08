@@ -6,6 +6,7 @@ import GeminiAnalyzerService from './GeminiAnalyzerService.js';
 import ResumeAnalysisRepository from '../repositories/ResumeAnalysisRepository.js';
 import ResumeAnalysisRetrievalService from './ResumeAnalysisRetrievalService.js';
 import logger from '../../../utils/logger.js';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 
 const repository = new ResumeAnalysisRepository();
 
@@ -20,7 +21,7 @@ export default class ResumeAnalysisOrchestrator {
     let analysisDoc;
 
     try {
-      logger.info('Starting Resume Analysis Orchestration', { requestId, userId, targetRole, originalName });
+      logger.info('analysis_started', { requestId, userId, targetRole });
 
       // 1. Initialize State
       const targetData = { role: targetRole, company: targetCompany, jobDescription };
@@ -29,13 +30,18 @@ export default class ResumeAnalysisOrchestrator {
 
       logger.info('Created pending analysis record', { requestId, analysisId: analysisDoc._id });
 
-      // 2. Concurrent Pre-Processing: Extract Document & Fetch Profile Context simultaneously
+      // 2. Concurrent Pre-Processing
+      logger.info('resume_processing_started', { requestId, analysisId: analysisDoc._id, userId });
+      
       const preProcessStartTime = performance.now();
       
       const [extractionResult, userProfile] = await Promise.all([
         DocumentExtractionService.extractText(filePath, mimetype, userId),
-        ResumeAnalysisContextBuilder.buildUserProfileContext(userId) // Exposed dynamically
+        ResumeAnalysisContextBuilder.buildUserProfileContext(userId) 
       ]);
+
+      logger.info('resume_processing_completed', { requestId, analysisId: analysisDoc._id, userId });
+      logger.info('profile_context_loaded', { requestId, analysisId: analysisDoc._id, userId });
       
       const preProcessDuration = performance.now() - preProcessStartTime;
 
@@ -83,6 +89,8 @@ export default class ResumeAnalysisOrchestrator {
       // 3. RAG Retrieval Layer
       // Now that we have the profile (skills) and target, we can fetch context.
       const retrievalStartTime = performance.now();
+      logger.info('retrieval_started', { requestId, analysisId: analysisDoc._id, userId });
+      
       const targetFacts = { role: targetRole, company: targetCompany, jobDescription };
       const candidateFacts = { profile: userProfile };
       
@@ -90,7 +98,14 @@ export default class ResumeAnalysisOrchestrator {
         targetFacts, 
         candidateFacts
       );
+      
       const retrievalDuration = performance.now() - retrievalStartTime;
+      logger.info('retrieval_completed', { 
+        requestId, 
+        analysisId: analysisDoc._id, 
+        userId, 
+        retrievalCount: relevantExperiences.experiences?.length || 0 
+      });
 
       // 4. Structural Context Build
       const contextObject = ResumeAnalysisContextBuilder.buildContext(
@@ -110,17 +125,23 @@ export default class ResumeAnalysisOrchestrator {
       await repository.updateStatus(analysisDoc._id, 'processing');
       
       const aiStartTime = performance.now();
+      logger.info('gemini_analysis_started', { requestId, analysisId: analysisDoc._id, userId, model: 'gemini-1.5-pro' });
+
       const analysisJson = await this._executeWithTimeout(
         GeminiAnalyzerService.generateStructuredAnalysis(prompt),
         60000 // 60 seconds
       );
       const aiDuration = performance.now() - aiStartTime;
+      
+      logger.info('gemini_analysis_completed', { requestId, analysisId: analysisDoc._id, userId, duration: Math.round(aiDuration) });
 
       // 6. Verify and Enrich Citations (Prevent Hallucinations)
       analysisJson.references = this._verifyAndEnrichReferences(
         analysisJson.references,
         relevantExperiences.experiences || []
       );
+      
+      logger.info('result_validation_completed', { requestId, analysisId: analysisDoc._id, userId, validationStatus: 'SUCCESS' });
 
       // 7. Persist and Finalize
       const totalLatencyMs = performance.now() - startTime;
@@ -134,16 +155,28 @@ export default class ResumeAnalysisOrchestrator {
 
       analysisDoc = await repository.saveResult(analysisDoc._id, analysisJson, executionInfo);
       
-      logger.info('Successfully saved Resume Analysis', { 
+      logger.info('analysis_persisted', { requestId, analysisId: analysisDoc._id, userId });
+      logger.info('analysis_completed', { 
         requestId, 
-        analysisId: analysisDoc._id,
-        metrics: executionInfo 
+        analysisId: analysisDoc._id, 
+        userId,
+        status: 'SUCCESS',
+        duration: Math.round(totalLatencyMs)
       });
 
       return analysisDoc;
 
     } catch (error) {
-      logger.error('Error in Resume Analyzer Orchestrator', { requestId, error: error.message, stack: error.stack });
+      const isCustomError = error instanceof ResumeAnalysisError;
+      const category = isCustomError ? error.category : ErrorCategories.TIMEOUT_ERROR;
+
+      logger.error('analysis_failed', { 
+        requestId, 
+        analysisId: analysisDoc ? analysisDoc._id : null, 
+        userId, 
+        errorCategory: category,
+        internalDetails: isCustomError ? error.internalDetails : error.message 
+      });
       
       if (analysisDoc && analysisDoc._id) {
         try {
@@ -287,7 +320,10 @@ export default class ResumeAnalysisOrchestrator {
     return Promise.race([
       promise,
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        setTimeout(() => reject(new ResumeAnalysisError(
+          ErrorCategories.TIMEOUT_ERROR,
+          `The analysis timed out after ${timeoutMs}ms. Please try again.`
+        )), timeoutMs)
       )
     ]);
   }
