@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Settings, KeyRound, Palette, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useAppSelector } from '../redux/store.js';
+import { HexColorPicker } from "react-colorful";
+import { applyThemeColor } from '../utils/theme.js';
 
 function SettingsPage() {
   const user = useAppSelector((state) => state.userState.user);
@@ -18,19 +20,8 @@ function SettingsPage() {
 
   const handleThemeChange = (colorKey) => {
     setSelectedThemeColor(colorKey);
-    const colorHex = colorKey === 'green' ? '#00a63e' : '#002E7D';
-    const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#347df8';
-    const bannerStart = colorKey === 'green' ? '#ABFF7E' : '#60a5fa';
-    const bannerEnd = colorKey === 'green' ? '#FDFEFF' : '#eff6ff';
-    const heroGradStart = colorKey === 'green' ? '#15803d' : '#001a47';
-    const heroGradEnd = colorKey === 'green' ? '#22c55e' : '#0040ad';
-    document.documentElement.style.setProperty('--color-primary', colorHex);
-    document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
-    document.documentElement.style.setProperty('--color-banner-start', bannerStart);
-    document.documentElement.style.setProperty('--color-banner-end', bannerEnd);
-    document.documentElement.style.setProperty('--color-hero-grad-start', heroGradStart);
-    document.documentElement.style.setProperty('--color-hero-grad-end', heroGradEnd);
     localStorage.setItem('primaryColor', colorKey);
+    applyThemeColor(colorKey);
   };
 
   const handlePasswordChange = (e) => {
@@ -134,34 +125,87 @@ function SettingsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Select a theme color for the application.
               </p>
-              <div className="flex gap-4">
-                {/* Green Option */}
-                <button 
-                  onClick={() => handleThemeChange('green')}
-                  className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-[#00a63e] bg-[#00a63e]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#00a63e] relative">
-                    {selectedThemeColor === 'green' && (
-                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
-                        <CheckCircle2 className="w-5 h-5 text-[#00a63e]" fill="currentColor" stroke="white" />
-                      </div>
-                    )}
-                  </div>
-                </button>
-                
-                {/* Dark Blue Option */}
-                <button 
-                  onClick={() => handleThemeChange('darkblue')}
-                  className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'darkblue' ? 'border-[#002E7D] bg-[#002E7D]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#002E7D] relative">
-                    {selectedThemeColor === 'darkblue' && (
-                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
-                        <CheckCircle2 className="w-5 h-5 text-[#002E7D]" fill="currentColor" stroke="white" />
-                      </div>
-                    )}
-                  </div>
-                </button>
+              <div className="flex flex-col gap-5">
+                <div className="flex gap-4">
+                  {/* Green Option */}
+                  <button 
+                    onClick={() => handleThemeChange('green')}
+                    className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-[#00a63e] bg-[#00a63e]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#00a63e] relative">
+                      {selectedThemeColor === 'green' && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                          <CheckCircle2 className="w-5 h-5 text-[#00a63e]" fill="currentColor" stroke="white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                  
+                  {/* Dark Blue Option */}
+                  <button 
+                    onClick={() => handleThemeChange('darkblue')}
+                    className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'darkblue' ? 'border-[#002E7D] bg-[#002E7D]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#002E7D] relative">
+                      {selectedThemeColor === 'darkblue' && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                          <CheckCircle2 className="w-5 h-5 text-[#002E7D]" fill="currentColor" stroke="white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                  
+                  {/* Orange Option */}
+                  <button 
+                    onClick={() => handleThemeChange('#FF6000')}
+                    className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === '#FF6000' ? 'border-[#FF6000] bg-[#FF6000]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#FF6000] relative">
+                      {selectedThemeColor === '#FF6000' && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                          <CheckCircle2 className="w-5 h-5 text-[#FF6000]" fill="currentColor" stroke="white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Bright Blue Option */}
+                  <button 
+                    onClick={() => handleThemeChange('#0e87f6')}
+                    className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === '#0e87f6' ? 'border-[#0e87f6] bg-[#0e87f6]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#0e87f6] relative">
+                      {selectedThemeColor === '#0e87f6' && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                          <CheckCircle2 className="w-5 h-5 text-[#0e87f6]" fill="currentColor" stroke="white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Deep Purple Option */}
+                  <button 
+                    onClick={() => handleThemeChange('#4e03d0')}
+                    className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === '#4e03d0' ? 'border-[#4e03d0] bg-[#4e03d0]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#4e03d0] relative">
+                      {selectedThemeColor === '#4e03d0' && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                          <CheckCircle2 className="w-5 h-5 text-[#4e03d0]" fill="currentColor" stroke="white" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Or choose a custom color:</p>
+                  <HexColorPicker 
+                    color={selectedThemeColor !== 'green' && selectedThemeColor !== 'darkblue' ? selectedThemeColor : (selectedThemeColor === 'green' ? '#00a63e' : '#002E7D')} 
+                    onChange={handleThemeChange} 
+                    style={{ width: '350px', height: '180px' }}
+                  />
+                </div>
               </div>
             </div>
 

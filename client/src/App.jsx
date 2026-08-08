@@ -3,8 +3,9 @@ import ChatbotModal from './components/ChatbotModal';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Loading from './pages/Loading';
 import { Toaster } from 'react-hot-toast';
-import NotFound from './pages/NotFound';
-import DefaultLayout from './pages/DefaultLayout';
+import NotFound from './pages/NotFound.jsx';
+import DefaultLayout from './pages/DefaultLayout.jsx';
+import { applyThemeColor } from './utils/theme.js';
 import useUserStatus from './hooks/useUserStatus.js';
 import Error from './pages/Error.jsx';
 import GoogleTokenSetter from './pages/GoogleTokenSetter.jsx';
@@ -46,18 +47,7 @@ const App = () => {
   // Load primary theme color on mount
   useEffect(() => {
     const savedColor = localStorage.getItem('primaryColor') || 'green';
-    const colorHex = savedColor === 'green' ? '#00a63e' : '#002E7D';
-    const dullColorHex = savedColor === 'green' ? '#dcfce7' : '#347df8';
-    const bannerStart = savedColor === 'green' ? '#ABFF7E' : '#60a5fa';
-    const bannerEnd = savedColor === 'green' ? '#FDFEFF' : '#eff6ff';
-    const heroGradStart = savedColor === 'green' ? '#15803d' : '#001a47';
-    const heroGradEnd = savedColor === 'green' ? '#22c55e' : '#0040ad';
-    document.documentElement.style.setProperty('--color-primary', colorHex);
-    document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
-    document.documentElement.style.setProperty('--color-banner-start', bannerStart);
-    document.documentElement.style.setProperty('--color-banner-end', bannerEnd);
-    document.documentElement.style.setProperty('--color-hero-grad-start', heroGradStart);
-    document.documentElement.style.setProperty('--color-hero-grad-end', heroGradEnd);
+    applyThemeColor(savedColor);
   }, []);
 
   if (isLoading) {
