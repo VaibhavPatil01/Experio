@@ -55,42 +55,7 @@ const resumeAnalysisSchema = new mongoose.Schema({
   },
 
   // Structured Result (populated on completion)
-  result: {
-    overallAssessment: { type: String, required: false },
-    overallScore: { type: Number, required: false, min: 0, max: 100 },
-    
-    strengths: [{ type: String }],
-    improvementAreas: [improvementAreaSchema],
-    
-    skillAlignment: {
-      matchingSkills: [{ type: String }],
-      missingSkills: [{ type: String }]
-    },
-    
-    sectionFeedback: {
-      experience: [{ type: String }],
-      projects: [{ type: String }],
-      summary: { type: String, required: false }
-    },
-    
-    alignment: {
-      roleAlignment: { type: String, required: false },
-      companyAlignment: { type: String, required: false },
-      jobDescriptionAlignment: { type: String, required: false }
-    },
-    
-    prioritizedRecommendations: [{
-      title: { type: String },
-      priority: { type: String },
-      problem: { type: String },
-      recommendation: { type: String },
-      evidence: { type: String },
-      example: { type: String },
-      sourceType: { type: String, enum: ['resume', 'profile', 'job-description', 'platform', 'general'], default: 'general' }
-    }],
-
-    references: [referenceSchema]
-  }
+  result: { type: mongoose.Schema.Types.Mixed }
 }, { timestamps: true });
 
 // Indexes for performance
