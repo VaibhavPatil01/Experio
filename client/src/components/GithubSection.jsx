@@ -93,18 +93,33 @@ const GithubSection = () => {
 
             {/* Right side UI */}
             <div className="w-full md:w-[55%] flex justify-center mt-8 md:mt-0 relative">
-              
-              <div className="relative w-full max-w-lg mx-auto">
+              {/* Decorative Stars */}
+              <svg className="absolute -top-4 left-4 md:left-0 w-5 h-5 text-primary/80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C12 0 12 10.5 24 12C24 12 12 13.5 12 24C12 24 12 13.5 0 12C0 12 12 10.5 12 0Z" /></svg>
+              <svg className="absolute top-12 right-12 md:-right-4 w-3.5 h-3.5 text-primary/60" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C12 0 12 10.5 24 12C24 12 12 13.5 12 24C12 24 12 13.5 0 12C0 12 12 10.5 12 0Z" /></svg>
+              <svg className="absolute bottom-16 left-8 md:-left-6 w-4 h-4 text-primary/70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C12 0 12 10.5 24 12C24 12 12 13.5 12 24C12 24 12 13.5 0 12C0 12 12 10.5 12 0Z" /></svg>
+              <svg className="absolute -bottom-8 right-16 w-5 h-5 text-primary/90" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C12 0 12 10.5 24 12C24 12 12 13.5 12 24C12 24 12 13.5 0 12C0 12 12 10.5 12 0Z" /></svg>
+
+              <div className="relative w-full max-w-[380px] mx-auto mt-2">
+                {/* Floating Code Icon (Top Left) */}
+                <div className="absolute -top-6 -left-1 md:-left-5 bg-primary text-white p-3 rounded-[14px] shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transform -rotate-[10deg] hover:rotate-0 transition-transform duration-300 z-20">
+                  <CodeXml size={26} strokeWidth={2.5} />
+                </div>
+                
+                {/* Floating GitHub Icon (Bottom Right) */}
+                <div className="absolute -bottom-6 -right-1 md:-right-5 bg-primary text-white p-3.5 rounded-[16px] shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transform rotate-[10deg] hover:rotate-0 transition-transform duration-300 z-20">
+                  <FaGithub size={36} />
+                </div>
+
                 {/* Dark Code Editor Window */}
-                <div className="bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-gray-800 transform -rotate-2 transition-transform hover:rotate-0 duration-500 w-[90%] md:w-[95%]">
+                <div className="bg-[#0a0a0a] rounded-xl shadow-2xl overflow-hidden border border-gray-800 transform -rotate-2 transition-transform hover:rotate-0 duration-500 w-[88%] mx-auto">
                   {/* Window Header */}
-                  <div className="bg-[#2d2d2d] px-4 py-3 flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                  <div className="bg-[#2d2d2d] px-3.5 py-2.5 flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
                   </div>
                   {/* Code Area */}
-                  <div className="p-5 md:p-6 text-left font-mono text-[13px] md:text-sm leading-loose overflow-x-auto text-gray-300">
+                  <div className="p-3.5 md:p-4 text-left font-mono text-[11px] md:text-[12px] leading-loose overflow-x-auto text-gray-300">
                     <div className="flex">
                       <span className="text-gray-500 w-6 text-right select-none pr-4">1</span>
                       <span className="text-green-400">// Interview Experience Platform</span>
@@ -145,43 +160,43 @@ const GithubSection = () => {
                 </div>
 
                 {/* Repository Stats Card */}
-                <div className="absolute right-0 top-12 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-100 p-5 transform rotate-3 transition-transform hover:rotate-6 duration-500 w-[240px] md:w-64 z-10">
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
-                    <h4 className="font-bold text-gray-800 text-[15px]">Repository Stats</h4>
-                    <FaGithub className="text-gray-800 text-xl" />
+                <div className="absolute -right-2 md:-right-6 -top-4 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-100 p-3.5 transform rotate-3 transition-transform hover:rotate-6 duration-500 w-[180px] md:w-48 z-10">
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-2.5">
+                    <h4 className="font-bold text-gray-800 text-[12px] md:text-[13px]">Repository Stats</h4>
+                    <FaGithub className="text-gray-800 text-base" />
                   </div>
                   
-                  <div className="flex flex-col gap-3.5">
+                  <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 text-gray-600">
-                        <Star className="w-4 h-4 text-primary" />
-                        <span className="text-[14px] font-medium">Stars</span>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Star className="w-3 h-3 text-primary" />
+                        <span className="text-[11px] md:text-[12px] font-medium">5tars</span>
                       </div>
-                      <span className="font-bold text-gray-800 text-[14px]">2.3k</span>
+                      <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">23k</span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 text-gray-600">
-                        <GitBranch className="w-4 h-4 text-primary" />
-                        <span className="text-[14px] font-medium">Forks</span>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <GitBranch className="w-3 h-3 text-primary" />
+                        <span className="text-[11px] md:text-[12px] font-medium">Forks</span>
                       </div>
-                      <span className="font-bold text-gray-800 text-[14px]">420</span>
+                      <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">420</span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 text-gray-600">
-                        <Eye className="w-4 h-4 text-primary" />
-                        <span className="text-[14px] font-medium">Watchers</span>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Eye className="w-3 h-3 text-primary" />
+                        <span className="text-[11px] md:text-[12px] font-medium">Watchers</span>
                       </div>
-                      <span className="font-bold text-gray-800 text-[14px]">66</span>
+                      <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">66</span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 text-gray-600">
-                        <Users className="w-4 h-4 text-primary" />
-                        <span className="text-[14px] font-medium">Contributors</span>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Users className="w-3 h-3 text-primary" />
+                        <span className="text-[11px] md:text-[12px] font-medium">Contributors</span>
                       </div>
-                      <span className="font-bold text-gray-800 text-[14px]">25+</span>
+                      <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">25+</span>
                     </div>
                   </div>
                 </div>
