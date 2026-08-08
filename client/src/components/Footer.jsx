@@ -1,5 +1,6 @@
 import React from 'react';
 import { assets, footer_data } from '../assets/assets';
+import Logo from './Logo';
 
 const Footer = () => {
   return (
@@ -19,11 +20,7 @@ const Footer = () => {
 
             <div className="w-full flex-1 space-y-4">
               <a href="/" className="block">
-                <img
-                  src={assets.logogreenblackpng}
-                  alt="logo"
-                  className="w-32 sm:w-40"
-                />
+                <Logo className="w-32 sm:w-40 h-auto text-primary" />
               </a>
               <p className="text-sm/6 text-neutral-600">
                 Mozify is a student-led platform empowering peers with firsthand insights into interviews across diverse companies and roles. By contributing and engaging, users foster a culture of collaboration and growth.

@@ -6,6 +6,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
+import Logo from '../components/Logo';
 import { assets } from '../assets/assets.js';
 import {
   loginUser,
@@ -169,11 +170,7 @@ function Login() {
         <div className="grid h-full min-h-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
           <section className="flex h-full min-h-0 flex-col px-5 py-6 sm:px-8 lg:px-12">
             <Link to="/" className="inline-flex w-fit" aria-label="Go to homepage">
-              <img
-                src={assets.logogreenblackpng}
-                alt="Interview Experience"
-                className="h-10 sm:h-12"
-              />
+              <Logo className="h-10 sm:h-12 w-auto text-primary" />
             </Link>
 
             <div

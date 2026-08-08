@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
+import Logo from './Logo.jsx';
 import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
 import useOutsideAlerter from '../hooks/useOutsideAlerter.js';
@@ -216,11 +217,7 @@ const Navbar = () => {
         }`}
     >
       <Link to="/" onClick={handleCloseNavbar}>
-        <img
-          src={theme == 'light' ? assets.logogreenblackpng : assets.logogreenwhitepng}
-          className="h-10 sm:h-12"
-          alt="Logo"
-        />
+        <Logo className="h-10 sm:h-12 w-auto text-primary" />
       </Link>
 
       <div className="hidden md:flex items-center gap-8 text-slate-800 dark:text-white">
