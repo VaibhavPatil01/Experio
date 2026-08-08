@@ -58,7 +58,7 @@ function SettingsPage() {
               </div>
               <form className="max-w-md flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Current Password
                   </label>
                   <input
@@ -66,12 +66,12 @@ function SettingsPage() {
                     name="currentPassword"
                     value={passwords.currentPassword}
                     onChange={handlePasswordChange}
-                    className="w-full rounded-lg border border-gray-200 dark:border-gray-700 py-2.5 px-3 bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-sm"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-[#252525] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
                     placeholder="••••••••"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     New Password
                   </label>
                   <input
@@ -79,12 +79,12 @@ function SettingsPage() {
                     name="newPassword"
                     value={passwords.newPassword}
                     onChange={handlePasswordChange}
-                    className="w-full rounded-lg border border-gray-200 dark:border-gray-700 py-2.5 px-3 bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-sm"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-[#252525] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
                     placeholder="••••••••"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     Confirm New Password
                   </label>
                   <input
@@ -92,12 +92,12 @@ function SettingsPage() {
                     name="confirmPassword"
                     value={passwords.confirmPassword}
                     onChange={handlePasswordChange}
-                    className="w-full rounded-lg border border-gray-200 dark:border-gray-700 py-2.5 px-3 bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-sm"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-[#252525] border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
                     placeholder="••••••••"
                   />
                 </div>
                 <div className="mt-2">
-                  <button type="submit" className="bg-primary hover:bg-primary/95 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                  <button type="submit" className="bg-primary hover:bg-primary/95 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
                     Update Password
                   </button>
                 </div>
