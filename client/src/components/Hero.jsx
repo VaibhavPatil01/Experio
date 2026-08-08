@@ -90,7 +90,7 @@ const Hero = () => {
 
                 {/* Hero Section */}
                 <div className="relative flex flex-col items-center justify-center text-sm px-4 md:px-16 lg:px-24 xl:px-40 text-black">
-                    <div className="absolute top-28 xl:top-10 -z-10 left-1/4 size-72 sm:size-96 xl:size-120 2xl:size-132 bg-green-300 blur-[100px] opacity-30"></div>
+                    <div className="absolute top-28 xl:top-10 -z-10 left-1/4 size-72 sm:size-96 xl:size-120 2xl:size-132 bg-primary blur-[100px] opacity-20"></div>
 
                     {/* Avatars + Stars */}
                     <div className="flex items-center mt-24">
@@ -105,7 +105,7 @@ const Hero = () => {
                         <div>
                             <div className="flex ">
                                 {Array(5).fill(0).map((_, i) => (
-                                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-star text-transparent fill-green-600" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-star text-transparent fill-primary" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
                                 ))}
                             </div>
                             <p className="text-sm text-gray-700">
@@ -116,18 +116,18 @@ const Hero = () => {
 
                     {/* Headline + CTA */}
                     <h1 className="text-5xl md:text-6xl font-semibold max-w-5xl text-center mt-4 md:leading-[70px]">
-                        Learn, Connect, and Grow with an <span className=" bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent text-nowrap">AI-Powered </span> Community.
+                        Learn, Connect, and Grow with an <span className=" bg-gradient-to-r from-[var(--color-hero-grad-start)] to-[var(--color-hero-grad-end)] bg-clip-text text-transparent text-nowrap">AI-Powered </span> Community.
                     </h1>
 
                     <p className="max-w-xl text-center text-base my-7">Behind every placement is a story worth sharing. Inspire others, learn together, and build a stronger community with every word you write.</p>
 
                     {/* CTA Buttons */}
                     <div className="flex items-center gap-4 ">
-                        <Link to="/post" className="bg-green-500 hover:bg-green-600 text-white rounded-full px-9 h-12 m-1 ring-offset-2 ring-1 ring-green-400 flex items-center transition-colors">
+                        <Link to="/post" className="bg-primary hover:bg-primary/90 text-white rounded-full px-9 h-12 m-1 ring-offset-2 ring-1 ring-primary/40 flex items-center transition-colors">
                             Create post
                             <ArrowRight height="16"  />
                         </Link>
-                        <Link to="/posts" className="flex items-center justify-center gap-0.5 border border-slate-400 hover:bg-green-50 transition rounded-full px-7 h-12 text-slate-700">
+                        <Link to="/posts" className="flex items-center justify-center gap-0.5 border border-slate-400 hover:bg-primary/10 transition rounded-full px-7 h-12 text-slate-700">
                             <Eye height="16" className='opacity-90' />
                             <span>View posts</span>
                         </Link>

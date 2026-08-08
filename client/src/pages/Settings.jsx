@@ -19,13 +19,17 @@ function SettingsPage() {
   const handleThemeChange = (colorKey) => {
     setSelectedThemeColor(colorKey);
     const colorHex = colorKey === 'green' ? '#00a63e' : '#002E7D';
-    const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#4586f5';
-    const bannerStart = colorKey === 'green' ? '#ABFF7E' : '#93c5fd';
+    const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#347df8';
+    const bannerStart = colorKey === 'green' ? '#ABFF7E' : '#60a5fa';
     const bannerEnd = colorKey === 'green' ? '#FDFEFF' : '#eff6ff';
+    const heroGradStart = colorKey === 'green' ? '#15803d' : '#001a47';
+    const heroGradEnd = colorKey === 'green' ? '#22c55e' : '#0040ad';
     document.documentElement.style.setProperty('--color-primary', colorHex);
     document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
     document.documentElement.style.setProperty('--color-banner-start', bannerStart);
     document.documentElement.style.setProperty('--color-banner-end', bannerEnd);
+    document.documentElement.style.setProperty('--color-hero-grad-start', heroGradStart);
+    document.documentElement.style.setProperty('--color-hero-grad-end', heroGradEnd);
     localStorage.setItem('primaryColor', colorKey);
   };
 
