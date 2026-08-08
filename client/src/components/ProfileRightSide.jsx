@@ -552,7 +552,7 @@ const ProfileRightSide = ({ profileData }) => {
         <button 
           onClick={() => resumeFileInputRef.current.click()}
           disabled={uploadResumeMutation.isLoading}
-          className="text-green-700 font-semibold text-[15px] hover:text-green-800 transition-colors cursor-pointer disabled:opacity-50"
+          className="text-primary font-semibold text-[15px] hover:text-primary/80 transition-colors cursor-pointer disabled:opacity-50"
         >
           {uploadResumeMutation.isLoading ? 'Uploading...' : (profileData?.resume?.url ? 'Replace resume' : 'Upload resume')}
         </button>
@@ -1018,7 +1018,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveSummary}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-8 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-8 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1070,7 +1070,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveSocialLink}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1136,7 +1136,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveAward}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1202,7 +1202,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveSkills}
                 disabled={updateProfileMutation.isLoading}
-                className={`text-white font-semibold px-10 py-2.5 rounded-full transition-colors shadow-sm cursor-pointer disabled:opacity-50 bg-green-600 hover:bg-green-700`}
+                className={`text-white font-semibold px-10 py-2.5 rounded-full transition-colors shadow-sm cursor-pointer disabled:opacity-50 bg-primary hover:bg-primary/90`}
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1409,7 +1409,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveWorkExperience}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1517,7 +1517,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveEducation}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1625,7 +1625,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveJobPreferences}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1814,7 +1814,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSavePersonalDetails}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1881,7 +1881,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveCourse}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -1952,7 +1952,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveProject}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -2054,7 +2054,7 @@ const ProfileRightSide = ({ profileData }) => {
               <button 
                 onClick={handleSaveLanguage}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>

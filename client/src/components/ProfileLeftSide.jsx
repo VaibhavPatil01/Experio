@@ -184,7 +184,7 @@ const ProfileLeftSide = ({ profileData }) => {
         <div className="relative flex items-center justify-center w-14 h-14 shrink-0">
           <svg className="w-14 h-14 transform -rotate-90">
             <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4.5" fill="transparent" className="text-gray-100" />
-            <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4.5" fill="transparent" strokeDasharray={24 * 2 * Math.PI} strokeDashoffset="0" className="text-emerald-600" />
+            <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4.5" fill="transparent" strokeDasharray={24 * 2 * Math.PI} strokeDashoffset="0" className="text-primary" />
           </svg>
           <span className="absolute text-[13px] font-bold text-gray-900">100%</span>
         </div>
@@ -223,7 +223,7 @@ const ProfileLeftSide = ({ profileData }) => {
               <button 
                 onClick={handlePhoneSave}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-green-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
@@ -347,7 +347,7 @@ const ProfileLeftSide = ({ profileData }) => {
               <button 
                 onClick={handleBasicSave}
                 disabled={updateProfileMutation.isLoading}
-                className="bg-emerald-600 text-white font-semibold px-10 py-2.5 rounded-full hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                className="bg-primary text-white font-semibold px-10 py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {updateProfileMutation.isLoading ? 'Saving...' : 'Save'}
               </button>
