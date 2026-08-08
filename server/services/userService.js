@@ -109,7 +109,13 @@ export const searchUserService = (
         branch: 1,
         profilePicture: 1,
         createdAt: 1,
+        email: 1,
+        workExperiences: 1,
       },
     },
   ]);
+};
+
+export const countUsersService = () => {
+  return UserModel.countDocuments({ isEmailVerified: true });
 };

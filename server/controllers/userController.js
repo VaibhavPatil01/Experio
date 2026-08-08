@@ -6,7 +6,7 @@ import decodeToken from '../utils/token/decodeToken.js';
 import generateAuthToken from '../utils/token/generateAuthToken.js';
 import generateEmailVerificationToken from '../utils/token/generateEmailVerificationToken.js';
 import generateForgotPasswordToken from '../utils/token/generateForgotPasswordToken.js';
-import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, getUserProfileService, updateUserService } from '../services/userService.js';
+import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
 import { eventBus, EVENTS } from '../events/index.js';
 
 
@@ -498,11 +498,13 @@ export async function searchUser(req, res) {
   const skip = limit * page;
   try {
     const userList = await searchUserService(search, limit, skip);
+    const totalUsers = await countUsersService();
 
     if (userList.length === 0) {
       return res.status(200).json({
         message: 'No posts to display',
         data: [],
+        totalUsers,
         page: { previousPage: page === 0 ? undefined : page },
       });
     }
@@ -515,6 +517,7 @@ export async function searchUser(req, res) {
     return res.status(200).json({
       message: 'Users fetched successfully',
       data: userList,
+      totalUsers,
       page: { nextPage, previousPage },
     });
   } catch (error) {

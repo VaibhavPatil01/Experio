@@ -104,7 +104,11 @@ function UserSearch() {
             {/* Right Column: Stats */}
             <div className="flex flex-col sm:items-end w-full sm:w-auto">
               <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-0.5">Total Users</div>
-              <div className="text-3xl font-extrabold text-slate-900 dark:text-white leading-tight mb-1">12,548</div>
+              <div className="text-3xl font-extrabold text-slate-900 dark:text-white leading-tight mb-1">
+                {data?.pages[0]?.totalUsers !== undefined 
+                  ? data.pages[0].totalUsers.toLocaleString() 
+                  : "..."}
+              </div>
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
                 Registered students & alumni
               </div>
@@ -154,15 +158,25 @@ function UserSearch() {
                                   </div>
                                 )}
                               </div>
-                              <span className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
-                                {user.username}
-                              </span>
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                                  {user.username}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  {user.email}
+                                </span>
+                              </div>
                             </Link>
                           </td>
                           <td className="p-4 hidden md:table-cell text-gray-600">
-                            {user.designation && user.designation !== 'NA' ? user.designation : (
-                              <span className="text-gray-400 italic">Not specified</span>
-                            )}
+                            {(() => {
+                              const primaryExp = user.workExperiences?.find(exp => exp.isCurrentlyWorking) || user.workExperiences?.[0];
+                              const designationToDisplay = primaryExp?.jobTitle || (user.designation !== 'NA' ? user.designation : null);
+                              if (designationToDisplay) {
+                                return designationToDisplay;
+                              }
+                              return <span className="text-gray-400 italic">Student</span>;
+                            })()}
                           </td>
                           <td className="p-4 hidden md:table-cell text-gray-600">
                             {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
