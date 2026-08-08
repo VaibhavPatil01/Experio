@@ -19,9 +19,9 @@ export const Banner = () => {
       }`}
     >
       <div className="min-h-0 overflow-hidden">
-        <div className="relative w-full px-12 py-2 font-medium text-sm text-green-800 text-center bg-gradient-to-r from-[#ABFF7E] to-[#FDFEFF]">
+        <div className="relative w-full px-12 py-2 font-medium text-sm text-primary text-center bg-gradient-to-r from-[var(--color-banner-start)] to-[var(--color-banner-end)]">
           <p className="truncate">
-            <span className="mr-2 inline-flex items-center rounded-lg bg-green-600 px-3.5 py-1.5 text-sm font-semibold leading-none text-white">
+            <span className="mr-2 inline-flex items-center rounded-lg bg-primary px-3.5 py-1.5 text-sm font-semibold leading-none text-white">
               New
             </span>
             AI Features Added
@@ -29,7 +29,7 @@ export const Banner = () => {
           <button
             type="button"
             onClick={() => setIsVisible(false)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-md text-green-900 transition hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-md text-primary transition hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
             aria-label="Close banner"
             title="Close banner"
           >

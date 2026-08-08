@@ -4,8 +4,8 @@ import { FaGithub } from 'react-icons/fa';
 import githubIllustration from '../assets/images/icons/github_illustration.png';
 
 const FeatureItem = ({ icon, title, description, isLast }) => (
-  <div className={`flex items-start gap-4 ${!isLast ? 'border-b border-green-200/50 pb-5' : ''}`}>
-    <div className="bg-[#e9f5ec] p-3 rounded-xl flex-shrink-0">
+  <div className={`flex items-start gap-4 ${!isLast ? 'border-b border-primary/20 pb-5' : ''}`}>
+    <div className="bg-primary/10 p-3 rounded-xl flex-shrink-0">
       {icon}
     </div>
     <div className="flex flex-col text-left mt-0.5">
@@ -22,7 +22,7 @@ const GithubSection = () => {
 
         {/* Small Title */}
         <div className="flex justify-center mb-6">
-          <div className="flex items-center gap-2 text-sm text-green-600 bg-green-400/10 rounded-full px-4 py-1.5 w-fit">
+          <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 rounded-full px-4 py-1.5 w-fit">
             <CodeXml width={16} />
             <span className="font-medium">Open Source</span>
           </div>
@@ -60,28 +60,28 @@ const GithubSection = () => {
         </p>
 
         {/* Card Container */}
-        <div className="bg-[#f3f9f5] border border-green-100/50 rounded-[2rem] p-8 md:p-12 pb-6 md:pb-8 w-full relative overflow-hidden">
+        <div className="bg-primary/5 border border-primary/20 rounded-[2rem] p-8 md:p-12 pb-6 md:pb-8 w-full relative overflow-hidden">
           <div className="flex flex-col md:flex-row gap-8 md:gap-4 items-center justify-between">
 
             {/* Left side content */}
             <div className="w-full md:w-[42%] flex flex-col gap-5">
               <FeatureItem
-                icon={<ShieldCheck className="text-green-600" size={20} />}
+                icon={<ShieldCheck className="text-primary" size={20} />}
                 title="Clean Code"
                 description="Well structured & easily maintainable"
               />
               <FeatureItem
-                icon={<GitBranch className="text-green-600" size={20} />}
+                icon={<GitBranch className="text-primary" size={20} />}
                 title="Scalable"
                 description="Built for growth & high performance"
               />
               <FeatureItem
-                icon={<Lock className="text-green-600" size={20} />}
+                icon={<Lock className="text-primary" size={20} />}
                 title="Secure"
                 description="Following best practices & industry standards"
               />
               <FeatureItem
-                icon={<Users className="text-green-600" size={20} />}
+                icon={<Users className="text-primary" size={20} />}
                 title="Community"
                 description="Open to contributions & collaboration"
                 isLast
@@ -104,7 +104,7 @@ const GithubSection = () => {
               href="https://github.com/VaibhavPatil01/Interview-Experience-GSMCOE"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-primary hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"
             >
               <FaGithub size={20} />
               View Source Code
@@ -114,11 +114,11 @@ const GithubSection = () => {
               href="https://github.com/VaibhavPatil01/Interview-Experience-GSMCOE"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 border border-green-200 hover:bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium transition-colors bg-white w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 border border-primary/20 hover:bg-primary/10 text-primary px-6 py-3 rounded-lg font-medium transition-colors bg-white w-full sm:w-auto justify-center"
             >
-              <Star size={20} className="text-green-600" />
+              <Star size={20} className="text-primary" />
               Star on GitHub
-              <span className="text-sm font-semibold ml-1 bg-green-50 px-2 py-0.5 rounded text-green-800">2.3k</span>
+              <span className="text-sm font-semibold ml-1 bg-primary/10 px-2 py-0.5 rounded text-primary">2.3k</span>
             </a>
           </div>
         </div>

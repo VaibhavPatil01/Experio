@@ -48,8 +48,12 @@ const App = () => {
     const savedColor = localStorage.getItem('primaryColor') || 'green';
     const colorHex = savedColor === 'green' ? '#00a63e' : '#002E7D';
     const dullColorHex = savedColor === 'green' ? '#dcfce7' : '#4586f5';
+    const bannerStart = savedColor === 'green' ? '#ABFF7E' : '#93c5fd';
+    const bannerEnd = savedColor === 'green' ? '#FDFEFF' : '#eff6ff';
     document.documentElement.style.setProperty('--color-primary', colorHex);
     document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
+    document.documentElement.style.setProperty('--color-banner-start', bannerStart);
+    document.documentElement.style.setProperty('--color-banner-end', bannerEnd);
   }, []);
 
   if (isLoading) {

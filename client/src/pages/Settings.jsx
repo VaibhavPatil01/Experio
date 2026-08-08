@@ -20,8 +20,12 @@ function SettingsPage() {
     setSelectedThemeColor(colorKey);
     const colorHex = colorKey === 'green' ? '#00a63e' : '#002E7D';
     const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#4586f5';
+    const bannerStart = colorKey === 'green' ? '#ABFF7E' : '#93c5fd';
+    const bannerEnd = colorKey === 'green' ? '#FDFEFF' : '#eff6ff';
     document.documentElement.style.setProperty('--color-primary', colorHex);
     document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
+    document.documentElement.style.setProperty('--color-banner-start', bannerStart);
+    document.documentElement.style.setProperty('--color-banner-end', bannerEnd);
     localStorage.setItem('primaryColor', colorKey);
   };
 
