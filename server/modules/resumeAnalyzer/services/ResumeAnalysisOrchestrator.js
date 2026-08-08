@@ -129,7 +129,7 @@ export default class ResumeAnalysisOrchestrator {
       await repository.updateStatus(analysisDoc._id, 'processing');
       
       const aiStartTime = performance.now();
-      logger.info('gemini_analysis_started', { requestId, analysisId: analysisDoc._id, userId, model: 'gemini-2.5-pro' });
+      logger.info('gemini_analysis_started', { requestId, analysisId: analysisDoc._id, userId, model: 'gemini-3.5-flash' });
 
       const analysisJson = await this._executeWithTimeout(
         GeminiAnalyzerService.generateStructuredAnalysis(prompt),
@@ -150,7 +150,7 @@ export default class ResumeAnalysisOrchestrator {
       // 7. Persist and Finalize (With Rescue Backup)
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
-        modelUsed: 'gemini-2.5-pro',
+        modelUsed: 'gemini-3.5-flash',
         totalLatencyMs: Math.round(totalLatencyMs),
         preProcessDuration: Math.round(preProcessDuration),
         retrievalDuration: Math.round(retrievalDuration),
@@ -319,7 +319,7 @@ export default class ResumeAnalysisOrchestrator {
       // 7. Persist (With Rescue Backup)
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
-        modelUsed: 'gemini-2.5-pro',
+        modelUsed: 'gemini-3.5-flash',
         totalLatencyMs: Math.round(totalLatencyMs),
         preProcessDuration: Math.round(preProcessDuration),
         retrievalDuration: Math.round(retrievalDuration),
