@@ -167,14 +167,14 @@ const ProfileLeftSide = ({ profileData }) => {
       {/* Card 2: Contact Info */}
       <div className="bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <div className="flex items-center gap-3 text-gray-700 mb-4">
-          <Phone className="w-5 h-5 text-emerald-600" />
+          <Phone className="w-5 h-5 text-primary" />
           <span className="text-[15px]">{profileData?.phone || '+91 7249412825'}</span>
           <button onClick={() => setIsPhoneModalOpen(true)} className="ml-auto text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
             <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
         </div>
         <div className="flex items-center gap-3 text-gray-700">
-          <Mail className="w-5 h-5 text-emerald-600" />
+          <Mail className="w-5 h-5 text-primary" />
           <span className="text-[15px] truncate">{profileData?.email || 'vaibhavvpatil132@gmail.com'}</span>
         </div>
       </div>

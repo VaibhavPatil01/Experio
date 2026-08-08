@@ -224,16 +224,16 @@ const Navbar = () => {
       </Link>
 
       <div className="hidden md:flex items-center gap-8 text-slate-800 dark:text-white">
-        <Link to="/" className="hover:text-green-600">
+        <Link to="/" className="hover:text-primary">
           Home
         </Link>
-        <Link to="/posts" className="hover:text-green-600">
+        <Link to="/posts" className="hover:text-primary">
           Experiences
         </Link>
-        <Link to="/resume" className="hover:text-green-600">
+        <Link to="/resume" className="hover:text-primary">
           Resume
         </Link>
-        <Link to="/assistant" className="hover:text-green-600">
+        <Link to="/assistant" className="hover:text-primary">
           Assistant
         </Link>
       </div>
@@ -471,27 +471,27 @@ const Navbar = () => {
           top: `${navBottomOffset}px`
         }}
       >
-        <Link to="/" onClick={handleCloseNavbar} className="rounded-md px-2 py-3 hover:text-green-600">
+        <Link to="/" onClick={handleCloseNavbar} className="rounded-md px-2 py-3 hover:text-primary">
           Home
         </Link>
         <Link
           to="/posts"
           onClick={handleCloseNavbar}
-          className="rounded-md px-2 py-3 hover:text-green-600"
+          className="rounded-md px-2 py-3 hover:text-primary"
         >
           Experiences
         </Link>
         <Link
           to="/resume"
           onClick={handleCloseNavbar}
-          className="rounded-md px-2 py-3 hover:text-green-600"
+          className="rounded-md px-2 py-3 hover:text-primary"
         >
           Resume
         </Link>
         <Link
           to="/assistant"
           onClick={handleCloseNavbar}
-          className="rounded-md px-2 py-3 hover:text-green-600"
+          className="rounded-md px-2 py-3 hover:text-primary"
         >
           Assistant
         </Link>
@@ -499,7 +499,7 @@ const Navbar = () => {
           <Link
             to="/post"
             onClick={handleCloseNavbar}
-            className="rounded-md px-2 py-3 hover:text-green-600"
+            className="rounded-md px-2 py-3 hover:text-primary"
           >
             Create Post
           </Link>

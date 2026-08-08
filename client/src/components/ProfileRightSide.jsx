@@ -425,8 +425,8 @@ const ProfileRightSide = ({ profileData }) => {
                   onClick={() => scrollToSection(item)}
                   className={`whitespace-nowrap px-4 py-2 text-[15px] font-medium rounded-full transition-colors cursor-pointer relative ${
                     activeSection === item 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'text-gray-500 hover:bg-green-50 hover:text-green-700'
+                      ? 'bg-primary/20 text-primary' 
+                      : 'text-gray-500 hover:bg-primary/10 hover:text-primary'
                   }`}
                 >
                   {item}
@@ -451,8 +451,8 @@ const ProfileRightSide = ({ profileData }) => {
                 onClick={() => scrollToSection(item)}
                 className={`whitespace-nowrap px-4 py-2 text-[15px] font-medium rounded-full transition-colors cursor-pointer relative ${
                   activeSection === item 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'text-gray-500 hover:bg-green-50 hover:text-green-700'
+                    ? 'bg-primary/20 text-primary' 
+                    : 'text-gray-500 hover:bg-primary/10 hover:text-primary'
                 }`}
               >
                 {item}
@@ -466,7 +466,7 @@ const ProfileRightSide = ({ profileData }) => {
           <div className="relative shrink-0" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className={`p-1 text-gray-700 hover:bg-green-100 hover:text-green-800 rounded-full transition-colors ml-2 cursor-pointer ${dropdownOpen ? 'bg-green-100 text-green-800' : ''}`}
+              className={`p-1 text-gray-700 hover:bg-primary/10 hover:text-primary rounded-full transition-colors ml-2 cursor-pointer ${dropdownOpen ? 'bg-primary/20 text-primary' : ''}`}
             >
               <MoreVertical className="w-5 h-5" />
             </button>
@@ -483,8 +483,8 @@ const ProfileRightSide = ({ profileData }) => {
                     }}
                     className={`w-full text-left px-4 py-2.5 text-[15px] transition-colors cursor-pointer relative ${
                       activeSection === item 
-                        ? 'bg-green-50 text-green-700 font-medium' 
-                        : 'text-gray-600 hover:bg-green-50 hover:text-green-700'
+                        ? 'bg-primary/10 text-primary font-medium' 
+                        : 'text-gray-600 hover:bg-primary/10 hover:text-primary'
                     }`}
                   >
                     {item}
@@ -510,8 +510,8 @@ const ProfileRightSide = ({ profileData }) => {
         <p className="text-gray-600 text-[15px] leading-relaxed mb-6 whitespace-pre-wrap">
           {profileData?.about || "No summary provided."}
         </p>
-        <button className="flex items-center gap-2 border-[1.5px] border-green-200 text-green-700 px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-green-50 transition-colors shadow-sm cursor-pointer">
-          <Sparkles className="w-4 h-4 text-green-600" /> Generate by AI
+        <button className="flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-primary/10 transition-colors shadow-sm cursor-pointer">
+          <Sparkles className="w-4 h-4 text-primary" /> Generate by AI
         </button>
       </div>
 
@@ -1006,8 +1006,8 @@ const ProfileRightSide = ({ profileData }) => {
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   className="w-full h-56 border border-gray-200 rounded-xl p-4 pr-4 pb-14 text-[15px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-green-400 resize-none leading-relaxed [&::-webkit-scrollbar]:hidden"
                 />
-                <button className="absolute bottom-4 right-4 flex items-center gap-2 border-[1.5px] border-green-200 text-green-700 px-4 py-2 rounded-full font-semibold text-[14px] hover:bg-green-50 transition-colors bg-white shadow-sm cursor-pointer">
-                  <Sparkles className="w-4 h-4 text-green-600" /> Generate by AI
+                <button className="absolute bottom-4 right-4 flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-4 py-2 rounded-full font-semibold text-[14px] hover:bg-primary/10 transition-colors bg-white shadow-sm cursor-pointer">
+                  <Sparkles className="w-4 h-4 text-primary" /> Generate by AI
                 </button>
               </div>
               
