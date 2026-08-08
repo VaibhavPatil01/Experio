@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UploadCloud, FileText, Briefcase, Building, AlignLeft, 
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
-  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye, User
+  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye, User, Trash2
 } from 'lucide-react';
 import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
 import axios from 'axios';
@@ -85,6 +85,34 @@ const AIResumeAnalyser = () => {
       toast.error(error.response?.data?.error || 'Failed to re-analyze resume.');
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleDelete = async (historyItem, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this analysis?')) {
+      return;
+    }
+    
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/resume-analyzer/${historyItem._id}`,
+        { 
+          headers: { token: getAuthToken() },
+          withCredentials: true 
+        }
+      );
+      toast.success('Analysis deleted successfully');
+      
+      // If the currently viewed result is the one being deleted, clear it
+      if (result && result._id === historyItem._id) {
+        setResult(null);
+      }
+      
+      fetchHistory();
+    } catch (error) {
+      console.error('Error deleting analysis:', error);
+      toast.error('Failed to delete analysis.');
     }
   };
 
@@ -371,17 +399,24 @@ const AIResumeAnalyser = () => {
                             <button 
                               onClick={() => handleReopen(item)}
                               disabled={item.status !== 'completed'}
-                              className="flex-1 py-1.5 px-3 bg-gray-50 hover:bg-gray-100 dark:bg-[#252525] dark:hover:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="flex-[2] py-1.5 px-3 bg-gray-50 hover:bg-gray-100 dark:bg-[#252525] dark:hover:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <Eye className="w-3.5 h-3.5" /> View
                             </button>
                             <button 
                               onClick={() => handleReanalyze(item)}
                               disabled={!item.resumeMetadata?.extractedText || isAnalyzing}
-                              className="flex-1 py-1.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="flex-[2] py-1.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                               title={!item.resumeMetadata?.extractedText ? 'Resume text not stored for this analysis.' : 'Re-analyze with latest AI'}
                             >
                               <RefreshCw className="w-3.5 h-3.5" /> Re-analyze
+                            </button>
+                            <button 
+                              onClick={(e) => handleDelete(item, e)}
+                              className="flex-1 py-1.5 px-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/10 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Delete analysis"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>
