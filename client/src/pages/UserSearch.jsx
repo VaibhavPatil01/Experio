@@ -79,7 +79,7 @@ function UserSearch() {
             {/* Left Column: Title & Search */}
             <div className="flex flex-col gap-6 w-full sm:max-w-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-500 flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary flex items-center justify-center shrink-0">
                   <Users className="w-8 h-8" strokeWidth={2.5} />
                 </div>
                 <div>
@@ -181,7 +181,7 @@ function UserSearch() {
                           <td className="px-4 py-2 hidden md:table-cell text-gray-600">
                             {user.createdAt ? (
                               <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-emerald-600" />
+                                <Calendar className="w-4 h-4 text-primary" />
                                 <span>
                                   {new Date(user.createdAt).toLocaleDateString('en-US', {
                                     year: 'numeric',

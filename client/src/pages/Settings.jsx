@@ -54,7 +54,7 @@ function SettingsPage() {
           <div className="flex flex-col sm:flex-row items-start justify-between mb-8 gap-6 sm:gap-4">
             <div className="flex flex-col gap-6 w-full sm:max-w-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-500 flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary flex items-center justify-center shrink-0">
                   <Settings className="w-8 h-8" strokeWidth={2.5} />
                 </div>
                 <div>
