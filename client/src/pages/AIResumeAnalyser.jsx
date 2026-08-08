@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UploadCloud, FileText, Briefcase, Building, AlignLeft, 
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
-  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3
+  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch
 } from 'lucide-react';
 import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
 import axios from 'axios';
@@ -378,92 +379,205 @@ const AIResumeAnalyser = () => {
           )}
 
           {/* Results State */}
-          {!isAnalyzing && result && (
+          {!isAnalyzing && result && result.result && (
             <motion.div 
               key="results"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="mt-16 mb-8 space-y-6"
             >
-              {/* Score Card */}
-              <div className="bg-gradient-to-br from-primary to-green-600 rounded-xl p-8 text-white relative overflow-hidden shadow-md shadow-primary/10">
+              {/* Score Header Card */}
+              <div className="bg-gradient-to-br from-primary to-green-600 rounded-xl p-6 md:p-8 text-white relative overflow-hidden shadow-md shadow-primary/10">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div>
-                    <h3 className="text-xl font-medium text-white/90 mb-1">Overall Match Score</h3>
-                    <p className="text-white/80 text-sm max-w-md">
-                      Based on your target role {targetCompany && `at ${targetCompany}`} and industry standards.
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                      <h3 className="text-2xl font-bold text-white">Analysis Complete</h3>
+                      {targetCompany && (
+                        <span className="px-3 py-1 bg-white/20 rounded-full text-sm font-medium backdrop-blur-md">Target: {targetCompany}</span>
+                      )}
+                    </div>
+                    <p className="text-white/90 text-base max-w-2xl leading-relaxed mt-3">
+                      {result.result.overallAssessment}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-24 h-24 rounded-full border-4 border-white/30 flex items-center justify-center bg-white/10 backdrop-blur-sm">
-                      <span className="text-4xl font-bold">{result.overallScore}%</span>
+                  <div className="flex flex-col items-center gap-2 shrink-0">
+                    <div className="w-24 h-24 rounded-full border-4 border-white/30 flex items-center justify-center bg-white/10 backdrop-blur-sm shadow-inner">
+                      <span className="text-4xl font-bold">{result.result.scores?.overallScore || 0}%</span>
                     </div>
+                    <span className="text-sm font-medium text-white/90">Overall Match</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Strengths */}
-              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-                  What looks good
-                </h3>
-                <ul className="space-y-3">
-                  {result.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 shrink-0"></div>
-                      <span className="text-gray-700 dark:text-gray-300">{strength}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Actionable Improvements */}
-              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
-                  Targeted Improvements
-                </h3>
                 
-                <div className="space-y-6">
-                  {result.improvements.map((imp, index) => (
-                    <div key={index} className="bg-green-50 dark:bg-green-500/5 border border-green-100 dark:border-green-500/20 rounded-xl p-5">
-                      <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">{imp.title}</h4>
-                      <p className="text-gray-700 dark:text-gray-300 mb-4">{imp.description}</p>
-                      
-                      {/* AI Reasoning & Citation */}
-                      <div className="bg-white dark:bg-[#252525] rounded-lg p-4 border border-green-100 dark:border-gray-700">
-                        <div className="flex items-start gap-2 mb-2">
-                          <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                          <span className="font-medium text-sm text-gray-900 dark:text-white">Why this matters:</span>
+                {/* Secondary Scores */}
+                <div className="mt-8 pt-6 border-t border-white/20 grid grid-cols-2 gap-4 relative z-10">
+                   <div>
+                     <p className="text-white/70 text-sm mb-1 uppercase tracking-wider font-semibold">Role Alignment</p>
+                     <p className="text-2xl font-bold">{result.result.scores?.roleAlignmentScore || 0}%</p>
+                   </div>
+                   <div>
+                     <p className="text-white/70 text-sm mb-1 uppercase tracking-wider font-semibold">Technical Skills</p>
+                     <p className="text-2xl font-bold">{result.result.scores?.technicalSkillScore || 0}%</p>
+                   </div>
+                </div>
+              </div>
+
+              {/* Priority Action Plan */}
+              {result.result.priorityRecommendations && result.result.priorityRecommendations.length > 0 && (
+                <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-red-100 dark:border-red-900/30 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <AlertCircle className="w-6 h-6 text-red-500" />
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Critical Action Plan</h3>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {result.result.priorityRecommendations.map((rec, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-[#252525] rounded-lg p-5 border border-gray-100 dark:border-gray-800">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-bold text-gray-900 dark:text-white text-lg">{rec.title}</h4>
+                          <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md ${
+                            rec.priority?.toLowerCase() === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400' :
+                            rec.priority?.toLowerCase() === 'medium' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400' :
+                            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'
+                          }`}>
+                            {rec.priority || 'Medium'} Priority
+                          </span>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 ml-6 mb-3 italic">
-                          "{imp.reason}"
-                        </p>
-                        <div className="ml-6 inline-flex items-center gap-1.5 text-xs font-medium bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-md">
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span>Source: {imp.citation}</span>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm mb-4"><span className="font-semibold">The Problem:</span> {rec.problem}</p>
+                        
+                        <div className="bg-white dark:bg-[#1e1e1e] rounded p-4 mb-4 border border-gray-100 dark:border-gray-700">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white mb-1 flex items-center gap-2"><Target className="w-4 h-4 text-primary"/> Recommendation</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{rec.recommendation}</p>
+                          {rec.example && (
+                            <div className="mt-3 p-3 bg-gray-50 dark:bg-[#2a2a2a] rounded text-sm italic text-gray-600 dark:text-gray-400 border-l-2 border-primary">
+                              <span className="font-semibold not-italic">Example:</span> "{rec.example}"
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-start gap-2 mt-3 text-xs text-gray-500 dark:text-gray-400">
+                          <ShieldCheck className="w-4 h-4 text-green-500 shrink-0" />
+                          <p><span className="font-semibold text-gray-700 dark:text-gray-300">Evidence:</span> {rec.evidence}</p>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Strengths & General Improvements */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <TrendingUp className="w-5 h-5 text-green-500" />
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Key Strengths</h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {result.result.strengths?.map((strength, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{strength}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Zap className="w-5 h-5 text-orange-500" />
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Areas to Polish</h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {result.result.improvements?.map((imp, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5 shrink-0"></div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{imp}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Deep Dive Analysis Grid */}
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Deep Dive Analysis</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {result.result.skillAnalysis && (
+                    <div>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2"><BarChart className="w-4 h-4 text-primary"/> Skill Alignment</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{result.result.skillAnalysis}</p>
                     </div>
-                  ))}
+                  )}
+                  {result.result.roleAnalysis && (
+                    <div>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary"/> Role Alignment</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{result.result.roleAnalysis}</p>
+                    </div>
+                  )}
+                  {result.result.companyAnalysis && (
+                    <div>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2"><Building className="w-4 h-4 text-primary"/> Company Alignment</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{result.result.companyAnalysis}</p>
+                    </div>
+                  )}
+                  {result.result.jobDescriptionAnalysis && (
+                    <div>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2"><AlignLeft className="w-4 h-4 text-primary"/> Job Description Alignment</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{result.result.jobDescriptionAnalysis}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Suggested Keywords */}
-              <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 md:p-8 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Suggested Keywords to Add</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  Based on successful profiles for similar roles, consider incorporating these terms if you have the experience:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {result.suggestedKeywords.map((keyword, index) => (
-                    <span key={index} className="px-3 py-1.5 bg-gray-100 dark:bg-[#252525] text-gray-700 dark:text-gray-300 rounded-lg text-sm border border-gray-200 dark:border-gray-700 font-medium hover:border-primary/50 hover:text-primary dark:hover:text-primary transition-colors cursor-default">
-                      {keyword}
-                    </span>
-                  ))}
+              {/* Suggested Rewrites */}
+              {result.result.suggestedRewrites && result.result.suggestedRewrites.length > 0 && (
+                <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-6">
+                    <FileEdit className="w-5 h-5 text-primary" />
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Suggested Rewrites</h3>
+                  </div>
+                  <div className="space-y-6">
+                    {result.result.suggestedRewrites.map((rewrite, idx) => (
+                      <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-red-50 dark:bg-red-900/10 p-4 rounded-lg border border-red-100 dark:border-red-900/30 relative">
+                           <span className="absolute -top-3 left-4 bg-white dark:bg-[#1e1e1e] px-2 text-xs font-bold text-red-600 dark:text-red-400">Current</span>
+                           <p className="text-sm text-gray-700 dark:text-gray-300 line-through opacity-70">"{rewrite.originalText}"</p>
+                        </div>
+                        <div className="bg-green-50 dark:bg-green-900/10 p-4 rounded-lg border border-green-100 dark:border-green-900/30 relative">
+                           <span className="absolute -top-3 left-4 bg-white dark:bg-[#1e1e1e] px-2 text-xs font-bold text-green-600 dark:text-green-400">Suggested</span>
+                           <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">"{rewrite.suggestedText}"</p>
+                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic flex items-center gap-1"><Sparkles className="w-3 h-3"/> {rewrite.reasoning}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
+              {/* References */}
+              {result.result.references && result.result.references.length > 0 && (
+                <div className="bg-gray-50 dark:bg-[#252525] rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FileSearch className="w-5 h-5 text-gray-500" />
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Evidence Used</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">The AI consulted the following successful interview experiences to form this analysis:</p>
+                  <div className="flex flex-wrap gap-3">
+                    {result.result.references.map((ref, idx) => (
+                      <Link 
+                        key={idx} 
+                        to={`/post/${ref}`}
+                        target="_blank"
+                        className="inline-flex items-center gap-2 bg-white dark:bg-[#1e1e1e] px-4 py-2 rounded-lg text-sm font-medium text-primary border border-gray-200 dark:border-gray-700 hover:border-primary transition-colors shadow-sm"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        View Experience
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
           </AnimatePresence>
