@@ -1,5 +1,7 @@
 import PdfResumeParser from '../parsers/PdfResumeParser.js';
 import DocxResumeParser from '../parsers/DocxResumeParser.js';
+import crypto from 'crypto';
+import fs from 'fs';
 import logger from '../../../utils/logger.js';
 
 export default class DocumentExtractionService {
@@ -40,6 +42,10 @@ export default class DocumentExtractionService {
       // Augment metadata with extraction metrics
       result.metadata.extractionDurationMs = Math.round(durationMs);
       result.metadata.characterCount = result.text.length;
+
+      // Calculate file hash for fingerprinting
+      const fileBuffer = fs.readFileSync(filePath);
+      result.metadata.fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
 
       return result;
     } catch (error) {

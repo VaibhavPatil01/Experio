@@ -39,6 +39,16 @@ export default class ResumeAnalysisOrchestrator {
       
       const preProcessDuration = performance.now() - preProcessStartTime;
 
+      // Update document with extracted text and file hash (for re-analysis and versioning)
+      analysisDoc = await repository.model.findByIdAndUpdate(
+        analysisDoc._id,
+        {
+          'resumeMetadata.fileHash': extractionResult.metadata.fileHash,
+          'resumeMetadata.extractedText': extractionResult.text
+        },
+        { new: true }
+      );
+
       // 3. RAG Retrieval Layer
       // Now that we have the profile (skills) and target, we can fetch context.
       const retrievalStartTime = performance.now();
@@ -110,6 +120,99 @@ export default class ResumeAnalysisOrchestrator {
    */
   static async getHistory(userId) {
     return await repository.findByUserId(userId);
+  }
+
+  /**
+   * Executes a fresh analysis on an existing parsed resume without needing the file again.
+   */
+  static async executeReanalysis(userId, analysisId, targetRole, targetCompany, jobDescription) {
+    const existingAnalysis = await repository.findByIdAndUser(analysisId, userId);
+    if (!existingAnalysis) {
+      throw new Error('Analysis not found');
+    }
+
+    if (!existingAnalysis.resumeMetadata?.extractedText) {
+      throw new Error('Previous analysis did not store extracted text. Please re-upload your resume.');
+    }
+
+    const requestId = crypto.randomUUID();
+    const startTime = performance.now();
+    let newAnalysisDoc;
+
+    try {
+      logger.info('Starting Resume Re-Analysis Orchestration', { requestId, userId, targetRole, originalAnalysisId: analysisId });
+
+      const targetData = { role: targetRole, company: targetCompany, jobDescription };
+      const resumeMetadata = { 
+        originalName: existingAnalysis.resumeMetadata.originalName,
+        fileHash: existingAnalysis.resumeMetadata.fileHash,
+        extractedText: existingAnalysis.resumeMetadata.extractedText
+      };
+      
+      newAnalysisDoc = await repository.createAnalysis(userId, targetData, resumeMetadata);
+
+      // 1. Fetch Fresh Profile Context
+      const preProcessStartTime = performance.now();
+      const userProfile = await ResumeAnalysisContextBuilder.buildUserProfileContext(userId);
+      const preProcessDuration = performance.now() - preProcessStartTime;
+
+      // 2. Fresh RAG Retrieval
+      const retrievalStartTime = performance.now();
+      const targetFacts = { role: targetRole, company: targetCompany, jobDescription };
+      const candidateFacts = { profile: userProfile };
+      
+      const relevantExperiences = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences(
+        targetFacts, 
+        candidateFacts
+      );
+      const retrievalDuration = performance.now() - retrievalStartTime;
+
+      // 3. Structural Context Build
+      const contextObject = ResumeAnalysisContextBuilder.buildContext(
+        userId, 
+        targetRole, 
+        targetCompany, 
+        jobDescription,
+        existingAnalysis.resumeMetadata.extractedText,
+        userProfile,
+        relevantExperiences
+      );
+
+      // 4. Prompt Compilation
+      const prompt = AnalyzerPromptBuilder.buildPrompt(contextObject);
+
+      // 5. Execute AI Evaluation
+      await repository.updateStatus(newAnalysisDoc._id, 'processing');
+      
+      const aiStartTime = performance.now();
+      const analysisJson = await this._executeWithTimeout(
+        GeminiAnalyzerService.generateStructuredAnalysis(prompt),
+        60000 
+      );
+      const aiDuration = performance.now() - aiStartTime;
+
+      // 6. Persist
+      const totalLatencyMs = performance.now() - startTime;
+      const executionInfo = {
+        modelUsed: 'gemini-1.5-pro',
+        totalLatencyMs: Math.round(totalLatencyMs),
+        preProcessDuration: Math.round(preProcessDuration),
+        retrievalDuration: Math.round(retrievalDuration),
+        aiDuration: Math.round(aiDuration)
+      };
+
+      newAnalysisDoc = await repository.saveResult(newAnalysisDoc._id, analysisJson, executionInfo);
+      logger.info('Successfully saved Re-Analysis', { requestId, newAnalysisId: newAnalysisDoc._id });
+
+      return newAnalysisDoc;
+
+    } catch (error) {
+      logger.error('Error in Resume Analyzer Re-Orchestration', { requestId, error: error.message, stack: error.stack });
+      if (newAnalysisDoc && newAnalysisDoc._id) {
+        await repository.updateStatus(newAnalysisDoc._id, 'failed', error.message).catch(() => {});
+      }
+      throw error;
+    }
   }
 
   /**

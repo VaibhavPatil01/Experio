@@ -25,7 +25,8 @@ const resumeAnalysisSchema = new mongoose.Schema({
   resumeMetadata: {
     fileUrl: { type: String, required: false },
     fileHash: { type: String, required: false }, // SHA-256 for deduping
-    originalName: { type: String, required: false }
+    originalName: { type: String, required: false },
+    extractedText: { type: String, required: false } // Stored for re-analysis
   },
 
   // Target Metadata

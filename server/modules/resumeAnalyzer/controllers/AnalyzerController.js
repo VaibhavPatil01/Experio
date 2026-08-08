@@ -139,5 +139,37 @@ export const retryAnalysis = async (req, res) => {
 };
 
 export const reanalyzeResume = async (req, res) => {
-  return res.status(400).json({ error: 'Resume file is not persisted. Please upload your resume again to re-analyze.' });
+  try {
+    const userId = req.authTokenData.id;
+    const analysisId = req.params.id;
+    const { targetRole, targetCompany, jobDescription } = req.body;
+
+    if (!targetRole) {
+      return res.status(400).json({ error: 'Target role is required for re-analysis.' });
+    }
+
+    logger.info('Received re-analysis request', { userId, analysisId, targetRole });
+
+    const newAnalysis = await ResumeAnalysisOrchestrator.executeReanalysis(
+      userId,
+      analysisId,
+      targetRole,
+      targetCompany,
+      jobDescription
+    );
+
+    res.status(200).json({
+      message: 'Resume re-analyzed successfully',
+      data: newAnalysis
+    });
+  } catch (error) {
+    logger.error('Reanalyze Resume Error', { error: error.message });
+    if (error.message.includes('not store extracted text')) {
+      return res.status(400).json({ error: error.message });
+    }
+    if (error.message === 'Analysis not found') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Failed to re-analyze resume. ' + error.message });
+  }
 };

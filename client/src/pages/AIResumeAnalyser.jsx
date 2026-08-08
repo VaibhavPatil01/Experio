@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UploadCloud, FileText, Briefcase, Building, AlignLeft, 
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
-  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch
+  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye
 } from 'lucide-react';
 import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
 import axios from 'axios';
@@ -20,6 +20,66 @@ const AIResumeAnalyser = () => {
   
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
+  
+  const [history, setHistory] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+
+  // Fetch history on mount
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      setIsLoadingHistory(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/resume-analyzer/history`,
+        { withCredentials: true }
+      );
+      setHistory(response.data.data);
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const handleReopen = (historyItem) => {
+    setResult(historyItem);
+    setTargetRole(historyItem.target.role);
+    setTargetCompany(historyItem.target.company || '');
+    setJobDescription(historyItem.target.jobDescription || '');
+    toast.success('Loaded past analysis');
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleReanalyze = async (historyItem) => {
+    setIsAnalyzing(true);
+    setResult(null);
+    setTargetRole(historyItem.target.role);
+    setTargetCompany(historyItem.target.company || '');
+    
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/resume-analyzer/${historyItem._id}/reanalyze`,
+        {
+          targetRole: historyItem.target.role,
+          targetCompany: historyItem.target.company,
+          jobDescription: historyItem.target.jobDescription
+        },
+        { withCredentials: true }
+      );
+      setResult(response.data.data);
+      fetchHistory(); // Refresh history
+      toast.success('Resume re-analyzed successfully!');
+    } catch (error) {
+      console.error('Error re-analyzing resume:', error);
+      toast.error(error.response?.data?.error || 'Failed to re-analyze resume.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -79,6 +139,7 @@ const AIResumeAnalyser = () => {
       );
 
       setResult(response.data.data);
+      fetchHistory(); // Refresh history
       toast.success('Resume analyzed successfully!');
     } catch (error) {
       console.error('Error analyzing resume:', error);
@@ -241,6 +302,69 @@ const AIResumeAnalyser = () => {
                       </>
                     )}
                   </button>
+                </div>
+
+                {/* History Section */}
+                <div className="mt-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <History className="w-5 h-5 text-gray-500" />
+                    <h3 className="font-bold text-gray-900 dark:text-white text-lg">Past Analyses</h3>
+                  </div>
+                  
+                  {isLoadingHistory ? (
+                    <div className="flex justify-center py-6">
+                      <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                    </div>
+                  ) : history.length === 0 ? (
+                    <div className="bg-gray-50 dark:bg-[#252525] rounded-xl p-6 text-center border border-gray-200 dark:border-gray-800">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">No past analyses found.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                      {history.map((item) => (
+                        <div key={item._id} className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">{item.target.role}</h4>
+                              <p className="text-xs text-gray-500">{item.target.company || 'General'}</p>
+                            </div>
+                            {item.status === 'completed' && item.result?.scores?.overallScore && (
+                              <span className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded text-xs font-bold">
+                                {item.result.scores.overallScore}%
+                              </span>
+                            )}
+                            {item.status === 'failed' && (
+                              <span className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 px-2 py-0.5 rounded text-xs font-bold">
+                                Failed
+                              </span>
+                            )}
+                          </div>
+                          
+                          <p className="text-xs text-gray-400 mb-3">
+                            {new Date(item.createdAt).toLocaleDateString()} • {item.resumeMetadata?.originalName || 'Resume'}
+                          </p>
+
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleReopen(item)}
+                              disabled={item.status !== 'completed'}
+                              className="flex-1 py-1.5 px-3 bg-gray-50 hover:bg-gray-100 dark:bg-[#252525] dark:hover:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Eye className="w-3.5 h-3.5" /> View
+                            </button>
+                            <button 
+                              onClick={() => handleReanalyze(item)}
+                              disabled={!item.resumeMetadata?.extractedText || isAnalyzing}
+                              className="flex-1 py-1.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={!item.resumeMetadata?.extractedText ? 'Resume text not stored for this analysis.' : 'Re-analyze with latest AI'}
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" /> Re-analyze
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
             </div>
