@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import arrowImage from '../../../assets/images/icons/arrow-Photoroom.svg';
+import arrowSvgContent from '../../../assets/images/icons/arrow-Photoroom.svg?raw';
 
 const PracticePromoCard = () => {
   return (
@@ -16,9 +16,10 @@ const PracticePromoCard = () => {
       </button>
 
       {/* Background decoration */}
-      <div className="absolute right-0 bottom-0 pointer-events-none opacity-80">
-        <img src={arrowImage} alt="" className="w-32 h-auto" />
-      </div>
+      <div 
+        className="absolute right-0 bottom-0 pointer-events-none opacity-80 text-primary [&>svg]:w-32 [&>svg]:h-auto"
+        dangerouslySetInnerHTML={{ __html: arrowSvgContent }}
+      />
     </div>
   );
 };
