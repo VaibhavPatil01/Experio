@@ -97,7 +97,7 @@ function SettingsPage() {
                   />
                 </div>
                 <div className="mt-2">
-                  <button type="submit" className="bg-primary hover:bg-primary/95 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
+                  <button type="submit" className="cursor-pointer bg-primary hover:bg-primary/95 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
                     Update Password
                   </button>
                 </div>
@@ -119,7 +119,7 @@ function SettingsPage() {
                 {/* Green Option */}
                 <button 
                   onClick={() => setSelectedThemeColor('green')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all shadow-sm ${selectedThemeColor === 'green' ? 'border-green-600 bg-green-50 dark:bg-green-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-green-600 bg-green-50 dark:bg-green-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
                   <div className="w-10 h-10 rounded-full bg-[#00a63e]"></div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Green</span>
@@ -128,7 +128,7 @@ function SettingsPage() {
                 {/* Blue Option */}
                 <button 
                   onClick={() => setSelectedThemeColor('blue')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all shadow-sm ${selectedThemeColor === 'blue' ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'blue' ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
                   <div className="w-10 h-10 rounded-full bg-[#2563eb]"></div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Blue</span>
@@ -137,7 +137,7 @@ function SettingsPage() {
                 {/* Red Option */}
                 <button 
                   onClick={() => setSelectedThemeColor('red')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all shadow-sm ${selectedThemeColor === 'red' ? 'border-red-600 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'red' ? 'border-red-600 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
                   <div className="w-10 h-10 rounded-full bg-[#dc2626]"></div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Red</span>
@@ -160,7 +160,7 @@ function SettingsPage() {
                     Once you delete your account, there is no going back. All your data, profile information, and posts will be permanently deleted.
                   </p>
                 </div>
-                <button className="flex items-center justify-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 rounded-lg font-medium transition-colors shrink-0 shadow-sm">
+                <button className="cursor-pointer flex items-center justify-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 rounded-lg font-medium transition-colors shrink-0">
                   <Trash2 className="w-4 h-4" />
                   Delete Account
                 </button>
