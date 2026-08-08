@@ -108,11 +108,8 @@ describe('GeminiAnalyzerService', () => {
       
       const promise = GeminiAnalyzerService.generateStructuredAnalysis('mock prompt');
       
-      // Fast forward the backoff timeouts
-      await Promise.resolve(); // flush microtasks
-      jest.advanceTimersByTime(2500); // Attempt 1 delay
-      await Promise.resolve(); // flush microtasks
-      jest.advanceTimersByTime(5000); // Attempt 2 delay
+      // Fast forward the backoff timeouts using the async version for Promises
+      await jest.advanceTimersByTimeAsync(10000);
       
       const result = await promise;
       

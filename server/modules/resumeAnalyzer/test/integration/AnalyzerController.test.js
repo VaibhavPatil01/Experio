@@ -2,17 +2,18 @@ import request from 'supertest';
 import { jest } from '@jest/globals';
 import express from 'express';
 import mongoose from 'mongoose';
-import router from '../../routes/analyzerRoutes.js';
 
 // Create a test app
 const app = express();
 app.use(express.json());
-// Mock auth middleware - force user 'test-user-123'
-app.use((req, res, next) => {
-  req.authTokenData = { id: 'test-user-123' };
-  next();
-});
-app.use('/api/resume-analysis', router);
+
+// Mock auth middleware
+jest.unstable_mockModule('../../../../middleware/isUserAuth.js', () => ({
+  default: (req, res, next) => {
+    req.authTokenData = { id: 'test-user-123' };
+    next();
+  }
+}));
 
 // Mock the repository
 const mockFindByUserId = jest.fn();
@@ -45,10 +46,18 @@ jest.unstable_mockModule('../../services/ResumeAnalysisOrchestrator.js', () => (
 
 describe('AnalyzerController Integration', () => {
   let orchestrator;
+  let isRouterLoaded = false;
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockModelUpdateMany.mockResolvedValue({ modifiedCount: 0 });
     orchestrator = (await import('../../services/ResumeAnalysisOrchestrator.js')).default;
+    
+    if (!isRouterLoaded) {
+      const router = (await import('../../routes/analyzerRoutes.js')).default;
+      app.use('/api/resume-analysis', router);
+      isRouterLoaded = true;
+    }
   });
 
   describe('POST /analyze', () => {
@@ -85,6 +94,7 @@ describe('AnalyzerController Integration', () => {
 
   describe('GET /history', () => {
     it('should return empty array if no history', async () => {
+      mockFindByUserId.mockResolvedValue([]);
       const res = await request(app).get('/api/resume-analysis/history');
       expect(res.status).toBe(200);
       expect(res.body.data).toEqual([]);

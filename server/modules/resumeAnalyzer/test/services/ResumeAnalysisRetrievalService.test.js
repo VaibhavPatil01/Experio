@@ -12,8 +12,15 @@ jest.unstable_mockModule('../../../../configs/qdrant.js', () => ({
 
 const mockGenerateEmbedding = jest.fn();
 jest.unstable_mockModule('../../../../ai/embeddingService.js', () => ({
-  default: {
+  EmbeddingService: {
     generateEmbedding: mockGenerateEmbedding
+  }
+}));
+
+const mockPostFind = jest.fn();
+jest.unstable_mockModule('../../../../models/Post.js', () => ({
+  Post: {
+    find: mockPostFind
   }
 }));
 
@@ -26,6 +33,25 @@ describe('ResumeAnalysisRetrievalService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPostFind.mockReturnValue({
+      lean: jest.fn().mockResolvedValue([
+        {
+          _id: '123',
+          title: 'SDE at Google',
+          company: 'Google',
+          role: 'SDE',
+          technologies: ['React'],
+          rounds: [],
+          overallTips: 'Practice LeetCode'
+        },
+        {
+          _id: '999',
+          title: 'SDE at Amazon',
+          company: 'Amazon',
+          role: 'SDE'
+        }
+      ])
+    });
   });
 
   describe('retrieveRelevantExperiences', () => {
@@ -37,6 +63,7 @@ describe('ResumeAnalysisRetrievalService', () => {
           id: '123', 
           score: 0.85, 
           payload: { 
+            mongoId: '123',
             title: 'SDE at Google', 
             company: 'Google',
             role: 'SDE',
@@ -44,14 +71,28 @@ describe('ResumeAnalysisRetrievalService', () => {
           }
         }
       ]);
+      
+      mockPostFind.mockReturnValueOnce({
+        lean: jest.fn().mockResolvedValue([
+          {
+            _id: '123',
+            title: 'SDE at Google',
+            company: 'Google',
+            role: 'SDE',
+            technologies: ['React'],
+            rounds: [],
+            overallTips: 'Practice LeetCode'
+          }
+        ])
+      });
 
       const targetFacts = { role: 'Software Engineer', company: 'Google' };
       const candidateFacts = { profile: { skills: ['React'] } };
 
       const result = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences(targetFacts, candidateFacts);
       
-      expect(mockGenerateEmbedding).toHaveBeenCalledTimes(1);
-      expect(mockSearch).toHaveBeenCalledTimes(1);
+      expect(mockGenerateEmbedding).toHaveBeenCalledTimes(2);
+      expect(mockSearch).toHaveBeenCalledTimes(2);
       expect(result.isUnavailable).toBe(false);
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].experienceId).toBe('123');
@@ -80,19 +121,25 @@ describe('ResumeAnalysisRetrievalService', () => {
           id: '999', 
           score: 0.9, 
           payload: { 
+            mongoId: '999',
             title: 'SDE', 
             company: 'Amazon',
-            role: 'SDE',
-            content: massiveString
+            role: 'SDE'
           }
         }
       ]);
+      
+      mockPostFind.mockReturnValue({
+        lean: jest.fn().mockResolvedValue([
+          { _id: '999', title: 'SDE at Amazon', company: 'Amazon', role: 'SDE', overallTips: massiveString }
+        ])
+      });
 
       const result = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences({ role: 'SDE' }, {});
       
       // Ensure the content was truncated
-      expect(result.experiences[0].relevantContext.length).toBeLessThan(5000);
-      expect(result.experiences[0].relevantContext.endsWith('...')).toBe(true);
+      expect(result.experiences[0].candidateAdvice.length).toBeLessThan(5000);
+      expect(result.experiences[0].candidateAdvice.endsWith('...')).toBe(true);
     });
 
     it('should filter out duplicate experiences', async () => {
@@ -100,9 +147,15 @@ describe('ResumeAnalysisRetrievalService', () => {
       
       // Return the same payload ID twice
       mockSearch.mockResolvedValue([
-        { id: '123', score: 0.8, payload: { title: 'A', company: 'B', role: 'C', content: 'D' } },
-        { id: '123', score: 0.7, payload: { title: 'A', company: 'B', role: 'C', content: 'D' } }
+        { id: '123', score: 0.8, payload: { mongoId: '123', title: 'A', company: 'B', role: 'C' } },
+        { id: '123', score: 0.7, payload: { mongoId: '123', title: 'A', company: 'B', role: 'C' } }
       ]);
+      
+      mockPostFind.mockReturnValue({
+        lean: jest.fn().mockResolvedValue([
+          { _id: '123', title: 'A', company: 'B', role: 'C' }
+        ])
+      });
 
       const result = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences({ role: 'SDE' }, {});
       

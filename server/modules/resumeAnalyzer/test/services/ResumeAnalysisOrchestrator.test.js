@@ -1,5 +1,4 @@
 import { jest } from '@jest/globals';
-import ResumeAnalysisOrchestrator from '../../services/ResumeAnalysisOrchestrator.js';
 import ResumeAnalysisError, { ErrorCategories } from '../../errors/ResumeAnalysisError.js';
 
 // Mock all internal services so we can test just the orchestrator flow
@@ -26,7 +25,7 @@ jest.unstable_mockModule('../../services/GeminiAnalyzerService.js', () => ({
 const mockCreateAnalysis = jest.fn();
 const mockUpdateStatus = jest.fn();
 const mockSaveResult = jest.fn();
-const mockCheckDuplicate = jest.fn();
+const mockModelFindOne = jest.fn();
 
 jest.unstable_mockModule('../../repositories/ResumeAnalysisRepository.js', () => {
   return {
@@ -34,13 +33,17 @@ jest.unstable_mockModule('../../repositories/ResumeAnalysisRepository.js', () =>
       createAnalysis: mockCreateAnalysis,
       updateStatus: mockUpdateStatus,
       saveResult: mockSaveResult,
-      checkDuplicate: mockCheckDuplicate
+      model: {
+        findOne: () => ({ sort: mockModelFindOne }),
+        findByIdAndUpdate: jest.fn().mockResolvedValue({ _id: 'analysis123' })
+      }
     }))
   };
 });
 
 describe('ResumeAnalysisOrchestrator', () => {
   let docExtractionService, contextBuilder, retrievalService, promptBuilder, geminiService;
+  let ResumeAnalysisOrchestrator;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -49,15 +52,16 @@ describe('ResumeAnalysisOrchestrator', () => {
     retrievalService = (await import('../../services/ResumeAnalysisRetrievalService.js')).default;
     promptBuilder = (await import('../../services/AnalyzerPromptBuilder.js')).default;
     geminiService = (await import('../../services/GeminiAnalyzerService.js')).default;
+    ResumeAnalysisOrchestrator = (await import('../../services/ResumeAnalysisOrchestrator.js')).default;
   });
 
   describe('executeAnalysis', () => {
     it('should successfully orchestrate a full analysis pipeline', async () => {
       // Mock all the steps
       mockCreateAnalysis.mockResolvedValue({ _id: 'analysis123' });
-      mockCheckDuplicate.mockResolvedValue(null);
+      mockModelFindOne.mockResolvedValue(null);
       
-      docExtractionService.extractText.mockResolvedValue({ text: 'My resume text', fileHash: 'hash123' });
+      docExtractionService.extractText.mockResolvedValue({ text: 'My resume text', metadata: { fileHash: 'hash123' } });
       contextBuilder.buildUserProfileContext.mockResolvedValue({ name: 'Test User' });
       
       retrievalService.retrieveRelevantExperiences.mockResolvedValue({ experiences: [] });
@@ -93,7 +97,7 @@ describe('ResumeAnalysisOrchestrator', () => {
         );
         fail('Should have thrown an error');
       } catch (error) {
-        expect(mockUpdateStatus).toHaveBeenCalledWith('analysis123', 'failed', expect.any(Object));
+        expect(mockUpdateStatus).toHaveBeenCalledWith('analysis123', 'failed', expect.any(String));
       }
     });
   });

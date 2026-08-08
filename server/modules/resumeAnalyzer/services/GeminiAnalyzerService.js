@@ -136,8 +136,11 @@ export default class GeminiAnalyzerService {
       }
 
       try {
-        const parsedResponse = JSON.parse(response.text);
-        
+        let cleanText = response.text.trim();
+        if (cleanText.startsWith('```')) {
+          cleanText = cleanText.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
+        }
+        const parsedResponse = JSON.parse(cleanText);
         // Basic validation to ensure schema was adhered to
         if (!parsedResponse.overallAssessment || !parsedResponse.scores) {
            throw new Error("Invalid schema structure returned from Gemini");
