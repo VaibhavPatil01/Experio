@@ -7,6 +7,10 @@ import ResumeAnalysisRepository from '../repositories/ResumeAnalysisRepository.j
 import ResumeAnalysisRetrievalService from './ResumeAnalysisRetrievalService.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
+import { withExponentialBackoff } from '../../../utils/retry.js';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 const repository = new ResumeAnalysisRepository();
 
@@ -143,7 +147,7 @@ export default class ResumeAnalysisOrchestrator {
       
       logger.info('result_validation_completed', { requestId, analysisId: analysisDoc._id, userId, validationStatus: 'SUCCESS' });
 
-      // 7. Persist and Finalize
+      // 7. Persist and Finalize (With Rescue Backup)
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
         modelUsed: 'gemini-1.5-pro',
@@ -153,7 +157,30 @@ export default class ResumeAnalysisOrchestrator {
         aiDuration: Math.round(aiDuration)
       };
 
-      analysisDoc = await repository.saveResult(analysisDoc._id, analysisJson, executionInfo);
+      try {
+        analysisDoc = await withExponentialBackoff(
+          () => repository.saveResult(analysisDoc._id, analysisJson, executionInfo),
+          { maxRetries: 3, baseDelayMs: 1000 }
+        );
+      } catch (dbError) {
+        // FATAL: The AI generated successfully but the database is down.
+        // Rescue the expensive AI generation to disk so it is not lost.
+        const rescuePath = path.join(os.tmpdir(), `resume_rescue_${analysisDoc._id}.json`);
+        fs.writeFileSync(rescuePath, JSON.stringify(analysisJson, null, 2));
+        
+        logger.error('CRITICAL: Database failed to save AI results. Generation rescued to disk.', {
+          requestId,
+          analysisId: analysisDoc._id,
+          rescuePath,
+          error: dbError.message
+        });
+
+        throw new ResumeAnalysisError(
+          ErrorCategories.DATABASE_ERROR,
+          'Your resume was analyzed, but a server error prevented saving the results. Our team has been notified.',
+          { originalError: dbError.message, rescuePath }
+        );
+      }
       
       logger.info('analysis_persisted', { requestId, analysisId: analysisDoc._id, userId });
       logger.info('analysis_completed', { 
@@ -289,7 +316,7 @@ export default class ResumeAnalysisOrchestrator {
         relevantExperiences.experiences || []
       );
 
-      // 7. Persist
+      // 7. Persist (With Rescue Backup)
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
         modelUsed: 'gemini-1.5-pro',
@@ -299,7 +326,22 @@ export default class ResumeAnalysisOrchestrator {
         aiDuration: Math.round(aiDuration)
       };
 
-      newAnalysisDoc = await repository.saveResult(newAnalysisDoc._id, analysisJson, executionInfo);
+      try {
+        newAnalysisDoc = await withExponentialBackoff(
+          () => repository.saveResult(newAnalysisDoc._id, analysisJson, executionInfo),
+          { maxRetries: 3, baseDelayMs: 1000 }
+        );
+      } catch (dbError) {
+        const rescuePath = path.join(os.tmpdir(), `resume_rescue_reanalyze_${newAnalysisDoc._id}.json`);
+        fs.writeFileSync(rescuePath, JSON.stringify(analysisJson, null, 2));
+        
+        throw new ResumeAnalysisError(
+          ErrorCategories.DATABASE_ERROR,
+          'Your resume was analyzed, but a server error prevented saving the results.',
+          { originalError: dbError.message, rescuePath }
+        );
+      }
+
       logger.info('Successfully saved Re-Analysis', { requestId, newAnalysisId: newAnalysisDoc._id });
 
       return newAnalysisDoc;

@@ -87,6 +87,17 @@ export const getHistory = async (req, res) => {
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10)); // Max 50 per page
     const skip = (page - 1) * limit;
 
+    // Lazy Cleanup: Identify jobs stuck in 'processing' for > 5 mins and fail them
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const staleDocs = await repository.model.updateMany(
+      { userId, status: 'processing', updatedAt: { $lt: fiveMinutesAgo } },
+      { $set: { status: 'failed', 'executionInfo.failureReason': 'Analysis timed out or server crashed during generation.' } }
+    );
+
+    if (staleDocs.modifiedCount > 0) {
+      logger.info(`Lazy cleanup: Marked ${staleDocs.modifiedCount} stale analysis jobs as failed for user ${userId}`);
+    }
+
     const history = await repository.findByUserId(userId, skip, limit);
     res.status(200).json({ data: history, page, limit });
   } catch (error) {
@@ -156,7 +167,53 @@ export const deleteAnalysis = async (req, res) => {
 };
 
 export const retryAnalysis = async (req, res) => {
-  return res.status(400).json({ error: 'Resume file is not persisted. Please upload your resume again to retry.' });
+  try {
+    const userId = req.authTokenData.id;
+    const analysisId = req.params.id;
+
+    // Fetch the existing failed analysis
+    const existingAnalysis = await repository.findByIdAndUser(analysisId, userId);
+    if (!existingAnalysis) {
+      return res.status(404).json({ error: 'Analysis not found' });
+    }
+
+    if (existingAnalysis.status === 'completed') {
+      return res.status(400).json({ error: 'This analysis is already completed. Use /reanalyze instead.' });
+    }
+
+    const { targetRole, targetCompany, jobDescription } = existingAnalysis.targetParams;
+
+    logger.info('Retrying failed resume analysis', { userId, analysisId, targetRole });
+
+    // Re-use executeReanalysis since it skips file upload and uses the persisted text
+    const newAnalysis = await ResumeAnalysisOrchestrator.executeReanalysis(
+      userId,
+      analysisId,
+      targetRole,
+      targetCompany,
+      jobDescription
+    );
+
+    res.status(200).json({
+      message: 'Resume retry successful',
+      data: newAnalysis
+    });
+  } catch (error) {
+    if (error instanceof ResumeAnalysisError) {
+      const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
+      return res.status(statusCode).json({ 
+        error: error.userMessage,
+        category: error.category
+      });
+    }
+
+    if (error.message.includes('not store extracted text')) {
+      return res.status(400).json({ error: 'Cannot retry: The original extracted text was not stored. Please upload the resume again.' });
+    }
+    
+    logger.error('Unhandled Retry Resume Error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'An unexpected internal error occurred during retry. Please try again later.' });
+  }
 };
 
 export const reanalyzeResume = async (req, res) => {

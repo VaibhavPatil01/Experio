@@ -126,14 +126,12 @@ export default class ResumeAnalysisRetrievalService {
         experiences: structuredCitations
       };
     } catch (error) {
-      if (error instanceof ResumeAnalysisError) {
-        throw error;
-      }
-      throw new ResumeAnalysisError(
-        ErrorCategories.QDRANT_ERROR,
-        'Failed to retrieve relevant interview experiences from the platform.',
-        { originalError: error.message }
-      );
+      logger.warn('Qdrant retrieval failed. Gracefully degrading pipeline to rely purely on candidate and target facts.', { error: error.message });
+      return {
+        isUnavailable: true,
+        fallbackNote: "Platform knowledge retrieval failed or is unavailable. Base your analysis on general industry knowledge and the provided Job Description.",
+        experiences: []
+      };
     }
   }
 

@@ -2,6 +2,7 @@ import { Type } from '@google/genai';
 import geminiClient from '../../../configs/gemini.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
+import { withExponentialBackoff } from '../../../utils/retry.js';
 
 export default class GeminiAnalyzerService {
   /**
@@ -93,19 +94,36 @@ export default class GeminiAnalyzerService {
 
       let response;
       try {
-        response = await geminiClient.models.generateContent({
-          model: 'gemini-1.5-pro',
-          contents: contents,
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: responseSchema,
-            temperature: 0.2, // Low temperature for consistent, analytical output
+        response = await withExponentialBackoff(
+          async () => {
+            return await geminiClient.models.generateContent({
+              model: 'gemini-1.5-pro',
+              contents: contents,
+              config: {
+                responseMimeType: 'application/json',
+                responseSchema: responseSchema,
+                temperature: 0.2,
+              }
+            });
+          },
+          {
+            maxRetries: 3,
+            baseDelayMs: 2000,
+            shouldRetry: (error) => {
+              const msg = error.message.toLowerCase();
+              // Do not retry 400 errors (bad request, invalid schema, prompt too large)
+              if (msg.includes('400') || msg.includes('bad request') || msg.includes('schema')) {
+                return false;
+              }
+              // Retry on 5xx, 429, timeouts, network drops
+              return true;
+            }
           }
-        });
+        );
       } catch (geminiError) {
         throw new ResumeAnalysisError(
           ErrorCategories.GEMINI_ERROR,
-          'Failed to connect to the AI analysis engine. Please try again later.',
+          'Failed to connect to the AI analysis engine after multiple attempts. Please try again later.',
           { originalError: geminiError.message }
         );
       }
@@ -138,11 +156,7 @@ export default class GeminiAnalyzerService {
       if (error instanceof ResumeAnalysisError) {
         throw error;
       }
-      if (retries > 0) {
-        logger.warn('Gemini parsing or validation failed, retrying...', { error: error.message });
-        return this.generateStructuredAnalysis(prompt, retries - 1);
-      }
-      logger.error('Failed to generate analysis from Gemini after retries', { error: error.message, stack: error.stack });
+      
       throw new ResumeAnalysisError(
         ErrorCategories.GEMINI_ERROR,
         'An unexpected error occurred during AI generation.',
