@@ -14,15 +14,13 @@ export default class ResumeAnalysisContextBuilder {
    * @param {string} resumeText
    * @returns {Promise<Object>} The strongly structured context object
    */
-  static async buildContext(userId, targetRole, targetCompany, jobDescription, resumeText) {
+  static buildContext(userId, targetRole, targetCompany, jobDescription, resumeText, userProfile, relevantExperiences) {
     try {
       const startTime = performance.now();
       
-      const userProfile = await this._buildUserProfileContext(userId);
-      
       const candidateFacts = {
         resumeText: resumeText || '',
-        profile: userProfile
+        profile: userProfile || {}
       };
       
       const targetFacts = {
@@ -30,8 +28,6 @@ export default class ResumeAnalysisContextBuilder {
         company: targetCompany || '',
         jobDescription: jobDescription || ''
       };
-
-      const relevantExperiences = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences(targetFacts, candidateFacts);
       
       const durationMs = Math.round(performance.now() - startTime);
       logger.info('Context preparation completed', { userId, durationMs });
@@ -54,8 +50,9 @@ export default class ResumeAnalysisContextBuilder {
 
   /**
    * Retrieves the user's existing profile data and carefully selects/normalizes useful fields.
+   * This is exported so the Orchestrator can call it concurrently with other operations.
    */
-  static async _buildUserProfileContext(userId) {
+  static async buildUserProfileContext(userId) {
     const user = await User.findById(userId).lean();
     if (!user) {
       logger.warn(`ContextBuilder: User not found for ID ${userId}`);
