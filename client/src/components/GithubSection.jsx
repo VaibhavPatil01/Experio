@@ -1,7 +1,9 @@
 import React from 'react';
 import { CodeXml, ShieldCheck, GitBranch, Lock, Users, ArrowUpRight, Star } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
-import githubIllustration from '../assets/images/icons/github_illustration.png';
+// import githubIllustration from '../assets/images/icons/github_illustration.png';
+import githubBlue from '../assets/images/icons/githubblue.png';
+import githubGreen from '../assets/images/icons/githubgreen.png';
 
 const FeatureItem = ({ icon, title, description, isLast }) => (
   <div className={`flex items-start gap-4 ${!isLast ? 'border-b border-primary/20 pb-5' : ''}`}>
@@ -16,6 +18,8 @@ const FeatureItem = ({ icon, title, description, isLast }) => (
 );
 
 const GithubSection = () => {
+  const theme = localStorage.getItem('primaryColor') || 'green';
+  const currentIllustration = theme === 'darkblue' ? githubBlue : githubGreen;
   return (
     <section className="w-full pt-20 pb-12 px-4 text-center">
       <div className="max-w-5xl mx-auto flex flex-col items-center justify-center">
@@ -90,9 +94,10 @@ const GithubSection = () => {
 
             {/* Right side Image */}
             <div className="w-full md:w-[55%] flex justify-center mt-8 md:mt-0">
-              <img
-                src={githubIllustration}
-                alt="GitHub Repository Overview"
+                {/* <img src={githubIllustration} alt="GitHub Repository Overview" /> */}
+                <img
+                  src={currentIllustration}
+                  alt="GitHub Repository Overview"
                 className="w-full max-w-2xl object-contain drop-shadow-sm transform md:scale-110"
               />
             </div>
