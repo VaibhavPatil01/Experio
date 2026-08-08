@@ -1,13 +1,12 @@
 import React from 'react';
 import DisplayQuill from '../../components/DisplayQuill';
-import { Clock, Tag, MessageSquare, AlertCircle, BookOpen, Banknote, Gift, TrendingUp, Briefcase, Star, Gauge } from 'lucide-react';
-import greenTickSvg from '../../assets/images/icons/greentick.svg';
+import { Clock, Tag, MessageSquare, AlertCircle, BookOpen, Banknote, Gift, TrendingUp, Briefcase, Star, Gauge, CheckCircle2 } from 'lucide-react';
 
 const PostContent = ({ activeTab, post }) => {
   if (!post) return null;
 
   const getDifficultyColor = (diff) => {
-    if (diff === 'Easy') return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+    if (diff === 'Easy') return 'bg-primary/10 text-primary border-primary/20';
     if (diff === 'Medium') return 'bg-orange-50 text-orange-600 border-orange-100';
     if (diff === 'Hard') return 'bg-red-50 text-red-500 border-red-100';
     return 'bg-gray-50 text-gray-600 border-gray-100';
@@ -82,13 +81,13 @@ const PostContent = ({ activeTab, post }) => {
                 {allQuestions.map((qGroup, idx) => (
                   <div key={idx} className="bg-gray-50 rounded-lg p-5 border border-gray-200">
                     <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                      <img src={greenTickSvg} alt="round" className="w-5 h-5" />
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
                       <span className="text-gray-500 font-medium">Round {qGroup.roundNum}:</span> {qGroup.roundType}
                     </h4>
                     <ul className="flex flex-col gap-3">
                       {qGroup.questions.map((q, qIdx) => (
                         <li key={qIdx} className="flex gap-3 items-center bg-white p-3 rounded-md border border-gray-100">
-                          <div className="w-6 h-6 rounded bg-green-50 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                          <div className="w-6 h-6 rounded bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                             Q{qIdx + 1}
                           </div>
                           <span className="text-gray-700 text-[15px] leading-relaxed">{q}</span>
@@ -117,7 +116,7 @@ const PostContent = ({ activeTab, post }) => {
                   {post.rounds.map((round, index) => (
                     <div key={index} className="flex gap-4 relative z-10">
                       <div className="mt-1 bg-white relative z-10 h-6 shrink-0 rounded-full">
-                        <img src={greenTickSvg} alt="" className="w-6 h-6" />
+                        <CheckCircle2 className="w-6 h-6 text-primary" fill="currentColor" stroke="white" />
                       </div>
                       <div className="flex-1 pb-2">
                         <div className="flex justify-between items-start gap-4 mb-3">
@@ -135,7 +134,7 @@ const PostContent = ({ activeTab, post }) => {
                                 </span>
                               )}
                               <span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap ${
-                                (round.difficulty || "Medium").toLowerCase() === 'easy' ? 'bg-green-50 text-green-600' :
+                                (round.difficulty || "Medium").toLowerCase() === 'easy' ? 'bg-primary/10 text-primary' :
                                 (round.difficulty || "Medium").toLowerCase() === 'hard' ? 'bg-red-50 text-red-600' :
                                 'bg-orange-50 text-orange-600'
                               }`}>
@@ -215,7 +214,7 @@ const PostContent = ({ activeTab, post }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <section className="bg-white border border-gray-200 rounded-lg p-5">
                   <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <Banknote className="w-5 h-5 text-green-600" /> Base Salary
+                    <Banknote className="w-5 h-5 text-primary" /> Base Salary
                   </h4>
                   <p className="text-gray-700 text-lg font-bold">{post.salary.base || "N/A"} {post.salary.base && post.salary.base !== 'N/A' && !isNaN(post.salary.base) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
                 </section>
@@ -233,7 +232,7 @@ const PostContent = ({ activeTab, post }) => {
                 </section>
                 <section className="bg-white border border-gray-200 rounded-lg p-5">
                   <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-emerald-600" /> Total CTC
+                    <Briefcase className="w-5 h-5 text-primary" /> Total CTC
                   </h4>
                   <p className="text-gray-700 text-xl font-bold">{post.salary.totalCTC || "N/A"} {post.salary.totalCTC && post.salary.totalCTC !== 'N/A' && !isNaN(post.salary.totalCTC) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
                 </section>

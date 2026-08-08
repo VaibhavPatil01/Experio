@@ -1,10 +1,10 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import arrowImage from '../../../assets/images/icons/arrow-Photoroom.png';
+import arrowImage from '../../../assets/images/icons/arrow-Photoroom.svg';
 
 const PracticePromoCard = () => {
   return (
-    <div className="bg-green-50 rounded-lg border border-green-100 p-5 mb-4 overflow-hidden relative">
+    <div className="bg-primary/10 rounded-lg border border-primary/20 p-5 mb-4 overflow-hidden relative">
       <h3 className="text-lg font-bold text-gray-900 mb-2 relative z-10">Practice for your next interview</h3>
       <p className="text-gray-600 text-[13px] mb-5 relative z-10 leading-relaxed max-w-[80%]">
         Explore curated resources and mock interviews tailored for Google.

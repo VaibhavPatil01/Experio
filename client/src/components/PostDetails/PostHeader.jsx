@@ -58,7 +58,7 @@ const PostHeader = ({ post, postId, isEditable, openDeleteModal }) => {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-2xl font-bold text-gray-900">{post.company || 'Google'}</h2>
-              <BadgeCheck className="w-6 h-6 text-emerald-500" fill="currentColor" stroke="white" />
+              <BadgeCheck className="w-6 h-6 text-primary" fill="currentColor" stroke="white" />
             </div>
             <p className="text-gray-800 font-semibold">{post.role || post.title || 'Software Engineer Intern'}</p>
           </div>
@@ -66,11 +66,11 @@ const PostHeader = ({ post, postId, isEditable, openDeleteModal }) => {
 
         {/* Right Side: Match % & Actions */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+          <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">
             92% Match
           </span>
           <button 
-            className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
             onClick={handleBookmarkClick}
             disabled={bookmarkMutation.isLoading}
           >
@@ -161,9 +161,9 @@ const PostHeader = ({ post, postId, isEditable, openDeleteModal }) => {
           <MapPin className="w-4 h-4 text-gray-500" />
           <span className="font-medium">{post.hiringType || 'On Campus'}</span>
         </div>
-        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
-          <Calendar className="w-4 h-4 text-gray-500" />
-          <span className="font-medium">{post.interviewDate || 'May 2024'}</span>
+        <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+          <Calendar className="w-4 h-4 text-primary" />
+          <span className="font-medium text-primary">{post.interviewDate || 'May 2024'}</span>
         </div>
       </div>
     </div>

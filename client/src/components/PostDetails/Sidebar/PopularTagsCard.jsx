@@ -16,8 +16,8 @@ const PopularTagsCard = ({ post }) => {
       <div className="flex flex-wrap gap-2">
         {tags.slice(0, 10).map((tag, idx) => (
           <span 
-            key={idx} 
-            className="bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-[12px] font-semibold hover:bg-green-100 cursor-pointer transition-colors"
+            key={idx}
+            className="bg-primary/10 text-primary px-3 py-1.5 rounded-full text-[12px] font-semibold hover:bg-primary/20 cursor-pointer transition-colors"
           >
             {tag}
           </span>

@@ -43,20 +43,20 @@ const PostAuthorCard = ({ post }) => {
       
       <div className="flex items-center justify-center gap-5 py-2 mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-[#ecfdf3] flex items-center justify-center shrink-0">
-            <SquarePen className="w-3.5 h-3.5 text-[#039855]" strokeWidth={2.5} />
+          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <SquarePen className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
           </div>
           <span className="text-[12.5px] text-[#475467] font-medium leading-tight">
-            <span className="text-[#039855] font-bold text-[13.5px]">{contributions}</span> contributions
+            <span className="text-primary font-bold text-[13.5px]">{contributions}</span> contributions
           </span>
         </div>
         <div className="w-px h-6 bg-gray-200"></div>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-[#ecfdf3] flex items-center justify-center shrink-0">
-            <Calendar className="w-3.5 h-3.5 text-[#039855]" strokeWidth={2.5} />
+          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <Calendar className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
           </div>
           <span className="text-[12.5px] text-[#475467] font-medium leading-tight whitespace-nowrap">
-            Joined <span className="text-[#039855] font-bold text-[13.5px]">{joinedDate}</span>
+            Joined <span className="text-primary font-bold text-[13.5px]">{joinedDate}</span>
           </span>
         </div>
       </div>

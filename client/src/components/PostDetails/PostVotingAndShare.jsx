@@ -59,7 +59,7 @@ const PostVotingAndShare = ({ post }) => {
             disabled={upvoteMutation.isLoading}
             className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors font-medium text-sm cursor-pointer ${
               post?.isUpVoted 
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                ? 'bg-primary/10 border-primary/20 text-primary' 
                 : 'border-gray-200 text-gray-700 hover:bg-gray-50'
             }`}
           >
