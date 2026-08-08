@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { searchUser } from '../services/userServices.js';
 import { Helmet } from 'react-helmet';
-import { Users, ArrowUp, Search } from 'lucide-react';
+import { Users, ArrowUp, Search, Calendar } from 'lucide-react';
 import userListImage from '../assets/images/pages/user-list.png';
 
 function UserSearch() {
@@ -140,12 +140,12 @@ function UserSearch() {
                           key={user._id}
                           className="hover:bg-blue-50 transition duration-150 even:bg-gray-50 border-b border-gray-100 last:border-0"
                         >
-                          <td className="p-4 pl-7">
+                          <td className="px-4 py-2 pl-7">
                             <Link
                               to={`/profile/${user._id}`}
                               className="flex items-center gap-3 group"
                             >
-                              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0 border border-gray-200">
+                              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 shrink-0 border border-gray-200">
                                 {user.profilePicture ? (
                                   <img 
                                     src={user.profilePicture} 
@@ -168,7 +168,7 @@ function UserSearch() {
                               </div>
                             </Link>
                           </td>
-                          <td className="p-4 hidden md:table-cell text-gray-600">
+                          <td className="px-4 py-2 hidden md:table-cell text-gray-600">
                             {(() => {
                               const primaryExp = user.workExperiences?.find(exp => exp.isCurrentlyWorking) || user.workExperiences?.[0];
                               const designationToDisplay = primaryExp?.jobTitle || (user.designation !== 'NA' ? user.designation : null);
@@ -178,12 +178,19 @@ function UserSearch() {
                               return <span className="text-gray-400 italic">Student</span>;
                             })()}
                           </td>
-                          <td className="p-4 hidden md:table-cell text-gray-600">
-                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
-                            }) : (
+                          <td className="px-4 py-2 hidden md:table-cell text-gray-600">
+                            {user.createdAt ? (
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-emerald-600" />
+                                <span>
+                                  {new Date(user.createdAt).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
+                                </span>
+                              </div>
+                            ) : (
                               <span className="text-gray-400 italic">Unknown</span>
                             )}
                           </td>
