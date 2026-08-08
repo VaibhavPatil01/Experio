@@ -107,6 +107,8 @@ export const searchUserService = (
         designation: 1,
         passingYear: 1,
         branch: 1,
+        profilePicture: 1,
+        createdAt: 1,
       },
     },
   ]);

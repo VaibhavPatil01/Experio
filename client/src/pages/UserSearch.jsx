@@ -123,10 +123,9 @@ function UserSearch() {
                 <table className="w-full text-md text-left bg-white shadow-md rounded-lg overflow-hidden ">
                   <thead className="bg-primary text-white">
                     <tr>
-                      <th className="p-4 pl-7">Username</th>
+                      <th className="p-4 pl-7">User</th>
                       <th className="p-4 hidden md:table-cell">Designation</th>
-                      <th className="p-4 hidden md:table-cell">Branch</th>
-                      <th className="p-4 hidden md:table-cell">Passing Year</th>
+                      <th className="p-4 hidden md:table-cell">Joined On</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -135,19 +134,45 @@ function UserSearch() {
                       .map((user) => (
                         <tr
                           key={user._id}
-                          className="hover:bg-blue-50 transition duration-150 even:bg-gray-50"
+                          className="hover:bg-blue-50 transition duration-150 even:bg-gray-50 border-b border-gray-100 last:border-0"
                         >
                           <td className="p-4 pl-7">
                             <Link
                               to={`/profile/${user._id}`}
-                              className="text-primary hover:underline font-medium"
+                              className="flex items-center gap-3 group"
                             >
-                              {user.username}
+                              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0 border border-gray-200">
+                                {user.profilePicture ? (
+                                  <img 
+                                    src={user.profilePicture} 
+                                    alt={user.username} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-lg">
+                                    {user.username?.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <span className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                                {user.username}
+                              </span>
                             </Link>
                           </td>
-                          <td className="p-4 hidden md:table-cell">{user.designation}</td>
-                          <td className="p-4 hidden md:table-cell">{user.branch}</td>
-                          <td className="p-4 hidden md:table-cell">{user.passingYear}</td>
+                          <td className="p-4 hidden md:table-cell text-gray-600">
+                            {user.designation && user.designation !== 'NA' ? user.designation : (
+                              <span className="text-gray-400 italic">Not specified</span>
+                            )}
+                          </td>
+                          <td className="p-4 hidden md:table-cell text-gray-600">
+                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            }) : (
+                              <span className="text-gray-400 italic">Unknown</span>
+                            )}
+                          </td>
                         </tr>
                       ))}
                   </tbody>
