@@ -12,7 +12,18 @@ function SettingsPage() {
     confirmPassword: ''
   });
   
-  const [selectedThemeColor, setSelectedThemeColor] = useState('green'); // default
+  const [selectedThemeColor, setSelectedThemeColor] = useState(
+    localStorage.getItem('primaryColor') || 'green'
+  );
+
+  const handleThemeChange = (colorKey) => {
+    setSelectedThemeColor(colorKey);
+    const colorHex = colorKey === 'green' ? '#00a63e' : '#002E7D';
+    const dullColorHex = colorKey === 'green' ? '#dcfce7' : '#e0e7ff'; // light green vs light blue
+    document.documentElement.style.setProperty('--color-primary', colorHex);
+    document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
+    localStorage.setItem('primaryColor', colorKey);
+  };
 
   const handlePasswordChange = (e) => {
     setPasswords({
@@ -118,29 +129,20 @@ function SettingsPage() {
               <div className="flex gap-4">
                 {/* Green Option */}
                 <button 
-                  onClick={() => setSelectedThemeColor('green')}
-                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-green-600 bg-green-50 dark:bg-green-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  onClick={() => handleThemeChange('green')}
+                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-[#00a63e] bg-[#00a63e]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
                   <div className="w-10 h-10 rounded-full bg-[#00a63e]"></div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Green</span>
                 </button>
                 
-                {/* Blue Option */}
+                {/* Dark Blue Option */}
                 <button 
-                  onClick={() => setSelectedThemeColor('blue')}
-                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'blue' ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  onClick={() => handleThemeChange('darkblue')}
+                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'darkblue' ? 'border-[#002E7D] bg-[#002E7D]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#2563eb]"></div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Blue</span>
-                </button>
-
-                {/* Red Option */}
-                <button 
-                  onClick={() => setSelectedThemeColor('red')}
-                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'red' ? 'border-red-600 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#dc2626]"></div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Red</span>
+                  <div className="w-10 h-10 rounded-full bg-[#002E7D]"></div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Dark Blue</span>
                 </button>
               </div>
             </div>

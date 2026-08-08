@@ -43,6 +43,15 @@ const App = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Load primary theme color on mount
+  useEffect(() => {
+    const savedColor = localStorage.getItem('primaryColor') || 'green';
+    const colorHex = savedColor === 'green' ? '#00a63e' : '#002E7D';
+    const dullColorHex = savedColor === 'green' ? '#dcfce7' : '#e0e7ff';
+    document.documentElement.style.setProperty('--color-primary', colorHex);
+    document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
+  }, []);
+
   if (isLoading) {
     return <Loading />;
   }
