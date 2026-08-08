@@ -23,7 +23,7 @@ const Footer = () => {
                 <Logo className="w-32 sm:w-40 h-auto text-primary" />
               </a>
               <p className="text-sm/6 text-neutral-600">
-                Mozify is a student-led platform empowering peers with firsthand insights into interviews across diverse companies and roles. By contributing and engaging, users foster a culture of collaboration and growth.
+                Experio is a student-led platform empowering peers with firsthand insights into interviews across diverse companies and roles. By contributing and engaging, users foster a culture of collaboration and growth.
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Labore modi beatae veritatis. Consequuntur id magni consectetur eaque obcaecati. Quisquam inventore id minima ratione nisi aliquam quam, quod deserunt. Sit labore, praesentium omnis nesciunt fugiat quasi reprehenderit quisquam veritatis nisi dignissimos facere qui ut enim provident nihil, magnam velit animi unde?
               </p>
               <div className="flex gap-5 md:gap-6 order-1 md:order-2">
@@ -75,14 +75,14 @@ const Footer = () => {
           </div>
 
           <div className="max-w-7xl mx-auto mt-6 pt-2 border-t border-neutral-300 flex justify-between items-center z-10 relative">
-            <p className="text-neutral-600 text-sm">Copyright © 2025 Mozify.</p>
+            <p className="text-neutral-600 text-sm">Copyright © 2025 Experio.</p>
             <p className="text-sm text-neutral-600">Built with ♡ by Vaibhav Patil</p>
           </div>
 
           <div className="relative mt-2 z-0">
             <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-3xl h-full max-h-64 bg-slate-100 rounded-full blur-[100px] pointer-events-none"></div>
             <h1 className="text-center font-extrabold leading-[0.7] text-transparent text-[clamp(4rem,15vw,15rem)] [-webkit-text-stroke:1px_#D4D4D4] relative z-10">
-              Mozify
+              Experio
             </h1>
           </div>
         </footer>
