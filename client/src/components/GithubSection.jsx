@@ -100,6 +100,16 @@ const GithubSection = () => {
               <svg className="absolute -bottom-8 right-16 w-5 h-5 text-primary/90" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C12 0 12 10.5 24 12C24 12 12 13.5 12 24C12 24 12 13.5 0 12C0 12 12 10.5 12 0Z" /></svg>
 
               <div className="relative w-full max-w-[380px] mx-auto mt-2">
+                {/* Left Dashed String (Anchored Top-Left) */}
+                <svg className="absolute -left-24 top-0 w-40 h-32 pointer-events-none text-slate-300 z-0 overflow-visible" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5 5" strokeLinecap="round">
+                  <path d="M 0 60 C 40 120, 90 90, 100 50" />
+                </svg>
+
+                {/* Right Dashed String (Anchored Bottom-Right) */}
+                <svg className="absolute -right-20 -bottom-8 w-48 h-72 pointer-events-none text-slate-300 z-0 overflow-visible" viewBox="0 0 150 200" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5 5" strokeLinecap="round">
+                  <path d="M -10 160 C 60 260, 170 200, 140 80 C 120 0, 140 -50, 160 -100" />
+                </svg>
+
                 {/* Floating Code Icon (Top Left) */}
                 <div className="absolute -top-6 -left-1 md:-left-5 bg-primary text-white p-3 rounded-[14px] shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transform -rotate-[10deg] hover:rotate-0 transition-transform duration-300 z-20">
                   <CodeXml size={26} strokeWidth={2.5} />
