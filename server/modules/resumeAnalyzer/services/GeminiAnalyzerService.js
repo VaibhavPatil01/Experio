@@ -28,7 +28,8 @@ export default class GeminiAnalyzerService {
               overallScore: { type: Type.INTEGER },
               roleAlignmentScore: { type: Type.INTEGER },
               technicalSkillScore: { type: Type.INTEGER }
-            }
+            },
+            required: ["overallScore", "roleAlignmentScore", "technicalSkillScore"]
           },
           strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
           improvements: { type: Type.ARRAY, items: { type: Type.STRING } },
@@ -43,7 +44,8 @@ export default class GeminiAnalyzerService {
               properties: {
                 projectName: { type: Type.STRING },
                 feedback: { type: Type.STRING }
-              }
+              },
+              required: ["projectName", "feedback"]
             }
           },
           experienceFeedback: {
@@ -53,7 +55,8 @@ export default class GeminiAnalyzerService {
               properties: {
                 roleTitle: { type: Type.STRING },
                 feedback: { type: Type.STRING }
-              }
+              },
+              required: ["roleTitle", "feedback"]
             }
           },
           summaryFeedback: { type: Type.STRING },
@@ -70,7 +73,8 @@ export default class GeminiAnalyzerService {
                 evidence: { type: Type.STRING, description: "Cite specific evidence from the provided context facts" },
                 example: { type: Type.STRING },
                 sourceType: { type: Type.STRING, description: "Must be one of: 'resume', 'profile', 'job-description', 'platform', or 'general'" }
-              }
+              },
+              required: ["title", "priority", "problem", "whyItMatters", "recommendation", "evidence", "sourceType"]
             }
           },
           suggestedRewrites: {
@@ -81,7 +85,8 @@ export default class GeminiAnalyzerService {
                 originalText: { type: Type.STRING },
                 suggestedText: { type: Type.STRING },
                 reasoning: { type: Type.STRING }
-              }
+              },
+              required: ["originalText", "suggestedText", "reasoning"]
             }
           },
           references: {
@@ -89,7 +94,23 @@ export default class GeminiAnalyzerService {
             items: { type: Type.STRING },
             description: "Array of experienceIds that were explicitly cited in your analysis."
           }
-        }
+        },
+        required: [
+          "overallAssessment",
+          "scores",
+          "strengths",
+          "improvements",
+          "skillAnalysis",
+          "jobDescriptionAnalysis",
+          "roleAnalysis",
+          "companyAnalysis",
+          "projectFeedback",
+          "experienceFeedback",
+          "summaryFeedback",
+          "priorityRecommendations",
+          "suggestedRewrites",
+          "references"
+        ]
       };
 
       let response;

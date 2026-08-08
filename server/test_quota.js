@@ -20,10 +20,16 @@ async function testGemini() {
             scores: {
               type: Type.OBJECT,
               properties: {
-                overallScore: { type: Type.INTEGER }
-              }
-            }
-          }
+                overallScore: { type: Type.INTEGER },
+                roleAlignmentScore: { type: Type.INTEGER },
+                technicalSkillScore: { type: Type.INTEGER }
+              },
+              required: ["overallScore", "roleAlignmentScore", "technicalSkillScore"]
+            },
+            strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+            improvements: { type: Type.ARRAY, items: { type: Type.STRING } }
+          },
+          required: ["overallAssessment", "scores", "strengths", "improvements"]
         },
         temperature: 0.2,
       }
