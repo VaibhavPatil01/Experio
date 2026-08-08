@@ -5,7 +5,7 @@ import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
 import useOutsideAlerter from '../hooks/useOutsideAlerter.js';
 import { themeAction } from '../redux/theme/themeState.js';
-import { ChevronDown, MenuIcon, Moon, Sun, X, Users, LogOut } from 'lucide-react';
+import { ChevronDown, MenuIcon, Moon, Sun, X, Users, LogOut, Settings } from 'lucide-react';
 import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
 import { useQuery } from '@tanstack/react-query';
 import { getUserProfileStats } from '../services/userServices.js';
@@ -426,6 +426,14 @@ const Navbar = () => {
                   <Users className="w-[22px] h-[22px]" strokeWidth={1.5} />
                   Users
                 </Link>
+                <Link
+                  to="/settings"
+                  onClick={handleCloseNavbar}
+                  className="flex items-center gap-3 px-4 py-1.5 text-[15px] font-medium text-[#001b44] dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
+                >
+                  <Settings className="w-[22px] h-[22px]" strokeWidth={1.5} />
+                  Settings
+                </Link>
                 <LogoutButton
                   classNames="flex items-center gap-3 w-full text-left px-4 py-1.5 text-[15px] font-medium text-[#001b44] dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
                   onClickCallback={handleCloseNavbar}
@@ -530,6 +538,13 @@ const Navbar = () => {
                     className="block px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     Users
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={handleCloseNavbar}
+                    className="block px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    Settings
                   </Link>
                   <LogoutButton
                     classNames="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"

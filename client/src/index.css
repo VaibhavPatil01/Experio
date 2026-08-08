@@ -10,10 +10,9 @@
   font-family: "Outfit", sans-serif; 
 }
 
-@theme {
-  /* --color-primary: #5044E5; */ /* Purple */
-  /* --color-primary: #254D70; */ /* Old */
-  --color-primary: #00a63e;  /* Green */
+@theme { 
+  /* --color-primary: #002E7D;  Dark Blue */
+  --color-primary: #00a63e;  /*Green*/
   --color-primary-dull: #dcfce7;
   --color-light: #F1F5F9;
   --box-shadow: 0 12px 24px 2px rgb(129 146 179 / 8%);
