@@ -282,7 +282,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           {/* History Button */}
           <div className="relative flex">
             <button 
-              onClick={openHistory}
+              onClick={() => setIsHistoryOpen(true)}
               className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
             >
               <History className="w-[18px] h-[18px]" />

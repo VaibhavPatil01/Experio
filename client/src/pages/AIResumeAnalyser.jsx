@@ -7,6 +7,8 @@ import {
   BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3
 } from 'lucide-react';
 import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const AIResumeAnalyser = () => {
   const [file, setFile] = useState(null);
@@ -43,41 +45,46 @@ const AIResumeAnalyser = () => {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!file) {
-      alert('Please upload a resume first.');
+      toast.error('Please upload a resume first.');
       return;
     }
+    if (!targetRole) {
+      toast.error('Please specify a target role.');
+      return;
+    }
+
     setIsAnalyzing(true);
     setResult(null);
     
-    // Simulate AI analysis delay
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setResult({
-        overallScore: 82,
-        strengths: [
-          "Strong technical skills highlighted for frontend development.",
-          "Good use of action verbs in the recent experience section.",
-          "Education details are crisp and well-placed."
-        ],
-        improvements: [
-          {
-            title: "Add more measurable metrics",
-            description: "Instead of 'Improved performance', use 'Improved performance by 20%'. Quantifying your achievements makes them more impactful.",
-            reason: "Based on our platform's data, 85% of successful candidates at product-based companies included specific metrics in their resumes.",
-            citation: "Google Interview Experience by John Doe (2025)"
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+      formData.append('targetRole', targetRole);
+      if (targetCompany) formData.append('targetCompany', targetCompany);
+      if (jobDescription) formData.append('jobDescription', jobDescription);
+
+      // Using raw axios to handle FormData properly and send credentials
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/resume-analyzer/analyze`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
           },
-          {
-            title: "Include architectural keywords",
-            description: "Add keywords like 'Scalability', 'Microservices', and 'Caching' if you have experience with them, especially for senior roles.",
-            reason: "The target company (Amazon) frequently asks System Design questions for this role, and recruiters filter for these keywords.",
-            citation: "Amazon SDE II Interview Trends (2025)"
-          }
-        ],
-        suggestedKeywords: ["System Design", "AWS", "Performance Optimization", "GraphQL", "TypeScript", "CI/CD"]
-      });
-    }, 3000);
+          withCredentials: true
+        }
+      );
+
+      setResult(response.data.data);
+      toast.success('Resume analyzed successfully!');
+    } catch (error) {
+      console.error('Error analyzing resume:', error);
+      toast.error(error.response?.data?.error || 'Failed to analyze resume. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (

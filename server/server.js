@@ -18,6 +18,7 @@ import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import recommendationRouter from './routes/recommendationRoutes.js';
 import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
+import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
 import preventServerSleep from './utils/preventServerSleep.js'; 
 import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
 import { httpLogger } from './middlewares/httpLogger.js';
@@ -87,6 +88,7 @@ app.use('/posts', postRouter);
 app.use('/comments', commentRouter);
 app.use('/recommendations', recommendationRouter);
 app.use('/api/chat/sessions', chatSessionRoutes);
+app.use('/api/resume-analyzer', analyzerRoutes);
 
 // --------------------- Home Route ---------------------
 app.get('/', (req, res) => {
