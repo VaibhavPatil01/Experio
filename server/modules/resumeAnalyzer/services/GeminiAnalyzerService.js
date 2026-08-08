@@ -66,7 +66,8 @@ export default class GeminiAnalyzerService {
                 whyItMatters: { type: Type.STRING },
                 recommendation: { type: Type.STRING },
                 evidence: { type: Type.STRING, description: "Cite specific evidence from the provided context facts" },
-                example: { type: Type.STRING }
+                example: { type: Type.STRING },
+                sourceType: { type: Type.STRING, description: "Must be one of: 'resume', 'profile', 'job-description', 'platform', or 'general'" }
               }
             }
           },

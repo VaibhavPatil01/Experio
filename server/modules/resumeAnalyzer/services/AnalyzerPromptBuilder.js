@@ -42,26 +42,20 @@ ${JSON.stringify(platformFacts, null, 2)}
 
 ### INSTRUCTIONS FOR ANALYSIS
 Analyze the provided resume document against all the context provided above.
-Your response MUST be a valid JSON object matching the following schema EXACTLY.
-Do NOT wrap the response in markdown \`\`\`json blocks. Return raw JSON.
+Your response MUST be a valid JSON object matching the exact schema requested by the system.
 
-{
-  "overallScore": <integer 0-100 indicating how well the resume matches the target role>,
-  "strengths": [
-    "<string> - Be specific, e.g., 'Strong use of metrics in the Stripe experience section'"
-  ],
-  "improvements": [
-    {
-      "title": "<string> - Short actionable title",
-      "description": "<string> - Detailed explanation of what to change",
-      "reason": "<string> - Why this matters for the target role/company",
-      "citation": "<string or null> - Optional. Cite the platform intelligence if your advice is based on it, e.g., 'Google SDE II Interview Trends'"
-    }
-  ],
-  "suggestedKeywords": [
-    "<string> - e.g., 'System Design', 'Redis', 'Kubernetes'"
-  ]
-}
+### CITATION AND SOURCE TAGGING (CRITICAL)
+Every Priority Recommendation must have a \`sourceType\` indicating where the advice originated:
+- \`"resume"\`: Based on formatting, typos, or structural issues found in the resume itself.
+- \`"profile"\`: Based on a discrepancy or missing information that exists in the user's platform profile but is missing from the resume.
+- \`"job-description"\`: Based directly on a requirement found in the provided Job Description.
+- \`"platform"\`: Based on trends, requirements, or evidence found in the PLATFORM FACTS (Interview Experiences).
+- \`"general"\`: General best practices.
+
+If you use \`"platform"\` as the \`sourceType\`:
+1. You MUST include the \`experienceId\` of the relevant Platform Fact in the \`references\` array.
+2. DO NOT fabricate or hallucinate an \`experienceId\`. ONLY use exact IDs provided in the PLATFORM FACTS section.
+3. Your \`evidence\` field should explicitly state what the interview experience revealed.
 
 Focus heavily on:
 1. Impact metrics (STAR method).

@@ -5,7 +5,16 @@ const improvementAreaSchema = new mongoose.Schema({
   description: { type: String, required: true },
   reason: { type: String, required: true },
   suggestedRewrite: { type: String, required: false },
-  citation: { type: String, required: false }
+  citation: { type: String, required: false },
+  sourceType: { type: String, enum: ['resume', 'profile', 'job-description', 'platform', 'general'], default: 'general' }
+}, { _id: false });
+
+const referenceSchema = new mongoose.Schema({
+  experienceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
+  title: { type: String, required: true },
+  company: { type: String, required: false },
+  role: { type: String, required: false },
+  deepLink: { type: String, required: true }
 }, { _id: false });
 
 const resumeAnalysisSchema = new mongoose.Schema({
@@ -70,7 +79,17 @@ const resumeAnalysisSchema = new mongoose.Schema({
       jobDescriptionAlignment: { type: String, required: false }
     },
     
-    prioritizedRecommendations: [{ type: String }]
+    prioritizedRecommendations: [{
+      title: { type: String },
+      priority: { type: String },
+      problem: { type: String },
+      recommendation: { type: String },
+      evidence: { type: String },
+      example: { type: String },
+      sourceType: { type: String, enum: ['resume', 'profile', 'job-description', 'platform', 'general'], default: 'general' }
+    }],
+
+    references: [referenceSchema]
   }
 }, { timestamps: true });
 

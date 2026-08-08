@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UploadCloud, FileText, Briefcase, Building, AlignLeft, 
   Sparkles, CheckCircle2, AlertCircle, ChevronRight, FileUp, 
-  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye
+  BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye, User
 } from 'lucide-react';
 import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
 import axios from 'axios';
@@ -146,6 +146,21 @@ const AIResumeAnalyser = () => {
       toast.error(error.response?.data?.error || 'Failed to analyze resume. Please try again.');
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const getSourceBadge = (sourceType) => {
+    switch(sourceType) {
+      case 'resume': 
+        return <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-md flex items-center gap-1 border border-gray-200 dark:border-gray-700 w-fit"><FileText className="w-3 h-3"/> Resume Format</span>;
+      case 'profile': 
+        return <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-2 py-1 rounded-md flex items-center gap-1 border border-purple-200 dark:border-purple-800 w-fit"><User className="w-3 h-3"/> Profile Alignment</span>;
+      case 'job-description': 
+        return <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded-md flex items-center gap-1 border border-blue-200 dark:border-blue-800 w-fit"><Briefcase className="w-3 h-3"/> Job Requirement</span>;
+      case 'platform': 
+        return <span className="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded-md flex items-center gap-1 border border-indigo-200 dark:border-indigo-800 w-fit"><BookOpen className="w-3 h-3"/> Platform Intelligence</span>;
+      default: 
+        return null;
     }
   };
 
@@ -568,7 +583,8 @@ const AIResumeAnalyser = () => {
                             {rec.priority || 'Medium'} Priority
                           </span>
                         </div>
-                        <p className="text-gray-700 dark:text-gray-300 text-sm mb-4"><span className="font-semibold">The Problem:</span> {rec.problem}</p>
+                        {getSourceBadge(rec.sourceType)}
+                        <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 mt-3"><span className="font-semibold">The Problem:</span> {rec.problem}</p>
                         
                         <div className="bg-white dark:bg-[#1e1e1e] rounded p-4 mb-4 border border-gray-100 dark:border-gray-700">
                           <p className="text-sm font-medium text-gray-900 dark:text-white mb-1 flex items-center gap-2"><Target className="w-4 h-4 text-primary"/> Recommendation</p>
@@ -687,16 +703,23 @@ const AIResumeAnalyser = () => {
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Evidence Used</h3>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">The AI consulted the following successful interview experiences to form this analysis:</p>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {result.result.references.map((ref, idx) => (
                       <Link 
                         key={idx} 
-                        to={`/post/${ref}`}
+                        to={ref.deepLink}
                         target="_blank"
-                        className="inline-flex items-center gap-2 bg-white dark:bg-[#1e1e1e] px-4 py-2 rounded-lg text-sm font-medium text-primary border border-gray-200 dark:border-gray-700 hover:border-primary transition-colors shadow-sm"
+                        className="flex items-start gap-3 bg-white dark:bg-[#1e1e1e] p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary transition-colors shadow-sm group"
                       >
-                        <BookOpen className="w-4 h-4" />
-                        View Experience
+                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <BookOpen className="w-5 h-5" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-900 dark:text-white line-clamp-1">{ref.title}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {ref.company ? ref.company : 'Unknown Company'} • {ref.role ? ref.role : 'Unknown Role'}
+                          </span>
+                        </div>
                       </Link>
                     ))}
                   </div>

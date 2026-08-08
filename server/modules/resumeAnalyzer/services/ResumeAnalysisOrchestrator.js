@@ -85,6 +85,12 @@ export default class ResumeAnalysisOrchestrator {
       );
       const aiDuration = performance.now() - aiStartTime;
 
+      // 6. Verify and Enrich Citations (Prevent Hallucinations)
+      analysisJson.references = this._verifyAndEnrichReferences(
+        analysisJson.references,
+        relevantExperiences.experiences || []
+      );
+
       // 7. Persist and Finalize
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
@@ -191,7 +197,13 @@ export default class ResumeAnalysisOrchestrator {
       );
       const aiDuration = performance.now() - aiStartTime;
 
-      // 6. Persist
+      // 6. Verify and Enrich Citations
+      analysisJson.references = this._verifyAndEnrichReferences(
+        analysisJson.references,
+        relevantExperiences.experiences || []
+      );
+
+      // 7. Persist
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
         modelUsed: 'gemini-1.5-pro',
@@ -225,5 +237,41 @@ export default class ResumeAnalysisOrchestrator {
         setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
       )
     ]);
+  }
+
+  /**
+   * Cross-references Gemini's cited experience IDs against the documents actually retrieved.
+   * Strips hallucinated IDs and enriches valid IDs with trusted metadata.
+   */
+  static _verifyAndEnrichReferences(geminiReferences, retrievedExperiences) {
+    if (!geminiReferences || !Array.isArray(geminiReferences)) {
+      return [];
+    }
+
+    const verifiedReferences = [];
+    const retrievedMap = new Map();
+    
+    // Build lookup map of valid experiences
+    retrievedExperiences.forEach(exp => {
+      retrievedMap.set(exp.experienceId, exp);
+    });
+
+    // Verify and enrich
+    geminiReferences.forEach(id => {
+      if (retrievedMap.has(id)) {
+        const validExp = retrievedMap.get(id);
+        verifiedReferences.push({
+          experienceId: validExp.experienceId,
+          title: validExp.title,
+          company: validExp.company,
+          role: validExp.role,
+          deepLink: `/post/${validExp.experienceId}`
+        });
+      } else {
+        logger.warn(`Hallucinated or invalid reference ID blocked: ${id}`);
+      }
+    });
+
+    return verifiedReferences;
   }
 }
