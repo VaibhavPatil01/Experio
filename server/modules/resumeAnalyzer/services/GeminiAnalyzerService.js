@@ -14,7 +14,7 @@ export default class GeminiAnalyzerService {
    */
   static async generateStructuredAnalysis(prompt, retries = 1) {
     try {
-      logger.info('Calling Gemini 1.5 for Resume Analysis');
+      logger.info('Calling Gemini 2.5 for Resume Analysis');
       
       const contents = [ prompt ];
 
@@ -97,7 +97,7 @@ export default class GeminiAnalyzerService {
         response = await withExponentialBackoff(
           async () => {
             return await geminiClient.models.generateContent({
-              model: 'gemini-1.5-pro',
+              model: 'gemini-2.5-pro',
               contents: contents,
               config: {
                 responseMimeType: 'application/json',

@@ -10,6 +10,7 @@ import {
 import starIcon from '../assets/images/icons/stars-line-svgrepo-com.svg';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import getAuthToken from '../utils/getAuthToken';
 
 const AIResumeAnalyser = () => {
   const [file, setFile] = useState(null);
@@ -34,7 +35,10 @@ const AIResumeAnalyser = () => {
       setIsLoadingHistory(true);
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/resume-analyzer/history`,
-        { withCredentials: true }
+        { 
+          headers: { token: getAuthToken() },
+          withCredentials: true 
+        }
       );
       setHistory(response.data.data);
     } catch (error) {
@@ -68,7 +72,10 @@ const AIResumeAnalyser = () => {
           targetCompany: historyItem.target.company,
           jobDescription: historyItem.target.jobDescription
         },
-        { withCredentials: true }
+        { 
+          headers: { token: getAuthToken() },
+          withCredentials: true 
+        }
       );
       setResult(response.data.data);
       fetchHistory(); // Refresh history
@@ -132,7 +139,8 @@ const AIResumeAnalyser = () => {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'token': getAuthToken()
           },
           withCredentials: true
         }

@@ -66,6 +66,12 @@ export const analyzeResume = async (req, res) => {
     }
   } catch (error) {
     if (error instanceof ResumeAnalysisError) {
+      // Log the categorized error so we can see the internalDetails
+      logger.error('Categorized Resume Analysis Error', { 
+        category: error.category, 
+        internalDetails: error.internalDetails, 
+        message: error.message 
+      });
       // Handle categorized errors gracefully
       const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
       return res.status(statusCode).json({ 
