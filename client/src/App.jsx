@@ -25,6 +25,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const UserSearch = lazy(() => import('./pages/UserSearch'));
 const Login = lazy(() => import('./pages/Login'));
 const Assistant = lazy(() => import('./pages/Assistant'));
+const Settings = lazy(() => import('./pages/Settings'));
 
 const App = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -74,6 +75,7 @@ const App = () => {
               <Route path="/post/:id" element={<PostPage />} />
               <Route path="/post/:id/:slug" element={<PostPage />} />
               <Route path="/post/edit/:id" element={<PostForm />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFound />} />
