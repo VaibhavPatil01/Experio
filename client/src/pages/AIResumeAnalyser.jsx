@@ -219,7 +219,7 @@ const AIResumeAnalyser = () => {
               <span>AI-Powered</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white">
-              Smart Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-hero-grad-start)] to-[var(--color-hero-grad-end)]">Analyser</span>
+              Smart Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-hero-grad-start to-hero-grad-end">Analyser</span>
             </h1>
             <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Get personalized resume feedback based on real interview experiences and company-specific data from our platform.

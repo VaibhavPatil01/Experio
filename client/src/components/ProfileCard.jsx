@@ -71,7 +71,7 @@ const ProfileCard = () => {
       {/* Only show for the logged in user */}
       <Link
         to="/profile/edit"
-        className="inline-block bg-primary text-white py-1 px-4 rounded-full text-sm font-semibold hover:bg-primary-dull transition-all"
+        className="inline-block bg-primary text-white py-1 px-4 rounded-full text-sm font-semibold hover:bg-primary/90 transition-all"
       >
         Edit Profile
       </Link>

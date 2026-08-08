@@ -154,7 +154,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             </span>
           )}
           <button 
-            className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
             onClick={handleBookmarkClick}
             disabled={bookmarkMutation.isLoading}
           >

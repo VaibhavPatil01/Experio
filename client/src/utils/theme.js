@@ -22,31 +22,26 @@ export const applyThemeColor = (colorValue) => {
 
   if (colorValue === 'green') {
     colorHex = '#00a63e';
-    dullColorHex = '#dcfce7';
     bannerStart = '#ABFF7E';
     bannerEnd = '#FDFEFF';
-    heroGradStart = '#15803d';
-    heroGradEnd = '#22c55e';
   } else if (colorValue === 'darkblue') {
     colorHex = '#002E7D';
-    dullColorHex = '#347df8';
     bannerStart = '#60a5fa';
     bannerEnd = '#eff6ff';
-    heroGradStart = '#001a47';
-    heroGradEnd = '#0040ad';
   } else {
     // Generate derived colors from custom hex
-    dullColorHex = mixColors(colorHex, '#ffffff', 0.2); 
     bannerStart = mixColors(colorHex, '#ffffff', 0.5);
     bannerEnd = mixColors(colorHex, '#ffffff', 0.05);
-    heroGradStart = mixColors(colorHex, '#000000', 0.8);
-    heroGradEnd = colorHex;
   }
 
+  // Uniformly generate a dark-to-light gradient from the base primary color
+  heroGradStart = mixColors(colorHex, '#000000', 0.6); // 60% color, 40% black
+  heroGradEnd = mixColors(colorHex, '#ffffff', 0.7);   // 70% color, 30% white
+
   document.documentElement.style.setProperty('--color-primary', colorHex);
-  document.documentElement.style.setProperty('--color-primary-dull', dullColorHex);
   document.documentElement.style.setProperty('--color-banner-start', bannerStart);
   document.documentElement.style.setProperty('--color-banner-end', bannerEnd);
+  document.documentElement.style.setProperty('--color-hero-grad-start', heroGradStart);
   document.documentElement.style.setProperty('--color-hero-grad-end', heroGradEnd);
 
   updateFavicon(colorHex);

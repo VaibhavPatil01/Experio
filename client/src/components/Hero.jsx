@@ -116,7 +116,7 @@ const Hero = () => {
 
                     {/* Headline + CTA */}
                     <h1 className="text-5xl md:text-6xl font-semibold max-w-5xl text-center mt-4 md:leading-[70px]">
-                        Learn, Connect, and Grow with an <span className=" bg-gradient-to-r from-[var(--color-hero-grad-start)] to-[var(--color-hero-grad-end)] bg-clip-text text-transparent text-nowrap">AI-Powered </span> Community.
+                        Learn, Connect, and Grow with an <span className=" bg-gradient-to-r from-hero-grad-start to-hero-grad-end bg-clip-text text-transparent text-nowrap">AI-Powered </span> Community.
                     </h1>
 
                     <p className="max-w-xl text-center text-base my-7">Behind every placement is a story worth sharing. Inspire others, learn together, and build a stronger community with every word you write.</p>
