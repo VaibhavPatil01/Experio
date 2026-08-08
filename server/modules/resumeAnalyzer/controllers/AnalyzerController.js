@@ -15,10 +15,20 @@ export const analyzeResume = async (req, res) => {
       return res.status(400).json({ error: 'Resume document is required.' });
     }
 
-    if (!targetRole) {
-      // Clean up the unused file
+    // Input Validation & Bounds Checking
+    if (!targetRole || typeof targetRole !== 'string' || targetRole.length > 100) {
       fs.unlinkSync(file.path);
-      return res.status(400).json({ error: 'Target role is required.' });
+      return res.status(400).json({ error: 'Target role is required and must be under 100 characters.' });
+    }
+    
+    if (targetCompany && (typeof targetCompany !== 'string' || targetCompany.length > 100)) {
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ error: 'Target company must be under 100 characters.' });
+    }
+    
+    if (jobDescription && (typeof jobDescription !== 'string' || jobDescription.length > 3000)) {
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ error: 'Job description must be under 3000 characters.' });
     }
 
     logger.info('Received resume analysis request', { userId, targetRole });
@@ -62,8 +72,8 @@ export const analyzeResume = async (req, res) => {
 export const getHistory = async (req, res) => {
   try {
     const userId = req.authTokenData.id;
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 10;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10)); // Max 50 per page
     const skip = (page - 1) * limit;
 
     const history = await repository.findByUserId(userId, skip, limit);
@@ -144,8 +154,17 @@ export const reanalyzeResume = async (req, res) => {
     const analysisId = req.params.id;
     const { targetRole, targetCompany, jobDescription } = req.body;
 
-    if (!targetRole) {
-      return res.status(400).json({ error: 'Target role is required for re-analysis.' });
+    // Input Validation & Bounds Checking
+    if (!targetRole || typeof targetRole !== 'string' || targetRole.length > 100) {
+      return res.status(400).json({ error: 'Target role is required and must be under 100 characters.' });
+    }
+    
+    if (targetCompany && (typeof targetCompany !== 'string' || targetCompany.length > 100)) {
+      return res.status(400).json({ error: 'Target company must be under 100 characters.' });
+    }
+    
+    if (jobDescription && (typeof jobDescription !== 'string' || jobDescription.length > 3000)) {
+      return res.status(400).json({ error: 'Job description must be under 3000 characters.' });
     }
 
     logger.info('Received re-analysis request', { userId, analysisId, targetRole });
