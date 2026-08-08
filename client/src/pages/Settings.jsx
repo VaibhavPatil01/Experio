@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Settings, KeyRound, Palette, Trash2, AlertTriangle } from 'lucide-react';
+import { Settings, KeyRound, Palette, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useAppSelector } from '../redux/store.js';
 
 function SettingsPage() {
@@ -138,19 +138,29 @@ function SettingsPage() {
                 {/* Green Option */}
                 <button 
                   onClick={() => handleThemeChange('green')}
-                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-[#00a63e] bg-[#00a63e]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'green' ? 'border-[#00a63e] bg-[#00a63e]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#00a63e]"></div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Green</span>
+                  <div className="w-10 h-10 rounded-full bg-[#00a63e] relative">
+                    {selectedThemeColor === 'green' && (
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                        <CheckCircle2 className="w-5 h-5 text-[#00a63e]" fill="currentColor" stroke="white" />
+                      </div>
+                    )}
+                  </div>
                 </button>
                 
                 {/* Dark Blue Option */}
                 <button 
                   onClick={() => handleThemeChange('darkblue')}
-                  className={`cursor-pointer flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'darkblue' ? 'border-[#002E7D] bg-[#002E7D]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  className={`cursor-pointer flex items-center justify-center p-3 rounded-lg border-2 transition-all ${selectedThemeColor === 'darkblue' ? 'border-[#002E7D] bg-[#002E7D]/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#002E7D]"></div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Dark Blue</span>
+                  <div className="w-10 h-10 rounded-full bg-[#002E7D] relative">
+                    {selectedThemeColor === 'darkblue' && (
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full">
+                        <CheckCircle2 className="w-5 h-5 text-[#002E7D]" fill="currentColor" stroke="white" />
+                      </div>
+                    )}
+                  </div>
                 </button>
               </div>
             </div>
