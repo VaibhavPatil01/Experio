@@ -100,6 +100,14 @@ resumeAnalysisSchema.index({ userId: 1, createdAt: -1 });
 resumeAnalysisSchema.index({ userId: 1, status: 1 });
 // 3. Finding exact resume matches
 resumeAnalysisSchema.index({ "resumeMetadata.fileHash": 1 });
+// 4. Exact match duplicate detection (Caching)
+resumeAnalysisSchema.index({ 
+  userId: 1, 
+  "resumeMetadata.fileHash": 1, 
+  "target.role": 1, 
+  "target.company": 1,
+  status: 1
+});
 
 const ResumeAnalysis = mongoose.model('ResumeAnalysis', resumeAnalysisSchema);
 

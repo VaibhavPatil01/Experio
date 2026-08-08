@@ -39,6 +39,37 @@ export default class ResumeAnalysisOrchestrator {
       
       const preProcessDuration = performance.now() - preProcessStartTime;
 
+      // Deduplication Check: Check if this exact analysis was already completed
+      const existingAnalysis = await repository.model.findOne({
+        userId,
+        "resumeMetadata.fileHash": extractionResult.metadata.fileHash,
+        "target.role": targetRole,
+        "target.company": targetCompany,
+        status: 'completed'
+      }).sort({ createdAt: -1 });
+
+      if (existingAnalysis) {
+        logger.info('Exact duplicate analysis found. Bypassing AI generation.', { requestId, originalAnalysisId: existingAnalysis._id });
+        
+        // Update the current pending document with the cached result
+        analysisDoc = await repository.model.findByIdAndUpdate(
+          analysisDoc._id,
+          {
+            status: 'completed',
+            'resumeMetadata.fileHash': extractionResult.metadata.fileHash,
+            'resumeMetadata.extractedText': extractionResult.text,
+            result: existingAnalysis.result,
+            executionInfo: {
+              modelUsed: existingAnalysis.executionInfo?.modelUsed,
+              cached: true,
+              totalLatencyMs: Math.round(performance.now() - startTime)
+            }
+          },
+          { new: true }
+        );
+        return analysisDoc;
+      }
+
       // Update document with extracted text and file hash (for re-analysis and versioning)
       analysisDoc = await repository.model.findByIdAndUpdate(
         analysisDoc._id,
@@ -102,7 +133,12 @@ export default class ResumeAnalysisOrchestrator {
       };
 
       analysisDoc = await repository.saveResult(analysisDoc._id, analysisJson, executionInfo);
-      logger.info('Successfully saved Resume Analysis', { requestId, analysisId: analysisDoc._id });
+      
+      logger.info('Successfully saved Resume Analysis', { 
+        requestId, 
+        analysisId: analysisDoc._id,
+        metrics: executionInfo 
+      });
 
       return analysisDoc;
 
@@ -147,6 +183,23 @@ export default class ResumeAnalysisOrchestrator {
 
     try {
       logger.info('Starting Resume Re-Analysis Orchestration', { requestId, userId, targetRole, originalAnalysisId: analysisId });
+
+      // Deduplication Check
+      const identicalAnalysis = await repository.model.findOne({
+        userId,
+        "resumeMetadata.fileHash": existingAnalysis.resumeMetadata.fileHash,
+        "target.role": targetRole,
+        "target.company": targetCompany,
+        status: 'completed'
+      }).sort({ createdAt: -1 });
+
+      // Only bypass if the identical analysis was created recently (e.g. less than 1 hour ago) 
+      // so users CAN actually get a fresh analysis if platform data changed over time.
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      if (identicalAnalysis && identicalAnalysis.createdAt > oneHourAgo) {
+         logger.info('Recent identical analysis found during re-analyze. Bypassing execution.', { requestId, duplicateId: identicalAnalysis._id });
+         return identicalAnalysis;
+      }
 
       const targetData = { role: targetRole, company: targetCompany, jobDescription };
       const resumeMetadata = { 

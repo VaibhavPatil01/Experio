@@ -1,6 +1,10 @@
 import User from '../../../models/User.js';
 import ResumeAnalysisRetrievalService from './ResumeAnalysisRetrievalService.js';
 import logger from '../../../utils/logger.js';
+import NodeCache from 'node-cache';
+
+// Cache profile payloads for 15 minutes to avoid redundant DB normalization on rapid re-analysis
+const profileCache = new NodeCache({ stdTTL: 900, checkperiod: 120 });
 
 export default class ResumeAnalysisContextBuilder {
   /**
@@ -53,6 +57,13 @@ export default class ResumeAnalysisContextBuilder {
    * This is exported so the Orchestrator can call it concurrently with other operations.
    */
   static async buildUserProfileContext(userId) {
+    const cacheKey = `profile_${userId}`;
+    const cachedProfile = profileCache.get(cacheKey);
+    if (cachedProfile) {
+      logger.info('ContextBuilder: Profile loaded from cache', { userId });
+      return cachedProfile;
+    }
+
     const user = await User.findById(userId).lean();
     if (!user) {
       logger.warn(`ContextBuilder: User not found for ID ${userId}`);
@@ -77,11 +88,11 @@ export default class ResumeAnalysisContextBuilder {
         jobTitle: w.jobTitle,
         company: w.company,
         duration: `${w.startMonth || ''} ${w.startYear || ''}`,
-        description: safeTruncate(w.description, 400) // Truncate long descriptions
+        description: safeTruncate(w.description, 150) // Truncate heavily to save AI tokens
       })),
       projects: (user.projects || []).map(p => ({
         title: p.title,
-        description: safeTruncate(p.description, 400)
+        description: safeTruncate(p.description, 150)
       }))
     };
 
@@ -90,6 +101,8 @@ export default class ResumeAnalysisContextBuilder {
     if (profile.skills.length === 0) delete profile.skills;
     if (profile.workExperience.length === 0) delete profile.workExperience;
     if (profile.projects.length === 0) delete profile.projects;
+
+    profileCache.set(cacheKey, profile);
 
     return profile;
   }

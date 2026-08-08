@@ -2,6 +2,11 @@ import { QdrantRepository } from '../../../repositories/qdrantRepository.js';
 import { EmbeddingService } from '../../../ai/embeddingService.js';
 import { Post } from '../../../models/Post.js';
 import logger from '../../../utils/logger.js';
+import crypto from 'crypto';
+import NodeCache from 'node-cache';
+
+// Cache generated embeddings for 24 hours to reduce Gemini API costs and latency
+const embeddingCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
 
 export default class ResumeAnalysisRetrievalService {
   /**
@@ -19,11 +24,11 @@ export default class ResumeAnalysisRetrievalService {
       const targetQuery = this._buildTargetQuery(targetFacts);
       const candidateQuery = this._buildCandidateQuery(candidateFacts, targetFacts.role);
 
-      // 2. Generate Embeddings Concurrently
+      // 2. Generate Embeddings Concurrently (with Cache)
       const embedStartTime = performance.now();
       const [targetVector, candidateVector] = await Promise.all([
-        EmbeddingService.generateEmbedding(targetQuery),
-        EmbeddingService.generateEmbedding(candidateQuery)
+        this._getCachedEmbedding(targetQuery),
+        this._getCachedEmbedding(candidateQuery)
       ]);
       const embedDuration = performance.now() - embedStartTime;
 
@@ -95,9 +100,9 @@ export default class ResumeAnalysisRetrievalService {
           technologies: post.technologies || [],
           rounds: (post.rounds || []).map(r => ({
             type: r.roundType,
-            questions: r.questionsAsked
+            questions: (r.questionsAsked || []).slice(0, 3) // Limit to top 3 questions
           })),
-          candidateAdvice: post.overallTips || null,
+          candidateAdvice: post.overallTips ? post.overallTips.substring(0, 200) + '...' : null, // Limit text
           retrievalMetadata: {
             score: qdrantData ? qdrantData.score : 0,
             matchSource: qdrantData ? qdrantData.source : 'unknown'
@@ -148,5 +153,19 @@ export default class ResumeAnalysisRetrievalService {
       query += ` with skills in ${candidateFacts.profile.skills.slice(0, 10).join(', ')}`;
     }
     return query;
+  }
+
+  static async _getCachedEmbedding(query) {
+    const hash = crypto.createHash('md5').update(query).digest('hex');
+    const cacheKey = `embed_${hash}`;
+    const cachedVector = embeddingCache.get(cacheKey);
+    
+    if (cachedVector) {
+      return cachedVector;
+    }
+
+    const vector = await EmbeddingService.generateEmbedding(query);
+    embeddingCache.set(cacheKey, vector);
+    return vector;
   }
 }
