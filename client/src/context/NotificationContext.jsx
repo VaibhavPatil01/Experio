@@ -91,6 +91,16 @@ export const NotificationProvider = ({ children }) => {
       setUnreadCount(0);
     });
 
+    newSocket.on('notification:remove', ({ eventId }) => {
+      setNotifications((prev) => {
+        const notifToRemove = prev.find(n => n.eventId === eventId || n.notificationIds?.includes(eventId));
+        if (notifToRemove && !notifToRemove.isRead) {
+          setUnreadCount((count) => Math.max(0, count - 1));
+        }
+        return prev.filter(n => n.eventId !== eventId && !(n.notificationIds?.includes(eventId)));
+      });
+    });
+
     newSocket.on('disconnect', () => {
       console.log('[NotificationSocket] Disconnected');
     });

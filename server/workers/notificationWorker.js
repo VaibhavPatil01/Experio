@@ -3,7 +3,7 @@ import { redisConnection } from '../configs/redis.js';
 import { NOTIFICATION_QUEUE_NAME } from '../queues/notificationQueue.js';
 import { createNotification, createNotificationsBatch, deleteNotificationByEventId } from '../repositories/notificationRepository.js';
 import { QdrantRepository } from '../repositories/qdrantRepository.js';
-import { emitNotificationToUser } from '../configs/socket.js';
+import { emitNotificationToUser, emitNotificationRemove } from '../configs/socket.js';
 import qdrantClient from '../configs/qdrant.js';
 import { Post } from '../models/Post.js';
 import User from '../models/User.js';
@@ -171,10 +171,9 @@ async function processRemoveNotification(payload) {
   if (!eventId) return;
   try {
     const result = await deleteNotificationByEventId(eventId);
-    if (result && result.deletedCount > 0) {
+    if (result && result.recipientId) {
       logger.info(`[NotificationWorker] Deleted notification for event: ${eventId}`);
-      // Note: Optionally we could emit a websocket event here to remove it from the frontend real-time,
-      // but usually fetching fresh or refreshing handles the cleanup. Since it's a minor sync issue, DB delete is primary.
+      emitNotificationRemove(result.recipientId.toString(), eventId);
     }
   } catch (error) {
     logger.error(`[NotificationWorker] Remove notification error`, { error: error.message });

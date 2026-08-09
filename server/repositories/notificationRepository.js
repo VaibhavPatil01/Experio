@@ -30,7 +30,7 @@ export const createNotification = async (notificationData) => {
 
 export const deleteNotificationByEventId = async (eventId) => {
   try {
-    const result = await Notification.deleteOne({ eventId });
+    const result = await Notification.findOneAndDelete({ eventId });
     return result;
   } catch (error) {
     logger.error('Failed to delete notification by eventId', { error: error.message, eventId });

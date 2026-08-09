@@ -112,3 +112,9 @@ export const emitNotificationReadAll = (userId) => {
     io.to(`user:${userId}`).emit('notification:read_all');
   }
 };
+
+export const emitNotificationRemove = (userId, eventId) => {
+  if (io) {
+    io.to(`user:${userId}`).emit('notification:remove', { eventId });
+  }
+};
