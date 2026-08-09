@@ -159,15 +159,4 @@ export const markAllNotificationsAsRead = async (userId) => {
   }
 };
 
-export const markAllNotificationsAsRead = async (userId) => {
-  try {
-    const result = await Notification.updateMany(
-      { recipientId: userId, isRead: false },
-      { $set: { isRead: true, readAt: new Date() } }
-    );
-    return result;
-  } catch (error) {
-    logger.error('Failed to mark all notifications as read', { error: error.message, userId });
-    throw error;
-  }
-};
+

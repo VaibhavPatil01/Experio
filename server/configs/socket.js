@@ -1,4 +1,6 @@
 import { Server } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import Redis from 'ioredis';
 import decodeToken from '../utils/token/decodeToken.js';
 import winston from 'winston';
 
@@ -10,8 +12,16 @@ const logger = winston.createLogger({
 
 let io;
 
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const pubClient = new Redis(REDIS_URL);
+const subClient = pubClient.duplicate();
+
+pubClient.on('error', (err) => logger.error('[Socket.io Redis Pub] Error', { error: err.message }));
+subClient.on('error', (err) => logger.error('[Socket.io Redis Sub] Error', { error: err.message }));
+
 export const initSocket = (server) => {
   io = new Server(server, {
+    adapter: createAdapter(pubClient, subClient),
     cors: {
       origin: "*", // Or specify exact frontend domain for prod
       methods: ["GET", "POST"]
@@ -76,5 +86,17 @@ export const getIo = () => {
 export const emitNotificationToUser = (userId, notificationObj) => {
   if (io) {
     io.to(`user:${userId}`).emit('notification:new', notificationObj);
+  }
+};
+
+export const emitNotificationRead = (userId, notificationId) => {
+  if (io) {
+    io.to(`user:${userId}`).emit('notification:read', { notificationId });
+  }
+};
+
+export const emitNotificationReadAll = (userId) => {
+  if (io) {
+    io.to(`user:${userId}`).emit('notification:read_all');
   }
 };

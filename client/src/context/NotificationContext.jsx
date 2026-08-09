@@ -66,6 +66,29 @@ export const NotificationProvider = ({ children }) => {
       setUnreadCount((prev) => prev + 1);
     });
 
+    newSocket.on('notification:read', ({ notificationId }) => {
+      setNotifications((prev) => {
+        let wasUnread = false;
+        const updated = prev.map(n => {
+          if (n._id === notificationId || n.notificationIds?.includes(notificationId)) {
+            if (!n.isRead) wasUnread = true;
+            return { ...n, isRead: true };
+          }
+          return n;
+        });
+        
+        if (wasUnread) {
+          setUnreadCount((count) => Math.max(0, count - 1));
+        }
+        return updated;
+      });
+    });
+
+    newSocket.on('notification:read_all', () => {
+      setNotifications((prev) => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    });
+
     newSocket.on('disconnect', () => {
       console.log('[NotificationSocket] Disconnected');
     });
@@ -124,6 +147,10 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const markAsRead = async (id) => {
+    // Only proceed if it is actually unread in our local state to prevent loop/spam
+    const notif = notifications.find(n => n._id === id);
+    if (notif && notif.isRead) return;
+
     // Optimistic update
     setNotifications((prev) => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
     setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -132,11 +159,12 @@ export const NotificationProvider = ({ children }) => {
       await markNotificationRead(id);
     } catch (error) {
       console.error('Failed to mark read:', error);
-      // Revert optimism if needed (complex for count, skipping for simplicity)
     }
   };
 
   const markAllAsRead = async () => {
+    if (unreadCount === 0) return;
+    
     setNotifications((prev) => prev.map(n => ({ ...n, isRead: true })));
     setUnreadCount(0);
     try {

@@ -1,4 +1,5 @@
 import { getUserNotifications, markNotificationAsRead, getUnreadNotificationCount, markAllNotificationsAsRead, markMultipleNotificationsAsRead } from '../repositories/notificationRepository.js';
+import { emitNotificationRead, emitNotificationReadAll } from '../configs/socket.js';
 import { Notification } from '../models/Notification.js';
 
 export const getNotifications = async (req, res) => {
@@ -34,6 +35,9 @@ export const markAsRead = async (req, res) => {
 
     if (singleId) {
       const result = await markNotificationAsRead(singleId, userId);
+      if (result) {
+        emitNotificationRead(userId, singleId);
+      }
       return res.status(200).json({ message: 'Marked as read', count: result ? 1 : 0 });
     }
 
@@ -42,6 +46,16 @@ export const markAsRead = async (req, res) => {
     }
 
     const result = await markMultipleNotificationsAsRead(notificationIds, userId);
+    
+    // For legacy batch arrays, loop over the original list and emit individually, or add a batch emit.
+    // Given the prompt, emitNotificationRead for each or let frontend refetch. 
+    // Emitting individually is fine.
+    if (result.modifiedCount > 0) {
+      for (const id of notificationIds) {
+        emitNotificationRead(userId, id);
+      }
+    }
+
     return res.status(200).json({ message: 'Marked as read', count: result.modifiedCount });
   } catch (error) {
     console.error('markAsRead error:', error);
@@ -64,6 +78,9 @@ export const markAllRead = async (req, res) => {
   try {
     const userId = req.body.authTokenData.id;
     const result = await markAllNotificationsAsRead(userId);
+    if (result.modifiedCount > 0) {
+      emitNotificationReadAll(userId);
+    }
     return res.status(200).json({ message: 'All notifications marked as read', count: result.modifiedCount });
   } catch (error) {
     console.error('markAllRead error:', error);

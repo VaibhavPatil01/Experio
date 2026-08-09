@@ -20,6 +20,7 @@
     "@google/genai": "^2.13.0",
     "@google/generative-ai": "^0.24.1",
     "@qdrant/js-client-rest": "^1.18.0",
+    "@socket.io/redis-adapter": "^8.3.0",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
