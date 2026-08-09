@@ -167,12 +167,20 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const markAsRead = async (notif) => {
+    console.log('markAsRead triggered for:', notif);
     // Only proceed if it is actually unread in our local state to prevent loop/spam
     const existingNotif = notifications.find(n => n._id === (typeof notif === 'string' ? notif : notif._id));
-    if (existingNotif && existingNotif.isRead) return;
+    console.log('existingNotif found:', existingNotif);
+    
+    if (existingNotif && existingNotif.isRead) {
+      console.log('Notification already marked read locally, aborting');
+      return;
+    }
 
     const notifId = typeof notif === 'string' ? notif : notif._id;
     const isGrouped = notif.notificationIds && notif.notificationIds.length > 1;
+
+    console.log('notifId:', notifId, 'isGrouped:', isGrouped, 'notificationIds:', notif.notificationIds);
 
     // Optimistic update
     setNotifications((prev) => prev.map(n => n._id === notifId ? { ...n, isRead: true } : n));
@@ -183,10 +191,13 @@ export const NotificationProvider = ({ children }) => {
     
     try {
       if (isGrouped) {
+        console.log('Sending batch PATCH request for:', notif.notificationIds);
         await markNotificationRead('batch', notif.notificationIds);
       } else {
+        console.log('Sending single PATCH request for:', notifId);
         await markNotificationRead(notifId);
       }
+      console.log('PATCH request complete');
     } catch (error) {
       console.error('Failed to mark read:', error);
     }
