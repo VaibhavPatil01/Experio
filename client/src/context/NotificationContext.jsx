@@ -16,6 +16,7 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
+  const [error, setError] = useState(null);
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
@@ -61,7 +62,7 @@ export const NotificationProvider = ({ children }) => {
         // Deduplicate using eventId (or _id)
         const exists = prev.some(n => n.eventId === newNotification.eventId);
         if (exists) return prev;
-        return [newNotification, ...prev];
+        return [{ ...newNotification, _isNew: true }, ...prev];
       });
       setUnreadCount((prev) => prev + 1);
     });
@@ -102,14 +103,16 @@ export const NotificationProvider = ({ children }) => {
   const loadInitialNotifications = async () => {
     try {
       setIsFetching(true);
+      setError(null);
       const res = await fetchNotifications(20, null);
       setNotifications(res.data.notifications);
       if (res.data.notifications.length > 0) {
         setCursor(res.data.notifications[res.data.notifications.length - 1].createdAt);
       }
       setHasMore(res.data.notifications.length === 20);
-    } catch (error) {
-      console.error('Failed to load initial notifications:', error);
+    } catch (err) {
+      console.error('Failed to load initial notifications:', err);
+      setError('Failed to load notifications. Please try again.');
     } finally {
       setIsFetching(false);
     }
@@ -130,8 +133,9 @@ export const NotificationProvider = ({ children }) => {
         setCursor(res.data.notifications[res.data.notifications.length - 1].createdAt);
       }
       setHasMore(res.data.notifications.length === 20);
-    } catch (error) {
-      console.error('Failed to load more notifications:', error);
+    } catch (err) {
+      console.error('Failed to load more notifications:', err);
+      setError('Failed to load more notifications. Please try again.');
     } finally {
       setIsFetching(false);
     }
@@ -180,8 +184,10 @@ export const NotificationProvider = ({ children }) => {
       notifications,
       unreadCount,
       isFetching,
+      error,
       hasMore,
       loadMoreNotifications,
+      loadInitialNotifications,
       markAsRead,
       markAllAsRead,
     }}>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { ArrowLeft } from 'lucide-react';
 
@@ -30,6 +30,7 @@ import PracticePromoCard from '../components/PostDetails/Sidebar/PracticePromoCa
 function PostPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAppSelector((state) => state.userState.user);
   
   const [activeTab, setActiveTab] = useState('experience');
@@ -55,6 +56,23 @@ function PostPage() {
   if (postQuery.isError) {
     return <h3 className="text-center mt-10 text-red-500">Error occurred while fetching post</h3>;
   }
+
+  useEffect(() => {
+    if (postQuery.data && location.hash) {
+      // Delay slightly to ensure comments are rendered
+      setTimeout(() => {
+        const id = location.hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('bg-yellow-50', 'dark:bg-yellow-900/20', 'transition-colors', 'duration-1000');
+          setTimeout(() => {
+            element.classList.remove('bg-yellow-50', 'dark:bg-yellow-900/20');
+          }, 3000);
+        }
+      }, 500);
+    }
+  }, [postQuery.data, location.hash]);
 
   const authorId = postQuery.data?.postAuthorId;
   const isEditable = user?.userId === authorId || user?.isAdmin;

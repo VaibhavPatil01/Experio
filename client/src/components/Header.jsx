@@ -22,8 +22,10 @@ const Navbar = () => {
     notifications, 
     unreadCount, 
     isFetching, 
+    error,
     hasMore, 
     loadMoreNotifications, 
+    loadInitialNotifications,
     markAsRead, 
     markAllAsRead 
   } = useNotificationContext();
@@ -69,13 +71,14 @@ const Navbar = () => {
     
     switch (n.type) {
       case 'POST_MATCH':
-        return `New interview experience matches your profile by ${Math.round((n.similarityScore || 0) * 100)}%.`;
+        const score = n.similarityScore ?? n.metadata?.matchPercentage ?? 0;
+        return `New experience matches your profile by ${score}%.`;
       case 'POST_COMMENT':
-        return `${actorName}${othersCount} commented on your interview experience.`;
+        return `${actorName}${othersCount} commented on your experience.`;
       case 'POST_LIKE':
-        return `${actorName}${othersCount} liked your interview experience.`;
+        return `${actorName}${othersCount} liked your experience.`;
       case 'POST_DISLIKE':
-        return `${actorName}${othersCount} disliked your interview experience.`;
+        return `${actorName}${othersCount} disliked your experience.`;
       case 'COMMENT_REPLY':
       case 'REPLY_REPLY':
         return `${actorName}${othersCount} replied to your comment.`;
@@ -93,7 +96,14 @@ const Navbar = () => {
     
     if (n.type === 'POST_MATCH' || n.type === 'POST_LIKE' || n.type === 'POST_DISLIKE' || n.type === 'POST_COMMENT' || n.type === 'COMMENT_REPLY' || n.type === 'REPLY_REPLY') {
       const postId = n.postId?._id || n.postId;
-      if (postId) navigate(`/post/${postId}`);
+      if (postId) {
+        let url = `/post/${postId}`;
+        if (n.type === 'POST_COMMENT' || n.type === 'COMMENT_REPLY' || n.type === 'REPLY_REPLY') {
+          const hashId = n.entityId || n.commentId;
+          if (hashId) url += `#comment-${hashId}`;
+        }
+        navigate(url);
+      }
     }
   };
 
@@ -367,7 +377,20 @@ const Navbar = () => {
                 </div>
               </div>
               <div className="h-[350px] sm:h-[450px] overflow-y-auto custom-scrollbar" onScroll={handleScroll}>
-                {notifications.length === 0 ? (
+                {error ? (
+                  <div className="flex flex-col items-center justify-center h-full text-red-500 gap-2">
+                    <p>{error}</p>
+                    <button 
+                      onClick={() => {
+                        if (notifications.length === 0) loadInitialNotifications();
+                        else loadMoreNotifications();
+                      }} 
+                      className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-green-700 transition"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : notifications.length === 0 && !isFetching ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
                     <p>No notifications yet</p>
                   </div>
@@ -376,13 +399,13 @@ const Navbar = () => {
                     <div 
                       key={n._id || n.eventId} 
                       onClick={(e) => handleNotificationClick(e, n)}
-                      className={`flex gap-3 sm:gap-4 p-4 transition-colors border-l-2 cursor-pointer relative text-left ${n.isRead ? 'hover:bg-gray-50 dark:hover:bg-gray-800 border-transparent' : 'bg-blue-50/50 dark:bg-blue-900/10 border-primary'}`}
+                      className={`flex gap-3 sm:gap-4 p-4 transition-colors border-l-2 cursor-pointer relative text-left ${n.isRead ? 'hover:bg-gray-50 dark:hover:bg-gray-800 border-transparent' : 'bg-blue-50/50 dark:bg-blue-900/10 border-primary'} ${n._isNew ? 'animate-slide-down-fade' : ''}`}
                     >
                       {!n.isRead && <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-primary"></div>}
                       
                       {n.type === 'POST_MATCH' ? (
                         <div className="w-10 h-10 rounded-md bg-gradient-to-br from-green-500 to-emerald-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-[14px] overflow-hidden">
-                          {Math.round((n.similarityScore || 0) * 100)}%
+                          {n.similarityScore ?? n.metadata?.matchPercentage ?? 0}%
                         </div>
                       ) : n.actorId?.profilePic ? (
                         <img src={n.actorId.profilePic} alt="Profile" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
@@ -409,7 +432,15 @@ const Navbar = () => {
                   ))
                 )}
                 {isFetching && (
-                  <div className="p-4 text-center text-xs text-gray-500">Loading more...</div>
+                  <div className="p-4">
+                    <div className="animate-pulse flex space-x-4">
+                      <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-10 w-10"></div>
+                      <div className="flex-1 space-y-3 py-1">
+                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
