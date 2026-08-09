@@ -94,7 +94,7 @@ const Navbar = () => {
   const handleNotificationClick = (e, n) => {
     e.stopPropagation();
     if (!n.isRead) {
-      markAsRead(n._id);
+      markAsRead(n);
     }
     setIsNotificationOpen(false);
     

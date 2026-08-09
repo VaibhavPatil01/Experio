@@ -26,7 +26,10 @@ export const fetchUnreadCount = () => {
   return API.get('/unread-count');
 };
 
-export const markNotificationRead = (id) => {
+export const markNotificationRead = (id, notificationIds = null) => {
+  if (notificationIds && notificationIds.length > 0) {
+    return API.patch('/batch/read', { notificationIds });
+  }
   return API.patch(`/${id}/read`);
 };
 

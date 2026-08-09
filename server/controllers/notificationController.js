@@ -19,11 +19,10 @@ export const getNotifications = async (req, res) => {
 
     const notifications = await getUserNotifications(userId, limitNum, cursor, isUnreadOnly, category);
     
-    // Grouped notifications might not have an exact overall _id if there's multiple,
-    // but the frontend needs keys. We can map _id if needed, or use notificationIds[0].
+    // Grouped notifications have an object _id. The frontend needs a stable string key.
     const formatted = notifications.map(n => ({
       ...n,
-      _id: n._id === 'grouped' ? n.notificationIds[0] : n._id, // Ensure stable ID for React keys
+      _id: (typeof n._id === 'object' && n.notificationIds) ? n.notificationIds.join('_') : n._id, 
     }));
 
     return res.status(200).json({ notifications: formatted });
@@ -40,7 +39,7 @@ export const markAsRead = async (req, res) => {
     const { notificationIds } = req.body; // legacy batch support
     const singleId = req.params.id;
 
-    if (singleId) {
+    if (singleId && singleId !== 'batch') {
       const result = await markNotificationAsRead(singleId, userId);
       if (result) {
         emitNotificationRead(userId, singleId);

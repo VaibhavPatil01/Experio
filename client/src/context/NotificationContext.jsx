@@ -166,17 +166,27 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
-  const markAsRead = async (id) => {
+  const markAsRead = async (notif) => {
     // Only proceed if it is actually unread in our local state to prevent loop/spam
-    const notif = notifications.find(n => n._id === id);
-    if (notif && notif.isRead) return;
+    const existingNotif = notifications.find(n => n._id === (typeof notif === 'string' ? notif : notif._id));
+    if (existingNotif && existingNotif.isRead) return;
+
+    const notifId = typeof notif === 'string' ? notif : notif._id;
+    const isGrouped = notif.notificationIds && notif.notificationIds.length > 1;
 
     // Optimistic update
-    setNotifications((prev) => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+    setNotifications((prev) => prev.map(n => n._id === notifId ? { ...n, isRead: true } : n));
+    
+    // Decrease count appropriately
+    const countToDecrease = isGrouped ? notif.notificationIds.length : 1;
+    setUnreadCount((prev) => Math.max(0, prev - countToDecrease));
     
     try {
-      await markNotificationRead(id);
+      if (isGrouped) {
+        await markNotificationRead('batch', notif.notificationIds);
+      } else {
+        await markNotificationRead(notifId);
+      }
     } catch (error) {
       console.error('Failed to mark read:', error);
     }
