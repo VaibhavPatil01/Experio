@@ -380,17 +380,19 @@ const Navbar = () => {
               </div>
               <div className="h-[350px] sm:h-[450px] overflow-y-auto custom-scrollbar" onScroll={handleScroll}>
                 {error ? (
-                  <div className="flex flex-col items-center justify-center h-full text-red-500 gap-2">
+                  <div className="flex flex-col items-center justify-center h-full text-red-500 gap-2 p-4 text-center">
                     <p>{error}</p>
-                    <button 
-                      onClick={() => {
-                        if (notifications.length === 0) loadInitialNotifications();
-                        else loadMoreNotifications();
-                      }} 
-                      className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-green-700 transition"
-                    >
-                      Retry
-                    </button>
+                    {!error.includes('Session expired') && (
+                      <button 
+                        onClick={() => {
+                          if (notifications.length === 0) loadInitialNotifications();
+                          else loadMoreNotifications();
+                        }} 
+                        className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-green-700 transition"
+                      >
+                        Retry
+                      </button>
+                    )}
                   </div>
                 ) : notifications.length === 0 && !isFetching ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">

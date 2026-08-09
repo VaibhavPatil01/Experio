@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
+import getAuthToken from '../utils/getAuthToken';
 import { useAppSelector } from '../redux/store';
 import { BASE_API_URL } from '../services/serverConfig';
 import { 
@@ -22,7 +23,7 @@ export const NotificationProvider = ({ children }) => {
 
   // Redux user state tells us if logged in
   const user = useAppSelector((state) => state.userState.user);
-  const token = localStorage.getItem('token');
+  const token = getAuthToken();
   const isLoggedIn = !!user && !!token;
 
   // Initialize socket when user logs in
@@ -112,7 +113,11 @@ export const NotificationProvider = ({ children }) => {
       setHasMore(res.data.notifications.length === 20);
     } catch (err) {
       console.error('Failed to load initial notifications:', err);
-      setError('Failed to load notifications. Please try again.');
+      if (err?.response?.status === 401) {
+        setError('Session expired. Please log in again to view notifications.');
+      } else {
+        setError('Failed to load notifications. Please try again.');
+      }
     } finally {
       setIsFetching(false);
     }
@@ -135,7 +140,11 @@ export const NotificationProvider = ({ children }) => {
       setHasMore(res.data.notifications.length === 20);
     } catch (err) {
       console.error('Failed to load more notifications:', err);
-      setError('Failed to load more notifications. Please try again.');
+      if (err?.response?.status === 401) {
+        setError('Session expired. Please log in again to view notifications.');
+      } else {
+        setError('Failed to load more notifications. Please try again.');
+      }
     } finally {
       setIsFetching(false);
     }

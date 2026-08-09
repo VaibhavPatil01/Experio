@@ -1,14 +1,17 @@
 import axios from 'axios';
 import { BASE_API_URL } from './serverConfig';
 
+import getAuthToken from '../utils/getAuthToken';
+
 const API = axios.create({
   baseURL: `${BASE_API_URL}/api/notifications`,
 });
 
 // Attach token to every request
 API.interceptors.request.use((req) => {
-  if (localStorage.getItem('token')) {
-    req.headers['token'] = localStorage.getItem('token');
+  const token = getAuthToken();
+  if (token) {
+    req.headers['token'] = token;
   }
   return req;
 });
