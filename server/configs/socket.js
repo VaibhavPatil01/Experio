@@ -16,8 +16,8 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const pubClient = new Redis(REDIS_URL);
 const subClient = pubClient.duplicate();
 
-pubClient.on('error', (err) => logger.error('[Socket.io Redis Pub] Error', { error: err.message }));
-subClient.on('error', (err) => logger.error('[Socket.io Redis Sub] Error', { error: err.message }));
+pubClient.on('error', (err) => logger.error('[Socket.io Redis Pub] Error', { event: 'WEBSOCKET_ERROR', errorCategory: 'WEBSOCKET_ERROR', error: err.message }));
+subClient.on('error', (err) => logger.error('[Socket.io Redis Sub] Error', { event: 'WEBSOCKET_ERROR', errorCategory: 'WEBSOCKET_ERROR', error: err.message }));
 
 export const initSocket = (server) => {
   io = new Server(server, {
@@ -48,7 +48,11 @@ export const initSocket = (server) => {
       socket.userId = decoded.id;
       next();
     } catch (error) {
-      logger.warn('[Socket.io] Authentication failed', { error: error.message });
+      logger.warn('[Socket.io] Authentication failed', { 
+        event: 'AUTH_ERROR', 
+        errorCategory: 'AUTH_ERROR',
+        error: error.message 
+      });
       next(new Error('Authentication error: Invalid token'));
     }
   });
@@ -57,7 +61,11 @@ export const initSocket = (server) => {
     const userId = socket.userId;
     const userRoom = `user:${userId}`;
 
-    logger.info(`[Socket.io] Client connected`, { socketId: socket.id, userId });
+    logger.info(`[Socket.io] Client connected`, { 
+      event: 'WEBSOCKET_CONNECTED',
+      socketId: socket.id, 
+      userId 
+    });
 
     // Join user-specific channel to receive private notifications
     socket.join(userRoom);
@@ -65,8 +73,12 @@ export const initSocket = (server) => {
     // Initial sync could happen here, or client can explicitly fetch.
     // For now, we wait for the client to ask for sync or just let HTTP handle it.
     
-    socket.on('disconnect', (reason) => {
-      logger.info(`[Socket.io] Client disconnected`, { socketId: socket.id, userId, reason });
+    socket.on('disconnect', () => {
+      logger.info(`[Socket.io] Client disconnected`, { 
+        event: 'WEBSOCKET_DISCONNECTED',
+        socketId: socket.id, 
+        userId 
+      });
     });
   });
 

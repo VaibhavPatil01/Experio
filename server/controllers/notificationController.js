@@ -1,6 +1,13 @@
 import { getUserNotifications, markNotificationAsRead, getUnreadNotificationCount, markAllNotificationsAsRead, markMultipleNotificationsAsRead } from '../repositories/notificationRepository.js';
 import { emitNotificationRead, emitNotificationReadAll } from '../configs/socket.js';
 import { Notification } from '../models/Notification.js';
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [new winston.transports.Console()]
+});
 
 export const getNotifications = async (req, res) => {
   try {
@@ -37,6 +44,11 @@ export const markAsRead = async (req, res) => {
       const result = await markNotificationAsRead(singleId, userId);
       if (result) {
         emitNotificationRead(userId, singleId);
+        logger.info(`[NotificationController] Notification marked as read`, {
+          event: 'NOTIFICATION_READ',
+          notificationId: singleId,
+          userId
+        });
       }
       return res.status(200).json({ message: 'Marked as read', count: result ? 1 : 0 });
     }
@@ -54,6 +66,11 @@ export const markAsRead = async (req, res) => {
       for (const id of notificationIds) {
         emitNotificationRead(userId, id);
       }
+      logger.info(`[NotificationController] Notifications marked as read`, {
+        event: 'NOTIFICATION_READ',
+        count: result.modifiedCount,
+        userId
+      });
     }
 
     return res.status(200).json({ message: 'Marked as read', count: result.modifiedCount });
@@ -80,6 +97,11 @@ export const markAllRead = async (req, res) => {
     const result = await markAllNotificationsAsRead(userId);
     if (result.modifiedCount > 0) {
       emitNotificationReadAll(userId);
+      logger.info(`[NotificationController] All notifications marked as read`, {
+        event: 'NOTIFICATION_READ_ALL',
+        count: result.modifiedCount,
+        userId
+      });
     }
     return res.status(200).json({ message: 'All notifications marked as read', count: result.modifiedCount });
   } catch (error) {

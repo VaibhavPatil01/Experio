@@ -3,6 +3,13 @@ import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLCont
 import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
 import { findUserById } from '../services/userService.js';
 import { eventBus, EVENTS } from '../events/index.js';
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [new winston.transports.Console()]
+});
 
 
 export async function getPost(req, res) {
@@ -180,6 +187,14 @@ export async function createPost(req, res) {
     
     // AI Layer Sync
     eventBus.emit(EVENTS.POST_CREATED, { postId: post._id });
+
+    logger.info(`[PostController] Post Created`, {
+      event: 'POST_CREATED_EVENT',
+      postId: post._id,
+      userId: authTokenData.id,
+      company,
+      role
+    });
 
     return res
       .status(200)

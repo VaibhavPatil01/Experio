@@ -17,7 +17,11 @@ const logger = winston.createLogger({
 
 export const initNotificationWorker = () => {
   const worker = new Worker(NOTIFICATION_QUEUE_NAME, async (job) => {
-    logger.info(`[NotificationWorker] Processing job ${job.name}`, { jobId: job.id });
+    logger.info(`[NotificationWorker] Job Started`, { 
+      event: 'JOB_STARTED', 
+      jobId: job.id, 
+      jobName: job.name 
+    });
 
     if (job.name === 'process-social-notification') {
       await processSocialNotification(job.data);
@@ -31,7 +35,14 @@ export const initNotificationWorker = () => {
   });
 
   worker.on('failed', (job, err) => {
-    logger.error(`[NotificationWorker] Job ${job?.id} failed`, { error: err.message, stack: err.stack });
+    logger.error(`[NotificationWorker] Job Failed`, { 
+      event: 'JOB_FAILED', 
+      jobId: job?.id, 
+      jobName: job?.name,
+      errorCategory: 'QUEUE_ERROR',
+      error: err.message, 
+      stack: err.stack 
+    });
   });
 
   return worker;
@@ -84,31 +95,71 @@ async function processSocialNotification(payload) {
     }
   }
 
+  const startTime = Date.now();
   if (!recipientId) {
-    logger.warn('[NotificationWorker] Could not determine recipientId for payload', { payload });
+    logger.warn('[NotificationWorker] Could not determine recipientId for payload', { 
+      event: 'VALIDATION_ERROR', 
+      eventId 
+    });
     return;
   }
 
   // Prevent notifying oneself
   if (recipientId.toString() === actorUserId.toString()) {
-    logger.info('[NotificationWorker] Skipping self-notification', { actorUserId });
+    logger.info('[NotificationWorker] Skipping self-notification', { event: 'NOTIFICATION_SKIPPED', actorUserId, eventId });
     return;
   }
 
-  const savedNotification = await createNotification({
-    recipientId,
-    actorId: actorUserId,
-    type,
-    entityType,
-    entityId: targetEntityId,
-    postId,
-    commentId,
-    parentCommentId: commentId,
-    eventId
-  });
+  let savedNotification;
+  try {
+    const persistStartTime = Date.now();
+    savedNotification = await createNotification({
+      recipientId,
+      actorId: actorUserId,
+      type,
+      entityType,
+      entityId: targetEntityId,
+      postId,
+      commentId,
+      parentCommentId: commentId,
+      eventId
+    });
+    
+    logger.info(`[NotificationWorker] Notification created`, {
+      event: `${type}_CREATED`, // e.g. POST_COMMENT_CREATED, POST_LIKE_CREATED
+      eventId,
+      notificationId: savedNotification._id,
+      userId: recipientId,
+      persistLatencyMs: Date.now() - persistStartTime,
+      totalLatencyMs: Date.now() - startTime
+    });
+  } catch (error) {
+    logger.error(`[NotificationWorker] Database error creating notification`, {
+      event: 'DATABASE_ERROR',
+      eventId,
+      error: error.message
+    });
+    throw error;
+  }
 
   // Emit real-time notification to the connected user
-  emitNotificationToUser(recipientId, savedNotification);
+  try {
+    const wsStartTime = Date.now();
+    emitNotificationToUser(recipientId, savedNotification);
+    logger.info(`[NotificationWorker] Notification emitted via WebSocket`, {
+      event: 'NOTIFICATION_DELIVERED',
+      eventId,
+      notificationId: savedNotification._id,
+      userId: recipientId,
+      wsLatencyMs: Date.now() - wsStartTime
+    });
+  } catch (error) {
+    logger.error(`[NotificationWorker] WebSocket delivery failed`, {
+      event: 'WEBSOCKET_ERROR',
+      eventId,
+      error: error.message
+    });
+  }
 }
 
 async function processPostMatch(payload) {
@@ -149,7 +200,7 @@ async function processPostMatch(payload) {
       offset += BATCH_SIZE;
     }
 
-    const qdrantLatency = Date.now() - startTime;
+    const qdrantLatencyMs = Date.now() - startTime;
     
     const post = await Post.findById(postId).select('userId');
     const postAuthorId = post ? post.userId.toString() : null;
@@ -158,9 +209,10 @@ async function processPostMatch(payload) {
       .filter(m => m.score >= qdrantThreshold && m.payload?.mongoId !== postAuthorId)
       .slice(0, MAX_NOTIFICATIONS);
 
-    logger.info(`[NotificationWorker] PostMatch stats`, {
+    logger.info(`[NotificationWorker] Profile match completed`, {
+      event: 'PROFILE_MATCH_COMPLETED',
       postId,
-      qdrantLatencyMs: qdrantLatency,
+      qdrantLatencyMs,
       totalEvaluated: allMatches.length,
       aboveThreshold: validMatches.length,
       thresholdScoreUsed: qdrantThreshold
@@ -198,19 +250,36 @@ async function processPostMatch(payload) {
 
       // Yield event loop for websocket delivery
       setImmediate(() => {
-        if (Array.isArray(savedChunk)) {
-          savedChunk.forEach(n => emitNotificationToUser(n.recipientId, n));
+        try {
+          if (Array.isArray(savedChunk)) {
+            savedChunk.forEach(n => emitNotificationToUser(n.recipientId, n));
+          }
+        } catch (error) {
+           logger.error(`[NotificationWorker] WebSocket chunk delivery failed`, {
+             event: 'NOTIFICATION_DELIVERY_FAILED',
+             postId,
+             errorCategory: 'WEBSOCKET_ERROR',
+             error: error.message
+           });
         }
       });
     }
     
-    logger.info(`[NotificationWorker] Created ${savedTotal} POST_MATCH notifications in chunks`, {
+    logger.info(`[NotificationWorker] Match notifications created`, {
+      event: 'NOTIFICATION_CREATED',
       postId,
-      persistLatencyMs: Date.now() - persistStartTime
+      generatedCount: savedTotal,
+      persistLatencyMs: Date.now() - persistStartTime,
+      totalLatencyMs: Date.now() - startTime
     });
 
   } catch (error) {
-    logger.error(`[NotificationWorker] processPostMatch failed`, { error: error.message, postId });
+    logger.error(`[NotificationWorker] processPostMatch failed`, { 
+      event: 'JOB_FAILED',
+      errorCategory: error.message.includes('Qdrant') ? 'QDRANT_ERROR' : 'DATABASE_ERROR',
+      postId, 
+      error: error.message 
+    });
     throw error;
   }
 }
