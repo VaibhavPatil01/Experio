@@ -302,8 +302,8 @@ const Navbar = () => {
                         <div className="w-10 h-10 rounded-md bg-gradient-to-br from-green-500 to-emerald-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-[14px] overflow-hidden">
                           {n.similarityScore ?? n.metadata?.matchPercentage ?? 0}%
                         </div>
-                      ) : n.actorId?.profilePic ? (
-                        <img src={n.actorId.profilePic} alt="Profile" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
+                      ) : n.actorId?.profilePicture || n.actorId?.profilePic ? (
+                        <img src={n.actorId.profilePicture || n.actorId.profilePic} alt="Profile" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-md bg-[#001b44] flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden uppercase">
                           {n.actorId?.username?.slice(0, 2) || 'USR'}

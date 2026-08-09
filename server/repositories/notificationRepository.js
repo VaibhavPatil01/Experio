@@ -98,7 +98,7 @@ export const getUserNotifications = async (userId, limit = 20, cursor = null, un
 
     // Populate the grouped results
     const populated = await Notification.populate(notifications, [
-      { path: 'actors', select: 'username profilePic', model: 'User' },
+      { path: 'actors', select: 'username profilePicture', model: 'User' },
       { path: 'postId', select: 'title company role', model: 'Post' }
     ]);
 
