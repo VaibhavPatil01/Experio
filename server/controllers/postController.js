@@ -880,7 +880,8 @@ export async function addComment(req, res) {
     eventBus.emit(EVENTS.POST_COMMENTED, {
       eventId: `comment_${newComment._id}`,
       actorUserId: userId,
-      targetEntityId: postId, // The post being commented on
+      targetEntityId: postId, 
+      recipientId: updatedPost.userId, // Avoids extra DB lookup in worker
       postId: postId,
       commentId: newComment._id,
       timestamp: new Date()
@@ -920,7 +921,8 @@ export async function addReply(req, res) {
         eventId: `reply_${newReply._id}`,
         actorUserId: userId,
         targetEntityId: parentReplyId || commentId, 
-        replyToUserId: replyToUserId, // explicitly pass who to notify
+        recipientId: replyToUserId, // explicitly pass who to notify
+        replyToUserId: replyToUserId, 
         postId: postId,
         commentId: commentId,
         replyId: newReply._id,
@@ -932,6 +934,7 @@ export async function addReply(req, res) {
         eventId: `reply_${newReply._id}`,
         actorUserId: userId,
         targetEntityId: commentId,
+        recipientId: comment.userId, // Avoids extra DB lookup in worker
         postId: postId,
         commentId: commentId,
         replyId: newReply._id,
