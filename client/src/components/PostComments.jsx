@@ -122,9 +122,11 @@ const CommentItem = ({
     
     // Always attach to the parent comment if it's a sub-reply
     const targetCommentId = isReply ? parentId : comment.id;
+    // If this is a reply to another reply, pass the current reply's ID as parentReplyId
+    const parentReplyId = isReply ? comment.id : null;
 
     addReplyMutation.mutate(
-      { commentId: targetCommentId, content: replyContent },
+      { commentId: targetCommentId, content: replyContent, parentReplyId },
       {
         onSuccess: () => {
           setReplyContent('');
@@ -420,7 +422,7 @@ const PostComments = ({ postId }) => {
   });
 
   const addReplyMutation = useMutation({
-    mutationFn: ({ commentId, content }) => addReply(postId, commentId, content),
+    mutationFn: ({ commentId, content, parentReplyId }) => addReply(postId, commentId, content, parentReplyId),
     onSuccess: () => {
       queryClient.invalidateQueries(['comments', postId]);
       setReplyingToId(null);

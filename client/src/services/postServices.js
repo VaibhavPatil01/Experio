@@ -221,9 +221,10 @@ export function addComment(postId, content) {
   return axios.post(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
 }
 
-export function addReply(postId, commentId, content) {
+export function addReply(postId, commentId, content, parentReplyId = null) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies`;
-  return axios.post(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  const body = parentReplyId ? { content, parentReplyId } : { content };
+  return axios.post(url, body, { headers: { token: getAuthToken() } }).then((res) => res.data);
 }
 
 export function toggleCommentUpvote(postId, commentId) {
