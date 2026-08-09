@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
+import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
 import Logo from './Logo.jsx';
 import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
@@ -39,6 +40,7 @@ const Navbar = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('All');
   const notificationRef = useRef(null);
   const dropdownRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
