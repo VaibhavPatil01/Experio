@@ -3,6 +3,7 @@ import { redisConnection } from '../configs/redis.js';
 import { NOTIFICATION_QUEUE_NAME } from '../queues/notificationQueue.js';
 import { createNotification, createNotificationsBatch } from '../repositories/notificationRepository.js';
 import { QdrantRepository } from '../repositories/qdrantRepository.js';
+import { emitNotificationToUser } from '../configs/socket.js';
 import qdrantClient from '../configs/qdrant.js';
 import { Post } from '../models/Post.js';
 import User from '../models/User.js';
@@ -86,7 +87,7 @@ async function processSocialNotification(payload) {
     return;
   }
 
-  await createNotification({
+  const savedNotification = await createNotification({
     recipientId,
     actorId: actorUserId,
     type,
@@ -97,6 +98,9 @@ async function processSocialNotification(payload) {
     parentCommentId: commentId,
     eventId
   });
+
+  // Emit real-time notification to the connected user
+  emitNotificationToUser(recipientId, savedNotification);
 }
 
 async function processPostMatch(payload) {
@@ -175,14 +179,19 @@ async function processPostMatch(payload) {
     });
 
     const persistStartTime = Date.now();
-    await createNotificationsBatch(notificationsToCreate);
+    const savedNotifications = await createNotificationsBatch(notificationsToCreate);
     
     logger.info(`[NotificationWorker] Created ${notificationsToCreate.length} POST_MATCH notifications`, {
       postId,
       persistLatencyMs: Date.now() - persistStartTime
     });
     
-    // WebSockets delivery would be triggered here (e.g. emitToUser(recipientId, notification))
+    // WebSockets delivery
+    if (Array.isArray(savedNotifications)) {
+      savedNotifications.forEach(n => {
+        emitNotificationToUser(n.recipientId, n);
+      });
+    }
 
   } catch (error) {
     logger.error(`[NotificationWorker] processPostMatch failed`, { error: error.message, postId });

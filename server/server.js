@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import './configs/passport.js';
 import connectDB from './configs/db.js';
 import { initQdrant } from './configs/qdrant.js';
+import { initSocket } from './configs/socket.js';
 import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
 import { initNotificationWorker } from './workers/notificationWorker.js';
 import userRouter from './routes/userRoutes.js';
@@ -103,9 +104,13 @@ app.get('/', (req, res) => {
 // --------------------- Start Server ---------------------
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
   console.log(`✅ Server is running on PORT ${PORT}`);
   
+  // Initialize WebSockets
+  initSocket(server);
+  console.log('✅ Socket.io Initialized');
+
   // Initialize AI Knowledge Layer
   await initQdrant();
   
