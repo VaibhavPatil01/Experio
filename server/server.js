@@ -88,8 +88,8 @@ app.post('/test-sentiment', (req, res) => {
 
 // --------------------- API Routes ---------------------
 app.use('/user', userRouter);
-app.use('/posts', postRouter);
-app.use('/comments', commentRouter);
+app.use('/posts', globalLimiter, postRouter);
+app.use('/comments', globalLimiter, commentRouter);
 app.use('/feedbacks', feedbackRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/recommendations', recommendationRouter);

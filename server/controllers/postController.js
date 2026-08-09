@@ -905,8 +905,8 @@ export async function addReply(req, res) {
   if (!content) return res.status(400).json({ message: 'Content is required' });
 
   try {
-    // If frontend sends replyToUserId or parentReplyId, extract it (assuming req.body has it)
-    const { replyToUserId, parentReplyId } = req.body;
+    // If frontend sends parentReplyId, extract it to find the actual user being replied to
+    const { parentReplyId } = req.body;
     
     const updatedPost = await addReplyService(postId, commentId, userId, content);
     if (!updatedPost) return res.status(404).json({ message: 'Post or comment not found' });
@@ -914,15 +914,25 @@ export async function addReply(req, res) {
     // Find the comment and the newly added reply (the last one)
     const comment = updatedPost.comments.id(commentId);
     const newReply = comment.replies[comment.replies.length - 1];
+    let actualReplyToUserId = null;
+    let actualTargetEntityId = commentId;
+
+    if (parentReplyId) {
+      const parentReply = comment.replies.id(parentReplyId);
+      if (parentReply) {
+        actualReplyToUserId = parentReply.userId;
+        actualTargetEntityId = parentReplyId;
+      }
+    }
     
-    if (replyToUserId) {
+    if (actualReplyToUserId) {
       // This is a reply to another reply
       eventBus.emit(EVENTS.REPLY_REPLIED, {
         eventId: `reply_${newReply._id}`,
         actorUserId: userId,
-        targetEntityId: parentReplyId || commentId, 
-        recipientId: replyToUserId, // explicitly pass who to notify
-        replyToUserId: replyToUserId, 
+        targetEntityId: actualTargetEntityId, 
+        recipientId: actualReplyToUserId, // Securely derived from DB
+        replyToUserId: actualReplyToUserId, 
         postId: postId,
         commentId: commentId,
         replyId: newReply._id,
