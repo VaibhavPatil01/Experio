@@ -44,9 +44,13 @@ export const createNotificationsBatch = async (notificationsDataArray) => {
   }
 };
 
-export const getUserNotifications = async (userId, limit = 20, cursor = null) => {
+export const getUserNotifications = async (userId, limit = 20, cursor = null, unreadOnly = false) => {
   try {
     const matchQuery = { recipientId: new mongoose.Types.ObjectId(userId) };
+    
+    if (unreadOnly) {
+      matchQuery.isRead = false;
+    }
     
     // Cursor-based pagination: if cursor is provided, fetch older items
     if (cursor) {
@@ -138,6 +142,19 @@ export const markMultipleNotificationsAsRead = async (notificationIds, userId) =
     return result;
   } catch (error) {
     logger.error('Failed to mark multiple notifications as read', { error: error.message, userId });
+    throw error;
+  }
+};
+
+export const markAllNotificationsAsRead = async (userId) => {
+  try {
+    const result = await Notification.updateMany(
+      { recipientId: userId, isRead: false },
+      { $set: { isRead: true, readAt: new Date() } }
+    );
+    return result;
+  } catch (error) {
+    logger.error('Failed to mark all notifications as read', { error: error.message, userId });
     throw error;
   }
 };

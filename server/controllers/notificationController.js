@@ -1,13 +1,15 @@
-import { getUserNotifications, markNotificationAsRead } from '../repositories/notificationRepository.js';
+import { getUserNotifications, markNotificationAsRead, getUnreadNotificationCount, markAllNotificationsAsRead, markMultipleNotificationsAsRead } from '../repositories/notificationRepository.js';
+import { Notification } from '../models/Notification.js';
 
 export const getNotifications = async (req, res) => {
   try {
     const userId = req.body.authTokenData.id;
-    const { limit, cursor } = req.query;
+    const { limit, cursor, unreadOnly } = req.query;
 
     const limitNum = limit ? parseInt(limit) : 20;
+    const isUnreadOnly = unreadOnly === 'true';
 
-    const notifications = await getUserNotifications(userId, limitNum, cursor);
+    const notifications = await getUserNotifications(userId, limitNum, cursor, isUnreadOnly);
     
     // Grouped notifications might not have an exact overall _id if there's multiple,
     // but the frontend needs keys. We can map _id if needed, or use notificationIds[0].
@@ -27,21 +29,62 @@ export const markAsRead = async (req, res) => {
   try {
     const userId = req.body.authTokenData.id;
     // The frontend can pass an array of IDs if it's grouped
-    const { notificationIds } = req.body;
+    const { notificationIds } = req.body; // legacy batch support
+    const singleId = req.params.id;
+
+    if (singleId) {
+      const result = await markNotificationAsRead(singleId, userId);
+      return res.status(200).json({ message: 'Marked as read', count: result ? 1 : 0 });
+    }
 
     if (!notificationIds || !Array.isArray(notificationIds)) {
       return res.status(400).json({ message: 'Missing or invalid notificationIds' });
     }
 
-    let modifiedCount = 0;
-    for (const id of notificationIds) {
-      const result = await markNotificationAsRead(id, userId);
-      if (result) modifiedCount++;
-    }
-
-    return res.status(200).json({ message: 'Marked as read', count: modifiedCount });
+    const result = await markMultipleNotificationsAsRead(notificationIds, userId);
+    return res.status(200).json({ message: 'Marked as read', count: result.modifiedCount });
   } catch (error) {
     console.error('markAsRead error:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getUnreadCount = async (req, res) => {
+  try {
+    const userId = req.body.authTokenData.id;
+    const count = await getUnreadNotificationCount(userId);
+    return res.status(200).json({ count });
+  } catch (error) {
+    console.error('getUnreadCount error:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const markAllRead = async (req, res) => {
+  try {
+    const userId = req.body.authTokenData.id;
+    const result = await markAllNotificationsAsRead(userId);
+    return res.status(200).json({ message: 'All notifications marked as read', count: result.modifiedCount });
+  } catch (error) {
+    console.error('markAllRead error:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const deleteNotification = async (req, res) => {
+  try {
+    const userId = req.body.authTokenData.id;
+    const { id } = req.params;
+
+    const result = await Notification.findOneAndDelete({ _id: id, recipientId: userId });
+    
+    if (!result) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    return res.status(200).json({ message: 'Notification deleted successfully' });
+  } catch (error) {
+    console.error('deleteNotification error:', error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
