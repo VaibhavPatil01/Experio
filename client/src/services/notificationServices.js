@@ -16,8 +16,8 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-export const fetchNotifications = (limit = 20, cursor = null, unreadOnly = false) => {
-  let query = `?limit=${limit}&unreadOnly=${unreadOnly}`;
+export const fetchNotifications = (limit = 20, cursor = null, unreadOnly = false, category = 'All') => {
+  let query = `?limit=${limit}&unreadOnly=${unreadOnly}&category=${category}`;
   if (cursor) query += `&cursor=${cursor}`;
   return API.get(`/${query}`);
 };

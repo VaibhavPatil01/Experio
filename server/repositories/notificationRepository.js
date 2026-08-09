@@ -44,7 +44,7 @@ export const createNotificationsBatch = async (notificationsDataArray) => {
   }
 };
 
-export const getUserNotifications = async (userId, limit = 20, cursor = null, unreadOnly = false) => {
+export const getUserNotifications = async (userId, limit = 20, cursor = null, unreadOnly = false, category = 'All') => {
   try {
     const matchQuery = { recipientId: new mongoose.Types.ObjectId(userId) };
     
@@ -55,6 +55,12 @@ export const getUserNotifications = async (userId, limit = 20, cursor = null, un
     // Cursor-based pagination: if cursor is provided, fetch older items
     if (cursor) {
       matchQuery.createdAt = { $lt: new Date(cursor) };
+    }
+
+    if (category === 'Matches') {
+      matchQuery.type = 'POST_MATCH';
+    } else if (category === 'Interactions') {
+      matchQuery.type = { $in: ['POST_COMMENT', 'POST_LIKE', 'POST_DISLIKE', 'COMMENT_REPLY', 'REPLY_REPLY'] };
     }
 
     const notifications = await Notification.aggregate([

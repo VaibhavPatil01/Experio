@@ -12,12 +12,12 @@ const logger = winston.createLogger({
 export const getNotifications = async (req, res) => {
   try {
     const userId = req.body.authTokenData.id;
-    const { limit, cursor, unreadOnly } = req.query;
+    const { limit, cursor, unreadOnly, category } = req.query;
 
     const limitNum = limit ? parseInt(limit) : 20;
     const isUnreadOnly = unreadOnly === 'true';
 
-    const notifications = await getUserNotifications(userId, limitNum, cursor, isUnreadOnly);
+    const notifications = await getUserNotifications(userId, limitNum, cursor, isUnreadOnly, category);
     
     // Grouped notifications might not have an exact overall _id if there's multiple,
     // but the frontend needs keys. We can map _id if needed, or use notificationIds[0].

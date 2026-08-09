@@ -20,6 +20,7 @@ export const NotificationProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(true);
+  const [activeTab, setActiveTab] = useState('All');
 
   // Redux user state tells us if logged in
   const user = useAppSelector((state) => state.userState.user);
@@ -46,8 +47,7 @@ export const NotificationProvider = ({ children }) => {
 
     setSocket(newSocket);
 
-    // Fetch initial data
-    loadInitialNotifications();
+    // Fetch initial unread count
     loadUnreadCount();
 
     newSocket.on('connect', () => {
@@ -101,11 +101,18 @@ export const NotificationProvider = ({ children }) => {
     };
   }, [isLoggedIn, token]);
 
+  // Fetch notifications whenever activeTab changes or user logs in
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadInitialNotifications();
+    }
+  }, [isLoggedIn, activeTab]);
+
   const loadInitialNotifications = async () => {
     try {
       setIsFetching(true);
       setError(null);
-      const res = await fetchNotifications(20, null);
+      const res = await fetchNotifications(20, null, false, activeTab);
       setNotifications(res.data.notifications);
       if (res.data.notifications.length > 0) {
         setCursor(res.data.notifications[res.data.notifications.length - 1].createdAt);
@@ -127,7 +134,7 @@ export const NotificationProvider = ({ children }) => {
     if (!hasMore || isFetching) return;
     try {
       setIsFetching(true);
-      const res = await fetchNotifications(20, cursor);
+      const res = await fetchNotifications(20, cursor, false, activeTab);
       setNotifications((prev) => {
         const newItems = res.data.notifications.filter(
           n => !prev.some(p => p._id === n._id || p.eventId === n.eventId)
@@ -195,6 +202,8 @@ export const NotificationProvider = ({ children }) => {
       isFetching,
       error,
       hasMore,
+      activeTab,
+      setActiveTab,
       loadMoreNotifications,
       loadInitialNotifications,
       markAsRead,
