@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
 import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
+import emptyBellGif from '../assets/images/icons/icons8-bell.gif';
 import Logo from './Logo.jsx';
 import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
@@ -396,7 +397,8 @@ const Navbar = () => {
                   </div>
                 ) : notifications.length === 0 && !isFetching ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                    <p>No notifications yet</p>
+                    <img src={emptyBellGif} alt="Empty Notifications" className="w-16 h-16 mb-3 opacity-80" />
+                    <p className="font-medium text-gray-600 dark:text-gray-300">You’re all caught up!</p>
                   </div>
                 ) : (
                   notifications.map((n) => (
