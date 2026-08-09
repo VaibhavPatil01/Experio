@@ -69,6 +69,16 @@ export class QdrantRepository {
       return response;
   }
 
+  static async searchUsers(vector, limit = 10, filter = null) {
+      const response = await qdrantClient.search('users', {
+          vector: vector,
+          limit: limit,
+          filter: filter,
+          with_payload: true,
+      });
+      return response;
+  }
+
   /**
    * Convert 24-char hex Mongo ObjectId to 36-char UUID format
    * (e.g., 507f1f77bcf86cd799439011 -> 507f1f77-bcf8-6cd7-9943-901100000000)

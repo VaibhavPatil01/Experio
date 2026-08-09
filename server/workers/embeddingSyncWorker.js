@@ -6,6 +6,7 @@ import User from '../models/User.js';
 import { PromptBuilder } from '../ai/promptBuilder.js';
 import { EmbeddingService } from '../ai/embeddingService.js';
 import { QdrantRepository } from '../repositories/qdrantRepository.js';
+import { eventBus, EVENTS } from '../events/index.js';
 
 export const initEmbeddingSyncWorker = () => {
   const worker = new Worker(SYNC_QUEUE_NAME, async (job) => {
@@ -37,7 +38,13 @@ export const initEmbeddingSyncWorker = () => {
 
         await QdrantRepository.upsertPost(entityId, vector, payload);
         console.log(`[Worker] Synced Post ${entityId} to Qdrant`);
-      } 
+        
+        // Trigger notification worker to find matching users
+        eventBus.emit(EVENTS.POST_MATCH_READY, {
+          postId: entityId,
+          vector: vector
+        });
+      }
       else if (entityType === 'user') {
         const user = await User.findById(entityId);
         if (!user) {

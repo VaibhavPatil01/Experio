@@ -13,6 +13,7 @@ import './configs/passport.js';
 import connectDB from './configs/db.js';
 import { initQdrant } from './configs/qdrant.js';
 import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
+import { initNotificationWorker } from './workers/notificationWorker.js';
 import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
@@ -103,7 +104,12 @@ app.listen(PORT, async () => {
   
   // Initialize AI Knowledge Layer
   await initQdrant();
+  
+  console.log('[Workers] Init sync queue worker...');
   initEmbeddingSyncWorker();
+  
+  console.log('[Workers] Init notification queue worker...');
+  initNotificationWorker();
   console.log('✅ AI Knowledge Layer Initialized');
 
   preventServerSleep(); // Schedule background task
