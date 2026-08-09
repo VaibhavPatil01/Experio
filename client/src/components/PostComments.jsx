@@ -187,17 +187,17 @@ const CommentItem = ({
               <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50">
                 {isOwner ? (
                   <>
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left">
+                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer">
                       <Pencil className="w-3.5 h-3.5" />
                       Edit
                     </button>
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer">
                       <Trash2 className="w-3.5 h-3.5" />
                       Delete
                     </button>
                   </>
                 ) : (
-                  <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left">
+                  <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer">
                     <Flag className="w-3.5 h-3.5" />
                     Report
                   </button>
