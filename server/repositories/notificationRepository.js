@@ -106,6 +106,7 @@ export const getUserNotifications = async (userId, limit = 20, cursor = null, un
     return populated.map(n => {
       n.actorId = n.actors.length > 0 ? n.actors[0] : null;
       n.groupCount = n.actors.length;
+      n.createdAt = n.latestCreatedAt;
       return n;
     });
     
