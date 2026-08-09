@@ -50,13 +50,6 @@ function PostPage() {
     staleTime: 0 // Changed from 30 mins to force refresh during development
   });
 
-  if (postQuery.isLoading) {
-    return <Loading />;
-  }
-  if (postQuery.isError) {
-    return <h3 className="text-center mt-10 text-red-500">Error occurred while fetching post</h3>;
-  }
-
   useEffect(() => {
     if (postQuery.data && location.hash) {
       // Delay slightly to ensure comments are rendered
@@ -73,6 +66,13 @@ function PostPage() {
       }, 500);
     }
   }, [postQuery.data, location.hash]);
+
+  if (postQuery.isLoading) {
+    return <Loading />;
+  }
+  if (postQuery.isError) {
+    return <h3 className="text-center mt-10 text-red-500">Error occurred while fetching post</h3>;
+  }
 
   const authorId = postQuery.data?.postAuthorId;
   const isEditable = user?.userId === authorId || user?.isAdmin;
