@@ -259,6 +259,15 @@ export async function upVotePost(req, res) {
         .json({ message: 'Removed Up Vote Successfully' });
     }
 
+    // Dispatch domain event for notification
+    eventBus.emit(EVENTS.POST_LIKED, {
+      eventId: `like_${userId}_${postId}`,
+      actorUserId: userId,
+      targetEntityId: postId,
+      postId: postId,
+      timestamp: new Date()
+    });
+
     return res.status(200).json({ message: 'Post Up Voted Successfully' });
   } catch (error) {
     console.log(error);
@@ -289,6 +298,15 @@ export async function downVotePost(req, res) {
         .status(200)
         .json({ message: 'Removed Down Vote Successfully' });
     }
+
+    // Dispatch domain event for notification
+    eventBus.emit(EVENTS.POST_DISLIKED, {
+      eventId: `dislike_${userId}_${postId}`,
+      actorUserId: userId,
+      targetEntityId: postId,
+      postId: postId,
+      timestamp: new Date()
+    });
 
     return res.status(200).json({ message: 'Post Down Voted Successfully' });
   } catch (error) {
@@ -855,6 +873,19 @@ export async function addComment(req, res) {
   try {
     const updatedPost = await addCommentService(postId, userId, content);
     if (!updatedPost) return res.status(404).json({ message: 'Post not found' });
+
+    // The added comment is the last one in the array
+    const newComment = updatedPost.comments[updatedPost.comments.length - 1];
+    
+    eventBus.emit(EVENTS.POST_COMMENTED, {
+      eventId: `comment_${newComment._id}`,
+      actorUserId: userId,
+      targetEntityId: postId, // The post being commented on
+      postId: postId,
+      commentId: newComment._id,
+      timestamp: new Date()
+    });
+
     return res.status(200).json({ message: 'Comment added successfully' });
   } catch (error) {
     console.log(error);
@@ -873,8 +904,41 @@ export async function addReply(req, res) {
   if (!content) return res.status(400).json({ message: 'Content is required' });
 
   try {
+    // If frontend sends replyToUserId or parentReplyId, extract it (assuming req.body has it)
+    const { replyToUserId, parentReplyId } = req.body;
+    
     const updatedPost = await addReplyService(postId, commentId, userId, content);
     if (!updatedPost) return res.status(404).json({ message: 'Post or comment not found' });
+
+    // Find the comment and the newly added reply (the last one)
+    const comment = updatedPost.comments.id(commentId);
+    const newReply = comment.replies[comment.replies.length - 1];
+    
+    if (replyToUserId) {
+      // This is a reply to another reply
+      eventBus.emit(EVENTS.REPLY_REPLIED, {
+        eventId: `reply_${newReply._id}`,
+        actorUserId: userId,
+        targetEntityId: parentReplyId || commentId, 
+        replyToUserId: replyToUserId, // explicitly pass who to notify
+        postId: postId,
+        commentId: commentId,
+        replyId: newReply._id,
+        timestamp: new Date()
+      });
+    } else {
+      // Standard reply to a comment
+      eventBus.emit(EVENTS.COMMENT_REPLIED, {
+        eventId: `reply_${newReply._id}`,
+        actorUserId: userId,
+        targetEntityId: commentId,
+        postId: postId,
+        commentId: commentId,
+        replyId: newReply._id,
+        timestamp: new Date()
+      });
+    }
+
     return res.status(200).json({ message: 'Reply added successfully' });
   } catch (error) {
     console.log(error);
