@@ -299,7 +299,7 @@ const Navbar = () => {
                       {!n.isRead && <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-primary"></div>}
                       
                       {n.type === 'POST_MATCH' ? (
-                        <div className="w-10 h-10 rounded-md bg-gradient-to-br from-green-500 to-emerald-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-[14px] overflow-hidden">
+                        <div className="w-10 h-10 rounded-md bg-primary flex-shrink-0 flex items-center justify-center text-white font-bold text-[14px] overflow-hidden">
                           {n.similarityScore ?? n.metadata?.matchPercentage ?? 0}%
                         </div>
                       ) : n.actorId?.profilePicture || n.actorId?.profilePic ? (
