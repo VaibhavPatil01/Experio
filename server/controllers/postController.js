@@ -269,6 +269,12 @@ export async function upVotePost(req, res) {
     // Check if user was already bookmarked
     if (updateDetail.matchedCount === 0) {
       await nullifyUserVote(postId, userId);
+      
+      // Dispatch domain event to remove notification
+      eventBus.emit(EVENTS.POST_UNLIKED, {
+        eventId: `like_${userId}_${postId}`
+      });
+      
       return res
         .status(200)
         .json({ message: 'Removed Up Vote Successfully' });
@@ -309,6 +315,12 @@ export async function downVotePost(req, res) {
     // Check if user was already bookmarked
     if (updateDetail.matchedCount === 0) {
       await nullifyUserVote(postId, userId);
+      
+      // Dispatch domain event to remove notification
+      eventBus.emit(EVENTS.POST_UNDISLIKED, {
+        eventId: `dislike_${userId}_${postId}`
+      });
+      
       return res
         .status(200)
         .json({ message: 'Removed Down Vote Successfully' });

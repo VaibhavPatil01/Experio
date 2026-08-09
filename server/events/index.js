@@ -14,7 +14,9 @@ export const EVENTS = {
   // Notification Events
   POST_COMMENTED: 'post.commented',
   POST_LIKED: 'post.liked',
+  POST_UNLIKED: 'post.unliked',
   POST_DISLIKED: 'post.disliked',
+  POST_UNDISLIKED: 'post.undisliked',
   COMMENT_REPLIED: 'comment.replied',
   REPLY_REPLIED: 'reply.replied',
   POST_MATCH_READY: 'post.match.ready'
@@ -51,7 +53,9 @@ const enqueueNotification = async (jobName, payload) => {
 
 eventBus.on(EVENTS.POST_COMMENTED, (payload) => enqueueNotification('process-social-notification', payload));
 eventBus.on(EVENTS.POST_LIKED, (payload) => enqueueNotification('process-social-notification', payload));
+eventBus.on(EVENTS.POST_UNLIKED, (payload) => enqueueNotification('process-remove-notification', payload));
 eventBus.on(EVENTS.POST_DISLIKED, (payload) => enqueueNotification('process-social-notification', payload));
+eventBus.on(EVENTS.POST_UNDISLIKED, (payload) => enqueueNotification('process-remove-notification', payload));
 eventBus.on(EVENTS.COMMENT_REPLIED, (payload) => enqueueNotification('process-social-notification', payload));
 eventBus.on(EVENTS.REPLY_REPLIED, (payload) => enqueueNotification('process-social-notification', payload));
 eventBus.on(EVENTS.POST_MATCH_READY, (payload) => enqueueNotification('process-post-match', payload));

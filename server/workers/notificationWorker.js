@@ -1,7 +1,7 @@
 import { Worker } from 'bullmq';
 import { redisConnection } from '../configs/redis.js';
 import { NOTIFICATION_QUEUE_NAME } from '../queues/notificationQueue.js';
-import { createNotification, createNotificationsBatch } from '../repositories/notificationRepository.js';
+import { createNotification, createNotificationsBatch, deleteNotificationByEventId } from '../repositories/notificationRepository.js';
 import { QdrantRepository } from '../repositories/qdrantRepository.js';
 import { emitNotificationToUser } from '../configs/socket.js';
 import qdrantClient from '../configs/qdrant.js';
@@ -27,6 +27,8 @@ export const initNotificationWorker = () => {
       await processSocialNotification(job.data);
     } else if (job.name === 'process-post-match') {
       await processPostMatch(job.data);
+    } else if (job.name === 'process-remove-notification') {
+      await processRemoveNotification(job.data);
     } else {
       logger.warn(`[NotificationWorker] Unknown job name ${job.name}`);
     }
@@ -157,12 +159,26 @@ async function processSocialNotification(payload) {
       userId: recipientId,
       wsLatencyMs: Date.now() - wsStartTime
     });
+    
   } catch (error) {
-    logger.error(`[NotificationWorker] WebSocket delivery failed`, {
-      event: 'WEBSOCKET_ERROR',
-      eventId,
-      error: error.message
-    });
+    logger.error(`[NotificationWorker] Social notification error`, { error: error.message });
+    throw error;
+  }
+}
+
+async function processRemoveNotification(payload) {
+  const { eventId } = payload;
+  if (!eventId) return;
+  try {
+    const result = await deleteNotificationByEventId(eventId);
+    if (result && result.deletedCount > 0) {
+      logger.info(`[NotificationWorker] Deleted notification for event: ${eventId}`);
+      // Note: Optionally we could emit a websocket event here to remove it from the frontend real-time,
+      // but usually fetching fresh or refreshing handles the cleanup. Since it's a minor sync issue, DB delete is primary.
+    }
+  } catch (error) {
+    logger.error(`[NotificationWorker] Remove notification error`, { error: error.message });
+    throw error;
   }
 }
 

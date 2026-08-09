@@ -28,6 +28,16 @@ export const createNotification = async (notificationData) => {
   }
 };
 
+export const deleteNotificationByEventId = async (eventId) => {
+  try {
+    const result = await Notification.deleteOne({ eventId });
+    return result;
+  } catch (error) {
+    logger.error('Failed to delete notification by eventId', { error: error.message, eventId });
+    throw error;
+  }
+};
+
 export const createNotificationsBatch = async (notificationsDataArray) => {
   try {
     // ordered: false allows continuing insertion even if some documents fail (e.g. duplicate eventIds)
