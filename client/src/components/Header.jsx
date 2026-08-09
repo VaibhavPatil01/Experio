@@ -6,16 +6,27 @@ import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
 import useOutsideAlerter from '../hooks/useOutsideAlerter.js';
 import { themeAction } from '../redux/theme/themeState.js';
-import { ChevronDown, MenuIcon, Moon, Sun, X, Users, LogOut, Settings } from 'lucide-react';
-import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
+import { ChevronDown, MenuIcon, Moon, Sun, X, Users, LogOut, Settings, CheckCheck, Trash2 } from 'lucide-react';
+import { useNotificationContext } from '../context/NotificationContext.jsx';
 import { useQuery } from '@tanstack/react-query';
 import { getUserProfileStats } from '../services/userServices.js';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
   const user = useAppSelector((state) => state.userState.user);
   const theme = useAppSelector((state) => state.themeState.theme);
+
+  const { 
+    notifications, 
+    unreadCount, 
+    isFetching, 
+    hasMore, 
+    loadMoreNotifications, 
+    markAsRead, 
+    markAllAsRead 
+  } = useNotificationContext();
 
   const { data: profileData } = useQuery({
     queryKey: ['profile', user?.userId],
@@ -25,26 +36,73 @@ const Navbar = () => {
 
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isAiToolsOpen, setIsAiToolsOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('All');
   const notificationRef = useRef(null);
+  const dropdownRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [navBottomOffset, setNavBottomOffset] = useState(0);
-  const aiTools = [
-    { label: 'AI Resume Maker', path: '/ai-resume-maker' },
-    { label: 'AI Resume Analyser', path: '/ai-resume-analyser' },
-    { label: 'AI Mock Interview', path: '/ai-mock-interview' }
-  ];
 
   const handleCloseNavbar = () => {
     setIsNavOpen(false);
     setShowDropdown(false);
-    setIsAiToolsOpen(false);
     setIsNotificationOpen(false);
   };
 
-  const dropdownRef = useRef(null);
+  const getTimeAgo = (dateStr) => {
+    const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + 'y ago';
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + 'mo ago';
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + 'd ago';
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + 'h ago';
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + 'm ago';
+    return Math.floor(seconds) + 's ago';
+  };
+
+  const getNotificationText = (n) => {
+    const actorName = n.actorId ? n.actorId.username : 'Someone';
+    const othersCount = n.groupCount && n.groupCount > 1 ? ` and ${n.groupCount - 1} others` : '';
+    
+    switch (n.type) {
+      case 'POST_MATCH':
+        return `New interview experience matches your profile by ${Math.round((n.similarityScore || 0) * 100)}%.`;
+      case 'POST_COMMENT':
+        return `${actorName}${othersCount} commented on your interview experience.`;
+      case 'POST_LIKE':
+        return `${actorName}${othersCount} liked your interview experience.`;
+      case 'POST_DISLIKE':
+        return `${actorName}${othersCount} disliked your interview experience.`;
+      case 'COMMENT_REPLY':
+      case 'REPLY_REPLY':
+        return `${actorName}${othersCount} replied to your comment.`;
+      default:
+        return 'You have a new notification.';
+    }
+  };
+
+  const handleNotificationClick = (e, n) => {
+    e.stopPropagation();
+    if (!n.isRead) {
+      markAsRead(n._id);
+    }
+    setIsNotificationOpen(false);
+    
+    if (n.type === 'POST_MATCH' || n.type === 'POST_LIKE' || n.type === 'POST_DISLIKE' || n.type === 'POST_COMMENT' || n.type === 'COMMENT_REPLY' || n.type === 'REPLY_REPLY') {
+      const postId = n.postId?._id || n.postId;
+      if (postId) navigate(`/post/${postId}`);
+    }
+  };
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop <= clientHeight + 50 && hasMore && !isFetching) {
+      loadMoreNotifications();
+    }
+  };
 
   const updateNavBottomOffset = () => {
     if (dropdownRef.current) {
@@ -239,9 +297,14 @@ const Navbar = () => {
         <div className="relative" ref={notificationRef}>
           <button 
             onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-            className="peer cursor-pointer inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
+            className="peer cursor-pointer inline-flex h-10 w-10 relative items-center justify-center rounded-full border border-gray-200 bg-white transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
           >
             <img src={notificationIcon} alt="Notifications" className="h-[22px] w-[22px] opacity-70 dark:invert pointer-events-none" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </button>
           
           {/* Tooltip */}
@@ -271,11 +334,21 @@ const Navbar = () => {
 
           {/* Notification Modal */}
           {isNotificationOpen && (
-            <div className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:-right-16 md:-right-24 -translate-x-1/2 sm:translate-x-0 top-[4.5rem] sm:top-[3.25rem] w-[calc(100vw-32px)] sm:w-[520px] max-w-[520px] bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-[100] overflow-hidden flex flex-col cursor-default" onClick={e => e.stopPropagation()}>
+            <div className="fixed sm:absolute left-1/2 sm:left-auto right-auto sm:-right-16 md:-right-24 -translate-x-1/2 sm:translate-x-0 top-[4.5rem] sm:top-[3.25rem] w-[calc(100vw-32px)] sm:w-[420px] max-w-[420px] bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-[100] overflow-hidden flex flex-col cursor-default" onClick={e => e.stopPropagation()}>
               <div className="p-4 pb-0 border-b border-gray-100 dark:border-gray-700">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-left">Notifications</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <button 
+                      onClick={() => markAllAsRead()}
+                      className="text-xs text-primary hover:underline font-medium cursor-pointer"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
                 <div className="flex gap-4 sm:gap-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                  {['All', 'Job Recommendations', 'Recruiter Actions', 'Application Status'].map(tab => (
+                  {['All'].map(tab => (
                     <button
                       key={tab}
                       onClick={(e) => { e.stopPropagation(); setActiveTab(tab); }}
@@ -293,25 +366,51 @@ const Navbar = () => {
                   ))}
                 </div>
               </div>
-              <div className="h-[350px] sm:h-[450px] overflow-y-auto custom-scrollbar">
-                <div className="px-4 py-3 text-xs sm:text-sm text-gray-500 font-medium text-left">Today</div>
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="flex gap-3 sm:gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-l-2 border-transparent hover:border-primary cursor-pointer relative text-left">
-                    <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                    <div className="w-10 h-10 rounded-md bg-[#001b44] flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
-                      ADITI
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] sm:text-[15px] text-gray-800 dark:text-gray-200 leading-snug">
-                        <span className="font-bold">10 job recommendations!</span> from Aditi Tech Consulting Private Limited and +9 other companies
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">Job Recommendations</span>
-                        <span className="text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">{i + 1}h ago</span>
+              <div className="h-[350px] sm:h-[450px] overflow-y-auto custom-scrollbar" onScroll={handleScroll}>
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <p>No notifications yet</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <div 
+                      key={n._id || n.eventId} 
+                      onClick={(e) => handleNotificationClick(e, n)}
+                      className={`flex gap-3 sm:gap-4 p-4 transition-colors border-l-2 cursor-pointer relative text-left ${n.isRead ? 'hover:bg-gray-50 dark:hover:bg-gray-800 border-transparent' : 'bg-blue-50/50 dark:bg-blue-900/10 border-primary'}`}
+                    >
+                      {!n.isRead && <div className="absolute left-2 top-[30px] w-1.5 h-1.5 rounded-full bg-primary"></div>}
+                      
+                      {n.type === 'POST_MATCH' ? (
+                        <div className="w-10 h-10 rounded-md bg-gradient-to-br from-green-500 to-emerald-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-[14px] overflow-hidden">
+                          {Math.round((n.similarityScore || 0) * 100)}%
+                        </div>
+                      ) : n.actorId?.profilePic ? (
+                        <img src={n.actorId.profilePic} alt="Profile" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-md bg-[#001b44] flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden uppercase">
+                          {n.actorId?.username?.slice(0, 2) || 'USR'}
+                        </div>
+                      )}
+                      
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[13px] sm:text-[14px] leading-snug ${n.isRead ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-white font-medium'}`}>
+                          {getNotificationText(n)}
+                        </p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 capitalize">
+                            {n.type.replace('_', ' ').toLowerCase()}
+                          </span>
+                          <span className="text-[11px] sm:text-xs text-gray-400 dark:text-gray-500">
+                            {getTimeAgo(n.createdAt)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
+                {isFetching && (
+                  <div className="p-4 text-center text-xs text-gray-500">Loading more...</div>
+                )}
               </div>
             </div>
           )}
