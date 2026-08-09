@@ -17,6 +17,8 @@ import { initNotificationWorker } from './workers/notificationWorker.js';
 import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
+import feedbackRouter from './routes/feedbackRoute.js';
+import notificationRouter from './routes/notificationRoutes.js';
 import recommendationRouter from './routes/recommendationRoutes.js';
 import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
 import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
@@ -87,6 +89,8 @@ app.post('/test-sentiment', (req, res) => {
 app.use('/user', userRouter);
 app.use('/posts', postRouter);
 app.use('/comments', commentRouter);
+app.use('/feedbacks', feedbackRouter);
+app.use('/api/notifications', notificationRouter);
 app.use('/recommendations', recommendationRouter);
 app.use('/api/chat/sessions', chatSessionRoutes);
 app.use('/api/resume-analyzer', analyzerRoutes);

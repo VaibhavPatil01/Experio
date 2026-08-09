@@ -1,4 +1,5 @@
 import { Notification } from '../models/Notification.js';
+import mongoose from 'mongoose';
 import winston from 'winston';
 
 // Optional: you can export the logger or use a central one.
@@ -45,20 +46,59 @@ export const createNotificationsBatch = async (notificationsDataArray) => {
 
 export const getUserNotifications = async (userId, limit = 20, cursor = null) => {
   try {
-    const query = { recipientId: userId };
+    const matchQuery = { recipientId: new mongoose.Types.ObjectId(userId) };
     
     // Cursor-based pagination: if cursor is provided, fetch older items
     if (cursor) {
-      query.createdAt = { $lt: new Date(cursor) };
+      matchQuery.createdAt = { $lt: new Date(cursor) };
     }
 
-    const notifications = await Notification.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .populate('actorId', 'username profilePic') // Only fetch needed user fields
-      .populate('postId', 'title company role');  // Only fetch needed post fields
-      
-    return notifications;
+    const notifications = await Notification.aggregate([
+      { $match: matchQuery },
+      { $sort: { createdAt: -1 } },
+      {
+        // Group by combination of type, post, and read status for social actions.
+        // E.g., multiple unread likes on the same post are grouped.
+        // For non-groupable actions (like POST_MATCH), we group by the unique _id so they stay separate.
+        $group: {
+          _id: {
+            $cond: [
+              { $in: ["$type", ["POST_LIKE", "POST_COMMENT"]] },
+              { type: "$type", postId: "$postId", isRead: "$isRead" }, // Group key
+              "$_id" // Non-group key (unique)
+            ]
+          },
+          latestCreatedAt: { $first: "$createdAt" },
+          notificationIds: { $push: "$_id" },
+          actors: { $addToSet: "$actorId" },
+          type: { $first: "$type" },
+          isRead: { $first: "$isRead" },
+          entityType: { $first: "$entityType" },
+          entityId: { $first: "$entityId" },
+          postId: { $first: "$postId" },
+          commentId: { $first: "$commentId" },
+          parentCommentId: { $first: "$parentCommentId" },
+          similarityScore: { $first: "$similarityScore" },
+          metadata: { $first: "$metadata" }
+        }
+      },
+      { $sort: { latestCreatedAt: -1 } },
+      { $limit: limit }
+    ]);
+
+    // Populate the grouped results
+    const populated = await Notification.populate(notifications, [
+      { path: 'actors', select: 'username profilePic', model: 'User' },
+      { path: 'postId', select: 'title company role', model: 'Post' }
+    ]);
+
+    // Reformat slightly to match frontend expectations (putting actor at root if count is 1 for legacy support)
+    return populated.map(n => {
+      n.actorId = n.actors.length > 0 ? n.actors[0] : null;
+      n.groupCount = n.actors.length;
+      return n;
+    });
+    
   } catch (error) {
     logger.error('Failed to fetch user notifications', { error: error.message, userId });
     throw error;
