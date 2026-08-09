@@ -69,13 +69,17 @@ export class QdrantRepository {
       return response;
   }
 
-  static async searchUsers(vector, limit = 10, filter = null) {
-      const response = await qdrantClient.search('users', {
+  static async searchUsers(vector, limit = 10, filter = null, scoreThreshold = null) {
+      const searchParams = {
           vector: vector,
           limit: limit,
           filter: filter,
           with_payload: true,
-      });
+      };
+      if (scoreThreshold !== null) {
+          searchParams.score_threshold = scoreThreshold;
+      }
+      const response = await qdrantClient.search('users', searchParams);
       return response;
   }
 

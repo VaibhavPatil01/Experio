@@ -3,6 +3,7 @@ import { redisConnection } from '../configs/redis.js';
 import { NOTIFICATION_QUEUE_NAME } from '../queues/notificationQueue.js';
 import { createNotification, createNotificationsBatch } from '../repositories/notificationRepository.js';
 import { QdrantRepository } from '../repositories/qdrantRepository.js';
+import qdrantClient from '../configs/qdrant.js';
 import { Post } from '../models/Post.js';
 import User from '../models/User.js';
 import winston from 'winston';
@@ -100,38 +101,91 @@ async function processSocialNotification(payload) {
 
 async function processPostMatch(payload) {
   const { postId, vector } = payload;
+  const startTime = Date.now();
 
-  // We search Qdrant for users whose profiles match the post's vector
-  // QdrantRepository.searchUsers should return matches.
-  // Using a score threshold of 0.50 as required. Limit to 1000 to prevent infinite massive arrays.
-  const matches = await QdrantRepository.searchUsers(vector, 1000, {
-      must: [],
-      // Ensure we don't notify the author themselves (if we knew authorId, but we can filter later)
-  });
+  const MIN_SCORE = 0.60;
+  const MAX_SCORE = 0.75;
+  const TARGET_PERCENTAGE = 50; 
+  const qdrantThreshold = MIN_SCORE + (TARGET_PERCENTAGE / 100) * (MAX_SCORE - MIN_SCORE); // 0.675
 
-  const post = await Post.findById(postId).select('userId');
-  const postAuthorId = post ? post.userId.toString() : null;
+  let offset = 0;
+  const BATCH_SIZE = 500;
+  let allMatches = [];
+  
+  try {
+    // Paginate through matches if the platform grows. For Qdrant search, we can use offset + limit.
+    // In production with millions of users, we'd use Scroll API, but search with offset is fine for baseline.
+    while (true) {
+      const searchParams = {
+          must: [],
+      };
+      
+      // The qdrantClient.search accepts an offset parameter in modern versions
+      const response = await qdrantClient.search('users', {
+          vector: vector,
+          limit: BATCH_SIZE,
+          offset: offset,
+          filter: searchParams,
+          with_payload: true,
+          score_threshold: qdrantThreshold
+      });
+      
+      allMatches = allMatches.concat(response);
+      
+      if (response.length < BATCH_SIZE) {
+        break; // Reached the end of matches meeting the threshold
+      }
+      
+      offset += BATCH_SIZE;
+    }
 
-  const validMatches = matches.filter(m => m.score >= 0.50 && m.payload?.mongoId !== postAuthorId);
+    const qdrantLatency = Date.now() - startTime;
+    
+    const post = await Post.findById(postId).select('userId');
+    const postAuthorId = post ? post.userId.toString() : null;
 
-  if (validMatches.length === 0) {
-    logger.info('[NotificationWorker] No users matched post above 50% threshold', { postId });
-    return;
+    const validMatches = allMatches.filter(m => m.score >= qdrantThreshold && m.payload?.mongoId !== postAuthorId);
+
+    logger.info(`[NotificationWorker] PostMatch stats`, {
+      postId,
+      qdrantLatencyMs: qdrantLatency,
+      totalEvaluated: allMatches.length,
+      aboveThreshold: validMatches.length,
+      thresholdScoreUsed: qdrantThreshold
+    });
+
+    if (validMatches.length === 0) return;
+
+    const notificationsToCreate = validMatches.map(match => {
+      // Normalize score for UI
+      const normalizedScore = (match.score - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
+      const matchPercentage = Math.max(0, Math.min(100, Math.round(normalizedScore * 100)));
+
+      return {
+        recipientId: match.payload.mongoId,
+        actorId: postAuthorId,
+        type: 'POST_MATCH',
+        entityType: 'POST',
+        entityId: postId,
+        postId: postId,
+        similarityScore: matchPercentage,
+        eventId: `match_${match.payload.mongoId}_${postId}`,
+        metadata: { matchPercentage }
+      };
+    });
+
+    const persistStartTime = Date.now();
+    await createNotificationsBatch(notificationsToCreate);
+    
+    logger.info(`[NotificationWorker] Created ${notificationsToCreate.length} POST_MATCH notifications`, {
+      postId,
+      persistLatencyMs: Date.now() - persistStartTime
+    });
+    
+    // WebSockets delivery would be triggered here (e.g. emitToUser(recipientId, notification))
+
+  } catch (error) {
+    logger.error(`[NotificationWorker] processPostMatch failed`, { error: error.message, postId });
+    throw error;
   }
-
-  logger.info(`[NotificationWorker] Found ${validMatches.length} users matching post ${postId}`);
-
-  const notificationsToCreate = validMatches.map(match => ({
-    recipientId: match.payload.mongoId,
-    actorId: postAuthorId, // System or author generated
-    type: 'POST_MATCH',
-    entityType: 'POST',
-    entityId: postId,
-    postId: postId,
-    similarityScore: Math.round(match.score * 100),
-    eventId: `match_${match.payload.mongoId}_${postId}`
-  }));
-
-  // Batch insert
-  await createNotificationsBatch(notificationsToCreate);
 }
