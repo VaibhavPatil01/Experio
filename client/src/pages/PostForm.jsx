@@ -64,9 +64,9 @@ const MultiSelect = ({ options, value, onChange, placeholder, error }) => {
         onClick={() => setIsOpen(true)}
       >
         {value.map(v => (
-          <span key={v} className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm flex items-center gap-1">
+          <span key={v} className="bg-primary/20 text-primary px-2 py-1 rounded text-sm flex items-center gap-1">
             {v}
-            <button type="button" className="cursor-pointer hover:text-green-900" onClick={(e) => { e.stopPropagation(); handleRemove(v); }}><X size={14} /></button>
+            <button type="button" className="cursor-pointer hover:text-primary" onClick={(e) => { e.stopPropagation(); handleRemove(v); }}><X size={14} /></button>
           </span>
         ))}
         <input 
@@ -96,7 +96,7 @@ const MultiSelect = ({ options, value, onChange, placeholder, error }) => {
           )}
           {showAddButton && (
             <div 
-              className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-green-600 font-medium flex items-center gap-2 border-t border-gray-100"
+              className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-primary font-medium flex items-center gap-2 border-t border-gray-100"
               onClick={() => handleAdd(inputValue.trim())}
             >
               <Plus size={16} /> Add "{inputValue.trim()}"
@@ -133,7 +133,7 @@ const SingleSelect = ({ options, value, onChange, placeholder, error }) => {
     <div className="relative mt-2" ref={containerRef}>
       <button
         type="button"
-        className={`w-full p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex gap-2 cursor-pointer bg-white items-center justify-between focus:outline-none focus:ring-0 ${isOpen ? 'border-green-500 shadow-sm' : ''}`}
+        className={`w-full p-3 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg flex gap-2 cursor-pointer bg-white items-center justify-between focus:outline-none focus:ring-0 ${isOpen ? 'border-primary shadow-sm' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className={value ? "text-gray-900" : "text-gray-400"}>
@@ -146,7 +146,7 @@ const SingleSelect = ({ options, value, onChange, placeholder, error }) => {
           {options.map(opt => (
             <div 
               key={opt.value} 
-              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors ${value === opt.value ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-700'}`}
+              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors ${value === opt.value ? 'bg-primary/10 text-primary font-medium' : 'text-gray-700'}`}
               onClick={() => handleSelect(opt)}
             >
               {opt.label}
@@ -358,7 +358,7 @@ function PostForm() {
                 <BookOpen size={18} />
                 Save as Draft
               </button>
-              <button disabled={isLoading} onClick={() => { if (formRef.current) formRef.current.handleSubmit() }} className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2">
+              <button disabled={isLoading} onClick={() => { if (formRef.current) formRef.current.handleSubmit() }} className="cursor-pointer px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium flex items-center gap-2">
                 <CheckCircle2 size={18} />
                 {isLoading ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post')}
               </button>
@@ -404,7 +404,7 @@ function PostForm() {
                     {/* Section 1: Basic Details */}
                     <div className="mb-10">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">1</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</div>
                         <h2 className="text-xl font-bold text-gray-900">Basic Details</h2>
                       </div>
 
@@ -412,7 +412,7 @@ function PostForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Company <span className="text-red-500">*</span></label>
                           <input type="text" name="company" list="companies" placeholder="e.g., Amazon"
-                            className={`w-full mt-2 p-3 border ${formik.errors.company ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.company ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none`}
                             value={formik.values.company} onChange={formik.handleChange}
                           />
                           <datalist id="companies">{companyAndRoleQuery?.data?.company.map(c => <option key={c} value={c} />)}</datalist>
@@ -421,7 +421,7 @@ function PostForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Job Role <span className="text-red-500">*</span></label>
                           <input type="text" name="role" list="roles" placeholder="e.g., SDE Intern"
-                            className={`w-full mt-2 p-3 border ${formik.errors.role ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.role ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none`}
                             value={formik.values.role} onChange={formik.handleChange}
                           />
                           <datalist id="roles">{companyAndRoleQuery?.data?.role.map(r => <option key={r} value={r} />)}</datalist>
@@ -430,7 +430,7 @@ function PostForm() {
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Hiring Type <span className="text-red-500">*</span></label>
-                          <select name="hiringType" className={`w-full mt-2 p-3 border ${formik.errors.hiringType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
+                          <select name="hiringType" className={`w-full mt-2 p-3 border ${formik.errors.hiringType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
                             value={formik.values.hiringType} onChange={formik.handleChange}>
                             <option value="">Select</option>
                             {hiringTypes.map(h => <option key={h} value={h}>{h}</option>)}
@@ -439,7 +439,7 @@ function PostForm() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Interview Mode <span className="text-red-500">*</span></label>
-                          <select name="interviewMode" className={`w-full mt-2 p-3 border ${formik.errors.interviewMode ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
+                          <select name="interviewMode" className={`w-full mt-2 p-3 border ${formik.errors.interviewMode ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
                             value={formik.values.interviewMode} onChange={formik.handleChange}>
                             <option value="">Select</option>
                             {interviewModes.map(m => <option key={m} value={m}>{m}</option>)}
@@ -462,13 +462,13 @@ function PostForm() {
                             }}
                             dateFormat="dd MMM yyyy"
                             placeholderText="Select Interview Date"
-                            className={`w-full mt-2 p-3 border ${formik.errors.interviewDate ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none cursor-pointer`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.interviewDate ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none cursor-pointer`}
                           />
                           {formik.errors.interviewDate && <span className="text-red-500 text-xs mt-1">{formik.errors.interviewDate}</span>}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Result <span className="text-red-500">*</span></label>
-                          <select name="result" className={`w-full mt-2 p-3 border ${formik.errors.result ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
+                          <select name="result" className={`w-full mt-2 p-3 border ${formik.errors.result ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer`}
                             value={formik.values.result} onChange={formik.handleChange}>
                             <option value="">Select</option>
                             {results.map(r => <option key={r} value={r}>{r}</option>)}
@@ -481,7 +481,7 @@ function PostForm() {
                           <textarea
                             name="content"
                             placeholder="Share some details about the role, team, or overall experience..."
-                            className={`w-full mt-2 p-3 border ${formik.errors.content && formik.touched.content ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none resize-y`}
+                            className={`w-full mt-2 p-3 border ${formik.errors.content && formik.touched.content ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none resize-y`}
                             rows="4"
                             value={formik.values.content}
                             onChange={formik.handleChange}
@@ -497,7 +497,7 @@ function PostForm() {
                     {/* Section 2: Interview Process */}
                     <div className="mb-10">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">2</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</div>
                         <h2 className="text-xl font-bold text-gray-900">Interview Process</h2>
                       </div>
 
@@ -506,7 +506,7 @@ function PostForm() {
                         <div className="flex gap-2">
                           {[1, 2, 3, 4, '5+'].map(num => (
                             <button type="button" key={num}
-                              className={`cursor-pointer w-12 h-10 rounded-lg border transition-colors ${formik.values.rounds.length >= parseInt(num) ? 'border-green-600 bg-green-50 text-green-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+                              className={`cursor-pointer w-12 h-10 rounded-lg border transition-colors ${formik.values.rounds.length >= parseInt(num) ? 'border-primary bg-primary/10 text-primary' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
                               onClick={() => {
                                 const target = parseInt(num) || 5;
                                 const current = formik.values.rounds.length;
@@ -533,7 +533,7 @@ function PostForm() {
                                 <h3 className="font-medium text-gray-900">Round-wise Details <span className="text-red-500">*</span></h3>
                                 <p className="text-sm text-gray-500">Add all the rounds you went through in the interview process.</p>
                               </div>
-                              <button type="button" onClick={() => push({ roundType: '', durationHr: '', durationMin: '', difficulty: '', topicsCovered: [], questionsAsked: [''], experienceAndTips: '', isMostImportant: false })} className="cursor-pointer text-green-600 border border-green-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 hover:bg-green-50 transition">
+                              <button type="button" onClick={() => push({ roundType: '', durationHr: '', durationMin: '', difficulty: '', topicsCovered: [], questionsAsked: [''], experienceAndTips: '', isMostImportant: false })} className="cursor-pointer text-primary border border-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 hover:bg-primary/10 transition">
                                 <Plus size={16} /> Add Round
                               </button>
                             </div>
@@ -567,7 +567,7 @@ function PostForm() {
                                         </div>
                                       )}
                                       {round.difficulty && (
-                                        <span className={`px-3 py-1 rounded-md text-sm font-medium whitespace-nowrap ${round.difficulty === 'Easy' ? 'bg-green-50 text-green-600' : round.difficulty === 'Medium' ? 'bg-orange-50 text-orange-600' : 'bg-red-50 text-red-600'}`}>
+                                        <span className={`px-3 py-1 rounded-md text-sm font-medium whitespace-nowrap ${round.difficulty === 'Easy' ? 'bg-primary/10 text-primary' : round.difficulty === 'Medium' ? 'bg-orange-50 text-orange-600' : 'bg-red-50 text-red-600'}`}>
                                           {round.difficulty}
                                         </span>
                                       )}
@@ -594,7 +594,7 @@ function PostForm() {
                                             list="round-type-options" 
                                             name={`rounds.${index}.roundType`} 
                                             placeholder="Select or type (e.g., Online Assessment...)" 
-                                            className={`w-full mt-2 p-3 border ${roundError?.roundType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none bg-white`}
+                                            className={`w-full mt-2 p-3 border ${roundError?.roundType ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none bg-white`}
                                             value={round.roundType} 
                                             onChange={formik.handleChange} 
                                             autoComplete="off"
@@ -608,11 +608,11 @@ function PostForm() {
                                           <label className="block text-sm font-medium text-gray-700">Duration <span className="text-red-500">*</span></label>
                                           <div className="flex gap-2 mt-2">
                                             <div className="flex-1 relative">
-                                              <input type="number" name={`rounds.${index}.durationHr`} min="0" placeholder="0" className={`w-full p-3 border ${roundError?.durationHr ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none pr-10`} value={round.durationHr} onChange={formik.handleChange} />
+                                              <input type="number" name={`rounds.${index}.durationHr`} min="0" placeholder="0" className={`w-full p-3 border ${roundError?.durationHr ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none pr-10`} value={round.durationHr} onChange={formik.handleChange} />
                                               <span className="absolute right-3 top-3.5 text-gray-500 text-sm">hr</span>
                                             </div>
                                             <div className="flex-1 relative">
-                                              <input type="number" name={`rounds.${index}.durationMin`} min="0" max="59" placeholder="0" className={`w-full p-3 border ${roundError?.durationMin ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none pr-12`} value={round.durationMin} onChange={formik.handleChange} />
+                                              <input type="number" name={`rounds.${index}.durationMin`} min="0" max="59" placeholder="0" className={`w-full p-3 border ${roundError?.durationMin ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none pr-12`} value={round.durationMin} onChange={formik.handleChange} />
                                               <span className="absolute right-3 top-3.5 text-gray-500 text-sm">min</span>
                                             </div>
                                           </div>
@@ -623,7 +623,7 @@ function PostForm() {
                                           <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty <span className="text-red-500">*</span></label>
                                           <div className="flex gap-4">
                                             {difficulties.map(diff => (
-                                              <label key={diff} className={`flex-1 text-center py-2 px-4 rounded-lg border cursor-pointer transition-colors ${round.difficulty === diff ? (diff === 'Easy' ? 'bg-green-50 border-green-500 text-green-700' : diff === 'Medium' ? 'bg-orange-50 border-orange-500 text-orange-700' : 'bg-red-50 border-red-500 text-red-700') : 'border-gray-300 text-gray-600 hover:bg-gray-50 bg-white'}`}>
+                                              <label key={diff} className={`flex-1 text-center py-2 px-4 rounded-lg border cursor-pointer transition-colors ${round.difficulty === diff ? (diff === 'Easy' ? 'bg-primary/10 border-primary text-primary' : diff === 'Medium' ? 'bg-orange-50 border-orange-500 text-orange-700' : 'bg-red-50 border-red-500 text-red-700') : 'border-gray-300 text-gray-600 hover:bg-gray-50 bg-white'}`}>
                                                 <input type="radio" name={`rounds.${index}.difficulty`} value={diff} className="hidden cursor-pointer" onChange={formik.handleChange} />
                                                 {diff}
                                               </label>
@@ -656,7 +656,7 @@ function PostForm() {
                                                     Q{qIndex + 1}
                                                   </div>
                                                   <input type="text" name={`rounds.${index}.questionsAsked.${qIndex}`} placeholder="Enter the question asked in this round..."
-                                                    className={`flex-1 h-12 p-3 border ${questionError && typeof questionError === 'string' ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none`}
+                                                    className={`flex-1 h-12 p-3 border ${questionError && typeof questionError === 'string' ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none`}
                                                     value={question} onChange={formik.handleChange} />
                                                   <button type="button" onClick={() => removeQuestion(qIndex)} className="w-12 h-12 flex items-center justify-center border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition cursor-pointer shrink-0" disabled={round.questionsAsked.length === 1}>
                                                     <Trash2 size={18} />
@@ -667,7 +667,7 @@ function PostForm() {
                                             );
                                           })}
                                           {typeof roundError?.questionsAsked === 'string' && <span className="text-red-500 text-xs mt-1">{roundError.questionsAsked}</span>}
-                                          <button type="button" onClick={() => pushQuestion('')} className="text-green-600 font-medium text-sm flex items-center gap-1 mt-4 cursor-pointer hover:text-green-700 transition">
+                                          <button type="button" onClick={() => pushQuestion('')} className="text-primary font-medium text-sm flex items-center gap-1 mt-4 cursor-pointer hover:text-primary transition">
                                             <Plus size={16} /> Add Another Question
                                           </button>
                                         </div>
@@ -678,13 +678,13 @@ function PostForm() {
                                   <div className="mb-6">
                                     <label className="block text-sm font-medium text-gray-700">Experience & Tips <span className="text-red-500">*</span></label>
                                     <textarea name={`rounds.${index}.experienceAndTips`} rows={4} placeholder="Share your experience, what was discussed, important tips for others..."
-                                      className={`w-full mt-2 p-3 border ${roundError?.experienceAndTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none resize-y`}
+                                      className={`w-full mt-2 p-3 border ${roundError?.experienceAndTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none resize-y`}
                                       value={round.experienceAndTips} onChange={formik.handleChange}></textarea>
                                     {roundError?.experienceAndTips && <span className="text-red-500 text-xs mt-1">{roundError.experienceAndTips}</span>}
                                   </div>
 
                                       <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" name={`rounds.${index}.isMostImportant`} className="w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500 cursor-pointer"
+                                        <input type="checkbox" name={`rounds.${index}.isMostImportant`} className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer"
                                           checked={round.isMostImportant} onChange={formik.handleChange} />
                                         <span className="text-sm text-gray-700">Mark as most important round</span>
                                       </label>
@@ -703,7 +703,7 @@ function PostForm() {
                     {/* Section 3: Technical Information */}
                     <div className="mb-10">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">3</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">3</div>
                         <h2 className="text-xl font-bold text-gray-900">Technical Information</h2>
                       </div>
 
@@ -728,7 +728,7 @@ function PostForm() {
                     {/* Section 4: Salary Information */}
                     <div className="mb-10">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">4</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">4</div>
                         <h2 className="text-xl font-bold text-gray-900">Salary Details <span className="text-gray-400 font-normal text-base">(Optional)</span></h2>
                       </div>
                       
@@ -750,28 +750,28 @@ function PostForm() {
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Base Salary</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.base" placeholder="e.g. 15" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.base" placeholder="e.g. 15" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.base} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Bonus / Sign-on</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.bonus" placeholder="e.g. 2" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.bonus" placeholder="e.g. 2" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.bonus} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Stocks / RSUs</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.stocks" placeholder="e.g. 10" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.stocks" placeholder="e.g. 10" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.stocks} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
                         <div className="lg:col-span-1">
                           <label className="block text-sm font-medium text-gray-700">Total CTC</label>
                           <div className="relative mt-2">
-                            <input type="number" step="any" min="0" name="salary.totalCTC" placeholder="e.g. 27" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
+                            <input type="number" step="any" min="0" name="salary.totalCTC" placeholder="e.g. 27" className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none" value={formik.values.salary.totalCTC} onChange={formik.handleChange} />
                             <span className="absolute right-3 top-3.5 text-gray-400 text-sm font-medium pointer-events-none">{formik.values.salary.currency === 'INR' ? 'LPA' : 'K'}</span>
                           </div>
                         </div>
@@ -783,14 +783,14 @@ function PostForm() {
                     {/* Section 5: Additional Information */}
                     <div>
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">5</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">5</div>
                         <h2 className="text-xl font-bold text-gray-900">Additional Information</h2>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Preparation Duration</label>
-                          <select name="preparationDuration" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer"
+                          <select name="preparationDuration" className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none appearance-none bg-white cursor-pointer"
                             value={formik.values.preparationDuration} onChange={formik.handleChange}>
                             <option value="">Select duration</option>
                             {durations.map(d => <option key={d} value={d}>{d}</option>)}
@@ -799,7 +799,7 @@ function PostForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Preparation Resources <span className="text-gray-400 font-normal">(Optional)</span></label>
                           <input type="text" name="preparationResources" placeholder="e.g., LeetCode, GeeksforGeeks, Striver Sheet"
-                            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none"
+                            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none"
                             value={formik.values.preparationResources} onChange={formik.handleChange}
                           />
                         </div>
@@ -808,7 +808,7 @@ function PostForm() {
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Overall Tips for Future Aspirants <span className="text-red-500">*</span></label>
                         <textarea name="overallTips" rows={4} placeholder="Share your overall tips and advice..."
-                          className={`w-full mt-2 p-3 border ${formik.errors.overallTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-green-500 focus:outline-none focus:ring-0 outline-none resize-y`}
+                          className={`w-full mt-2 p-3 border ${formik.errors.overallTips ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:border-primary focus:outline-none focus:ring-0 outline-none resize-y`}
                           value={formik.values.overallTips} onChange={formik.handleChange}></textarea>
                         {formik.errors.overallTips && <span className="text-red-500 text-xs mt-1">{formik.errors.overallTips}</span>}
                       </div>
@@ -848,7 +848,7 @@ function PostForm() {
                         <div className="flex items-center gap-4 mb-4 sm:mb-0">
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="isAnonymous" className="sr-only peer cursor-pointer" checked={formik.values.isAnonymous} onChange={formik.handleChange} />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                           </label>
                           <div>
                             <div className="font-bold text-sm text-gray-900">Post Anonymously</div>
@@ -860,7 +860,7 @@ function PostForm() {
                           <button type="button" onClick={() => navigate(-1)} className="cursor-pointer px-6 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 font-medium w-full sm:w-auto transition">
                             Cancel
                           </button>
-                          <button type="submit" disabled={isLoading} className="cursor-pointer px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium w-full sm:w-auto flex items-center justify-center gap-2 disabled:opacity-70 transition">
+                          <button type="submit" disabled={isLoading} className="cursor-pointer px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium w-full sm:w-auto flex items-center justify-center gap-2 disabled:opacity-70 transition">
                             <PenTool size={18} /> {isLoading ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post')}
                           </button>
                         </div>
@@ -877,7 +877,7 @@ function PostForm() {
 
                       <div className="space-y-5">
                         <div className="flex gap-3">
-                          <div className="mt-0.5 text-green-600"><CheckCircle2 size={18} /></div>
+                          <div className="mt-0.5 text-primary"><CheckCircle2 size={18} /></div>
                           <div>
                             <div className="text-sm font-bold text-gray-900">Be honest and authentic</div>
                             <div className="text-xs text-gray-500 mt-1">Share your genuine experience</div>
@@ -885,7 +885,7 @@ function PostForm() {
                         </div>
 
                         <div className="flex gap-3">
-                          <div className="mt-0.5 text-green-600"><MessageSquare size={18} /></div>
+                          <div className="mt-0.5 text-primary"><MessageSquare size={18} /></div>
                           <div>
                             <div className="text-sm font-bold text-gray-900">Add specific questions</div>
                             <div className="text-xs text-gray-500 mt-1">Mention questions to help others</div>
@@ -893,7 +893,7 @@ function PostForm() {
                         </div>
 
                         <div className="flex gap-3">
-                          <div className="mt-0.5 text-green-600"><BookOpen size={18} /></div>
+                          <div className="mt-0.5 text-primary"><BookOpen size={18} /></div>
                           <div>
                             <div className="text-sm font-bold text-gray-900">Include your preparation</div>
                             <div className="text-xs text-gray-500 mt-1">Share resources that helped you</div>
@@ -901,7 +901,7 @@ function PostForm() {
                         </div>
 
                         <div className="flex gap-3">
-                          <div className="mt-0.5 text-green-600"><PenTool size={18} /></div>
+                          <div className="mt-0.5 text-primary"><PenTool size={18} /></div>
                           <div>
                             <div className="text-sm font-bold text-gray-900">Write helpful tips</div>
                             <div className="text-xs text-gray-500 mt-1">Help the next person succeed</div>
@@ -909,7 +909,7 @@ function PostForm() {
                         </div>
 
                         <div className="flex gap-3">
-                          <div className="mt-0.5 text-green-600"><ShieldAlert size={18} /></div>
+                          <div className="mt-0.5 text-primary"><ShieldAlert size={18} /></div>
                           <div>
                             <div className="text-sm font-bold text-gray-900">Keep it respectful</div>
                             <div className="text-xs text-gray-500 mt-1">Avoid sharing confidential info</div>
