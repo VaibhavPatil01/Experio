@@ -1,9 +1,27 @@
-# 🎓 Interview Experience GSMCOE
+# 🎓 Experio
 
-Welcome to the **Interview Experience GSMCOE** project!  
-A community-driven platform built with the MERN stack that enables students to share their real interview experiences, explore others’ journeys, and get well-prepared for placements. 
+Welcome to the **Experio** project!  
+This is a full-stack platform built using the **MERN** stack (MongoDB, Express.js, React.js, Node.js). 
 
-The platform provides a collaborative space where students of GSMCOE can document, share, and learn from detailed interview experiences of peers, thereby enhancing collective placement readiness and confidence.
+The platform provides a collaborative space where students can document, share, and learn from detailed interview experiences of peers, thereby enhancing collective placement readiness and confidence.
+
+---
+
+## 🎯 Purpose
+
+While there are many resources available online for interview preparation, finding experiences specifically from alumni and seniors can be challenging.  
+
+**Experio** is designed to help students preparing for placements by providing a repository of **real interview experiences** shared by their peers.  
+
+Students can browse, search, and filter interview posts by **company, role, or tags**, as well as share their own experiences. The platform ensures every student has **equal access to preparation resources**.
+
+### Key Features:
+- **User Authentication**: Secure registration & login with JWT-based authentication.  
+- **Post Management**: Users can write, edit, and view detailed interview experiences.  
+- **Comments & Reactions**: Engage with posts via comments, likes, and shares.  
+- **Search & Filter**: Quickly find experiences by company, role, or keywords.  
+- **Rate Us Section**: Students can rate the platform and update their feedback later.  
+- **Responsive UI**: Built with Tailwind CSS to support desktop and mobile devices.  
 
 ## Table of Contents
 
@@ -18,13 +36,6 @@ The platform provides a collaborative space where students of GSMCOE can documen
 
 ## Project Overview
 
-**Interview Experience GSMCOE** is designed to help students preparing for placements by providing a repository of **real interview experiences** shared by their peers.  
-
-Students can browse, search, and filter interview posts by **company, role, or tags**, as well as share their own experiences. The platform ensures every student has **equal access to preparation resources**.
-
-### Key Features:
-- **User Authentication**: Secure registration & login with JWT-based authentication.  
-- **Post Management**: Users can write, edit, and view detailed interview experiences.  
 - **Comments & Reactions**: Engage with posts via comments, likes, and shares.  
 - **Search & Filter**: Quickly find experiences by company, role, or keywords.  
 - **Rate Us Section**: Students can rate the platform and update their feedback later.  

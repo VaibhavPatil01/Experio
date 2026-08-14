@@ -63,7 +63,7 @@ const ProfilePage = () => {
     <>
     <Helmet>
         <title>
-          {`${profileData.username}'s Profile | Interview Experience`}
+          {`${profileData.username}'s Profile | Experio`}
         </title>
         <meta
           name="description"
@@ -72,7 +72,7 @@ const ProfilePage = () => {
         <meta name="twitter:card" content={profilePageImage} />
         <meta
           name="twitter:title"
-          content={`${profileData.username}'s Profile | Interview Experience`}
+          content={`${profileData.username}'s Profile | Experio`}
         />
         <meta
           name="twitter:description"
@@ -82,7 +82,7 @@ const ProfilePage = () => {
 
         <meta
           property="og:title"
-          content={`${profileData.username}'s Profile | Interview Experience`}
+          content={`${profileData.username}'s Profile | Experio`}
         />
         <meta
           property="og:description"

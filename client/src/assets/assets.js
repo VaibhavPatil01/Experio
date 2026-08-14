@@ -370,7 +370,7 @@ export const dummyUsers = [
     passingYear: '2025',
     designation: 'Student',
     about:
-      'I’m an IT student at GSMCOE and an admin for the Interview Experience platform. I manage content and mentor peers on data analytics, with experience in Power BI and SQL from my Microsoft internship. I’m passionate about building a supportive community.',
+      'I’m an IT student at GSMCOE and an admin for Experio. I manage content and mentor peers on data analytics, with experience in Power BI and SQL from my Microsoft internship. I’m passionate about building a supportive community.',
     github: 'https://github.com/rahuljoshi',
     leetcode: 'https://leetcode.com/rahuljoshi',
     linkedin: 'https://linkedin.com/in/rahuljoshi'

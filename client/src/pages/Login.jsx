@@ -139,22 +139,22 @@ function Login() {
   return (
     <>
       <Helmet>
-        <title>User {formTitle} | Interview Experience</title>
+        <title>User {formTitle} | Experio</title>
         <meta
           name="description"
-          content={`User ${formTitle} Page for Interview Experience GSMCOE Website`}
+          content={`User ${formTitle} Page for Experio`}
         />
         <meta name="twitter:card" content={loginPageImage} />
-        <meta name="twitter:title" content={`User ${formTitle} | Interview Experience`} />
+        <meta name="twitter:title" content={`User ${formTitle} | Experio`} />
         <meta
           name="twitter:description"
-          content={`User ${formTitle} Page for Interview Experience GSMCOE Website`}
+          content={`User ${formTitle} Page for Experio`}
         />
         <meta name="twitter:image" content={loginPageImage} />
-        <meta property="og:title" content={`User ${formTitle} | Interview Experience`} />
+        <meta property="og:title" content={`User ${formTitle} | Experio`} />
         <meta
           property="og:description"
-          content={`User ${formTitle} Page for Interview Experience GSMCOE Website`}
+          content={`User ${formTitle} Page for Experio`}
         />
         <meta property="og:image" content={loginPageImage} />
         <meta

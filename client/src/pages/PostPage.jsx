@@ -90,19 +90,19 @@ function PostPage() {
   return (
     <>
       <Helmet>
-        <title>{`${post.title || post.company} | Interview Experience`}</title>
+        <title>{`${post.title || post.company} | Experio`}</title>
         <meta
           name="description"
           content={`${post.postType} titled "${post.title}" specially for GSMCOE on Interview Experience. ${generateTextFromHTML(post.content || '')}`}
         />
         <meta name="twitter:card" content={postImage} />
-        <meta name="twitter:title" content={`${post.title || post.company} | Interview Experience`} />
+        <meta name="twitter:title" content={`${post.title || post.company} | Experio`} />
         <meta
           name="twitter:description"
           content={`${post.postType} titled "${post.title}" specially for GSMCOE on Interview Experience. ${generateTextFromHTML(post.content || '')}`}
         />
         <meta name="twitter:image" content={postImage} />
-        <meta property="og:title" content={`${post.title || post.company} | Interview Experience`} />
+        <meta property="og:title" content={`${post.title || post.company} | Experio`} />
         <meta
           property="og:description"
           content={`${post.postType} titled "${post.title}" specially for GSMCOE on Interview Experience. ${generateTextFromHTML(post.content || '')}`}

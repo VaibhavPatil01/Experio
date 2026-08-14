@@ -340,7 +340,7 @@ function PostForm() {
   return (
     <>
       <Helmet>
-        <title>Create Interview Experience Post | Interview Experience</title>
+        <title>Create Interview Experience Post | Experio</title>
         <meta name="description" content="Share your interview experience to help other students" />
       </Helmet>
 

@@ -4,7 +4,7 @@ const AIMockInterview = () => {
   return (
     <>
       <Helmet>
-        <title>AI Mock Interview | Interview Experience</title>
+        <title>AI Mock Interview | Experio</title>
         <meta
           name="description"
           content="Practice interview questions and improve your answers with AI feedback."

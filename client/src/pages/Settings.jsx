@@ -34,7 +34,7 @@ function SettingsPage() {
   return (
     <>
       <Helmet>
-        <title>Settings | Interview Experience</title>
+        <title>Settings | Experio</title>
         <meta name="description" content="Manage your account settings and preferences" />
       </Helmet>
       

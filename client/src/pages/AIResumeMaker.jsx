@@ -4,7 +4,7 @@ const AIResumeMaker = () => {
   return (
     <>
       <Helmet>
-        <title>AI Resume Maker | Interview Experience</title>
+        <title>AI Resume Maker | Experio</title>
         <meta
           name="description"
           content="Create a polished resume with AI-powered guidance."

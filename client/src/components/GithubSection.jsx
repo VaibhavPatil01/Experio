@@ -57,7 +57,7 @@ const GithubSection = () => {
 
         {/* Description */}
         <p className="text-gray-500 max-w-2xl mx-auto text-base mb-12">
-          Explore the source code behind Interview Experience GSMCOE — thoughtfully architected,
+          Explore the source code behind Experio — thoughtfully architected,
           cleanly styled, and built with scalability and maintainability in mind. From design
           patterns to performance, every line reflects real-world engineering standards.
         </p>

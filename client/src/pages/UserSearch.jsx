@@ -45,23 +45,23 @@ function UserSearch() {
   return (
     <>
       <Helmet>
-        <title>User List | Interview Experience</title>
+        <title>User List | Experio</title>
         <meta
           name="description"
-          content="Search seniors and alumni and connect with them on Interview Experience GSMCOE"
+          content="Search seniors and alumni and connect with them on Experio"
         />
         <meta name="twitter:card" content={userListImage} />
-        <meta name="twitter:title" content="User List | Interview Experience" />
+        <meta name="twitter:title" content="User List | Experio" />
         <meta
           name="twitter:description"
-          content="Search seniors and alumni and connect with them on Interview Experience GSMCOE"
+          content="Search seniors and alumni and connect with them on Experio"
         />
         <meta name="twitter:image" content={userListImage} />
 
-        <meta property="og:title" content="User List | Interview Experience" />
+        <meta property="og:title" content="User List | Experio" />
         <meta
           property="og:description"
-          content="Search seniors and alumni and connect with them on Interview Experience GSMCOE"
+          content="Search seniors and alumni and connect with them on Experio"
         />
         <meta property="og:image" content={userListImage} />
         <meta

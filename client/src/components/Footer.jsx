@@ -76,7 +76,7 @@ const Footer = () => {
 
           <div className="max-w-7xl mx-auto mt-6 pt-2 border-t border-neutral-300 flex justify-between items-center z-10 relative">
             <p className="text-neutral-600 text-sm">Copyright © 2025 Experio.</p>
-            <p className="text-sm text-neutral-600">Built with ♡ by Vaibhav Patil</p>
+            <p className="text-sm text-neutral-600">Built with <span className='text-primary'>❤︎</span> by Vaibhav Patil</p>
           </div>
 
           <div className="relative mt-2 z-0">

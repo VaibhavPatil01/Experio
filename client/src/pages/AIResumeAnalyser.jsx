@@ -203,7 +203,7 @@ const AIResumeAnalyser = () => {
   return (
     <>
       <Helmet>
-        <title>AI Resume Analyser | Interview Experience</title>
+        <title>AI Resume Analyser | Experio</title>
         <meta
           name="description"
           content="Analyse your resume and discover personalized, practical improvements with AI backed by real interview data."

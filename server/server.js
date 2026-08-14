@@ -96,7 +96,7 @@ app.use('/api/resume-analyzer', analyzerRoutes);
 
 // --------------------- Home Route ---------------------
 app.get('/', (req, res) => {
-  res.status(200).json({ name: 'Interview Experience API' });
+  res.status(200).json({ name: 'Experio API' });
 });
 
 // --------------------- Start Server ---------------------

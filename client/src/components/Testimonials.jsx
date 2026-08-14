@@ -16,7 +16,7 @@
 //         </h2>
 
 //         <p className="text-center text-gray-500 mb-10 max-w-2xl mx-auto">
-//           Hear directly from students who’ve used Interview Experience GSMCOE to ace their
+//           Hear directly from students who’ve used Experio to ace their
 //           interviews.
 //         </p>
 
