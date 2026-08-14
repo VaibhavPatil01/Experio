@@ -32,6 +32,7 @@ export async function getRecommendedFeed(req, res) {
 
       return {
         ...post,
+        userId: post.isAnonymous ? { ...(post.userId || {}), username: "Anonymous User", profilePicture: "", _id: null } : post.userId,
         isUpVoted,
         isDownVoted,
         isBookmarked,
