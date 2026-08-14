@@ -227,6 +227,26 @@ export function addReply(postId, commentId, content, parentReplyId = null) {
   return axios.post(url, body, { headers: { token: getAuthToken() } }).then((res) => res.data);
 }
 
+export function editComment(postId, commentId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}`;
+  return axios.put(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function deleteComment(postId, commentId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}`;
+  return axios.delete(url, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function editReply(postId, commentId, replyId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`;
+  return axios.put(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function deleteReply(postId, commentId, replyId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`;
+  return axios.delete(url, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
 export function toggleCommentUpvote(postId, commentId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/upvote`;
   return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);

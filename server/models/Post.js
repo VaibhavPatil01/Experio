@@ -5,6 +5,8 @@ const replySchema = new mongoose.Schema({
   content: { type: String, required: true },
   upVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   downVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  isEdited: { type: Boolean, default: false },
+  editedAt: { type: Date },
 }, { timestamps: true });
 
 const commentSchema = new mongoose.Schema({ 
@@ -13,6 +15,8 @@ const commentSchema = new mongoose.Schema({
   upVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   downVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   replies: [replySchema],
+  isEdited: { type: Boolean, default: false },
+  editedAt: { type: Date },
 }, { timestamps: true }); 
 
 const roundSchema = new mongoose.Schema({

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLContent.js';
-import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
+import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, editCommentService, deleteCommentService, editReplyService, deleteReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
 import { findUserById } from '../services/userService.js';
 import { eventBus, EVENTS } from '../events/index.js';
 import winston from 'winston';
@@ -1042,3 +1042,62 @@ export async function toggleReplyDownvote(req, res) {
   }
 }
 
+export async function editComment(req, res) {
+  const { id: postId, commentId } = req.params;
+  const { authTokenData, content } = req.body;
+  const userId = authTokenData.id;
+  if (!content?.trim()) return res.status(400).json({ message: 'Content is required' });
+  try {
+    await editCommentService(postId, commentId, userId, content);
+    return res.status(200).json({ message: 'Comment updated' });
+  } catch (error) {
+    if (error.message === 'Unauthorized') return res.status(403).json({ message: 'Unauthorized' });
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function deleteComment(req, res) {
+  const { id: postId, commentId } = req.params;
+  const { authTokenData } = req.body;
+  const userId = authTokenData.id;
+  const isAdmin = authTokenData.isAdmin || false;
+  try {
+    await deleteCommentService(postId, commentId, userId, isAdmin);
+    return res.status(200).json({ message: 'Comment deleted' });
+  } catch (error) {
+    if (error.message === 'Unauthorized') return res.status(403).json({ message: 'Unauthorized' });
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function editReply(req, res) {
+  const { id: postId, commentId, replyId } = req.params;
+  const { authTokenData, content } = req.body;
+  const userId = authTokenData.id;
+  if (!content?.trim()) return res.status(400).json({ message: 'Content is required' });
+  try {
+    await editReplyService(postId, commentId, replyId, userId, content);
+    return res.status(200).json({ message: 'Reply updated' });
+  } catch (error) {
+    if (error.message === 'Unauthorized') return res.status(403).json({ message: 'Unauthorized' });
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}
+
+export async function deleteReply(req, res) {
+  const { id: postId, commentId, replyId } = req.params;
+  const { authTokenData } = req.body;
+  const userId = authTokenData.id;
+  const isAdmin = authTokenData.isAdmin || false;
+  try {
+    await deleteReplyService(postId, commentId, replyId, userId, isAdmin);
+    return res.status(200).json({ message: 'Reply deleted' });
+  } catch (error) {
+    if (error.message === 'Unauthorized') return res.status(403).json({ message: 'Unauthorized' });
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong...' });
+  }
+}

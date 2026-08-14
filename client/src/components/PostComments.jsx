@@ -7,7 +7,7 @@ import {
 import { useAppSelector } from '../redux/store.js';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserProfileStats } from '../services/userServices.js';
-import { getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote } from '../services/postServices.js';
+import { getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote, editComment, deleteComment, editReply, deleteReply } from '../services/postServices.js';
 
 const formatTimeAgo = (dateString) => {
   if (!dateString) return 'Just now';
@@ -41,10 +41,17 @@ const CommentItem = ({
   toggleReplyUpvoteMutation,
   toggleCommentDownvoteMutation,
   toggleReplyDownvoteMutation,
-  addReplyMutation
+  addReplyMutation,
+  editCommentMutation,
+  deleteCommentMutation,
+  editReplyMutation,
+  deleteReplyMutation,
 }) => {
   const [replyContent, setReplyContent] = useState('');
   const replyEditorRef = useRef(null);
+  const editEditorRef = useRef(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
   
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -136,6 +143,49 @@ const CommentItem = ({
     );
   };
 
+  const handleStartEdit = () => {
+    setIsEditing(true);
+    setEditContent(comment.content);
+    setShowDropdown(false);
+    setTimeout(() => {
+      if (editEditorRef.current) {
+        editEditorRef.current.innerHTML = comment.content;
+        editEditorRef.current.focus();
+        const range = document.createRange();
+        range.selectNodeContents(editEditorRef.current);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }, 0);
+  };
+
+  const handleSaveEdit = () => {
+    const textContent = editEditorRef.current?.textContent || '';
+    if (!textContent.trim()) return;
+    if (isReply) {
+      editReplyMutation.mutate(
+        { commentId: parentId, replyId: comment.id, content: editContent },
+        { onSuccess: () => setIsEditing(false) }
+      );
+    } else {
+      editCommentMutation.mutate(
+        { commentId: comment.id, content: editContent },
+        { onSuccess: () => setIsEditing(false) }
+      );
+    }
+  };
+
+  const handleDelete = () => {
+    setShowDropdown(false);
+    if (isReply) {
+      deleteReplyMutation.mutate({ commentId: parentId, replyId: comment.id });
+    } else {
+      deleteCommentMutation.mutate({ commentId: comment.id });
+    }
+  };
+
   return (
     <div className={`flex gap-3 relative ${isReply ? 'mt-4' : 'mt-6'}`}>
       {comment.avatarUrl ? (
@@ -171,6 +221,9 @@ const CommentItem = ({
                 </span>
               )}
               <span className="text-gray-400 text-xs">{comment.time}</span>
+              {comment.isEdited && (
+                <span className="text-gray-400 text-[10px] italic">• Edited</span>
+              )}
             </div>
             <div className="text-gray-500 text-xs mb-1.5">{comment.role}</div>
           </div>
@@ -187,11 +240,11 @@ const CommentItem = ({
               <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50">
                 {isOwner ? (
                   <>
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer">
+                    <button onClick={handleStartEdit} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer">
                       <Pencil className="w-3.5 h-3.5" />
                       Edit
                     </button>
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer">
+                    <button onClick={handleDelete} disabled={deleteCommentMutation?.isLoading || deleteReplyMutation?.isLoading} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer disabled:opacity-50">
                       <Trash2 className="w-3.5 h-3.5" />
                       Delete
                     </button>
@@ -207,10 +260,38 @@ const CommentItem = ({
           </div>
         </div>
         
-        <div 
-          className="text-gray-700 text-sm leading-relaxed mb-3 whitespace-pre-wrap comment-content-html"
-          dangerouslySetInnerHTML={{ __html: comment.content }}
-        />
+        {isEditing ? (
+          <div className="mt-2">
+            <div className="border border-primary rounded-lg overflow-hidden ring-1 ring-primary flex flex-col">
+              <div
+                ref={editEditorRef}
+                contentEditable
+                onInput={(e) => setEditContent(e.currentTarget.innerHTML)}
+                className="w-full p-2 min-h-[60px] outline-none text-sm bg-white editable-editor flex-1"
+              />
+              <div className="bg-white px-3 py-2 border-t border-gray-200 flex justify-end gap-2">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="cursor-pointer border border-gray-300 text-gray-600 hover:bg-gray-100 px-3 py-1 rounded-md text-xs font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={editCommentMutation?.isLoading || editReplyMutation?.isLoading}
+                  className="cursor-pointer bg-primary hover:bg-primary-dark text-white px-3 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50"
+                >
+                  {(editCommentMutation?.isLoading || editReplyMutation?.isLoading) ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="text-gray-700 text-sm leading-relaxed mb-3 whitespace-pre-wrap comment-content-html"
+            dangerouslySetInnerHTML={{ __html: comment.content }}
+          />
+        )}
         
         <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
           <button 
@@ -329,6 +410,10 @@ const CommentItem = ({
                     toggleCommentDownvoteMutation={toggleCommentDownvoteMutation}
                     toggleReplyDownvoteMutation={toggleReplyDownvoteMutation}
                     addReplyMutation={addReplyMutation}
+                    editCommentMutation={editCommentMutation}
+                    deleteCommentMutation={deleteCommentMutation}
+                    editReplyMutation={editReplyMutation}
+                    deleteReplyMutation={deleteReplyMutation}
                   />
                 </div>
               );
@@ -379,6 +464,7 @@ const PostComments = ({ postId }) => {
     badge: c.userId?.badge || '',
     time: formatTimeAgo(c.createdAt),
     content: c.content,
+    isEdited: c.isEdited || false,
     upvotes: c.upVotes?.length || 0,
     hasUpvoted: c.upVotes?.includes(user?.userId),
     downvotes: c.downVotes?.length || 0,
@@ -393,6 +479,7 @@ const PostComments = ({ postId }) => {
       badge: r.userId?.badge || '',
       time: formatTimeAgo(r.createdAt),
       content: r.content,
+      isEdited: r.isEdited || false,
       upvotes: r.upVotes?.length || 0,
       hasUpvoted: r.upVotes?.includes(user?.userId),
       downvotes: r.downVotes?.length || 0,
@@ -446,6 +533,26 @@ const PostComments = ({ postId }) => {
 
   const toggleReplyDownvoteMutation = useMutation({
     mutationFn: ({ commentId, replyId }) => toggleReplyDownvote(postId, commentId, replyId),
+    onSuccess: () => queryClient.invalidateQueries(['comments', postId])
+  });
+
+  const editCommentMutation = useMutation({
+    mutationFn: ({ commentId, content }) => editComment(postId, commentId, content),
+    onSuccess: () => queryClient.invalidateQueries(['comments', postId])
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: ({ commentId }) => deleteComment(postId, commentId),
+    onSuccess: () => queryClient.invalidateQueries(['comments', postId])
+  });
+
+  const editReplyMutation = useMutation({
+    mutationFn: ({ commentId, replyId, content }) => editReply(postId, commentId, replyId, content),
+    onSuccess: () => queryClient.invalidateQueries(['comments', postId])
+  });
+
+  const deleteReplyMutation = useMutation({
+    mutationFn: ({ commentId, replyId }) => deleteReply(postId, commentId, replyId),
     onSuccess: () => queryClient.invalidateQueries(['comments', postId])
   });
 
@@ -567,6 +674,10 @@ const PostComments = ({ postId }) => {
               toggleCommentDownvoteMutation={toggleCommentDownvoteMutation}
               toggleReplyDownvoteMutation={toggleReplyDownvoteMutation}
               addReplyMutation={addReplyMutation}
+              editCommentMutation={editCommentMutation}
+              deleteCommentMutation={deleteCommentMutation}
+              editReplyMutation={editReplyMutation}
+              deleteReplyMutation={deleteReplyMutation}
             />
           ))
         )}

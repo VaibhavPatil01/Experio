@@ -322,7 +322,56 @@ export const addReplyService = (postId, commentId, userId, content) => {
   );
 };
 
+export const editCommentService = async (postId, commentId, userId, content) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  const comment = post.comments.id(commentId);
+  if (!comment) throw new Error("Comment not found");
+  if (comment.userId.toString() !== userId) throw new Error("Unauthorized");
+  comment.content = content;
+  comment.isEdited = true;
+  comment.editedAt = new Date();
+  return post.save();
+};
+
+export const deleteCommentService = async (postId, commentId, userId, isAdmin = false) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  const comment = post.comments.id(commentId);
+  if (!comment) throw new Error("Comment not found");
+  if (comment.userId.toString() !== userId && !isAdmin) throw new Error("Unauthorized");
+  comment.deleteOne();
+  return post.save();
+};
+
+export const editReplyService = async (postId, commentId, replyId, userId, content) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  const comment = post.comments.id(commentId);
+  if (!comment) throw new Error("Comment not found");
+  const reply = comment.replies.id(replyId);
+  if (!reply) throw new Error("Reply not found");
+  if (reply.userId.toString() !== userId) throw new Error("Unauthorized");
+  reply.content = content;
+  reply.isEdited = true;
+  reply.editedAt = new Date();
+  return post.save();
+};
+
+export const deleteReplyService = async (postId, commentId, replyId, userId, isAdmin = false) => {
+  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  if (!post) throw new Error("Post or comment not found");
+  const comment = post.comments.id(commentId);
+  if (!comment) throw new Error("Comment not found");
+  const reply = comment.replies.id(replyId);
+  if (!reply) throw new Error("Reply not found");
+  if (reply.userId.toString() !== userId && !isAdmin) throw new Error("Unauthorized");
+  reply.deleteOne();
+  return post.save();
+};
+
 export const toggleCommentUpvoteService = async (postId, commentId, userId) => {
+
   const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
   if (!post) throw new Error("Post or comment not found");
   
