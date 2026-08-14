@@ -109,11 +109,26 @@ export const getUserNotifications = async (userId, limit = 20, cursor = null, un
     // Populate the grouped results
     const populated = await Notification.populate(notifications, [
       { path: 'actors', select: 'username profilePicture', model: 'User' },
-      { path: 'postId', select: 'title company role', model: 'Post' }
+      { path: 'postId', select: 'title company role isAnonymous userId', model: 'Post' }
     ]);
 
     // Reformat slightly to match frontend expectations (putting actor at root if count is 1 for legacy support)
     return populated.map(n => {
+      // Mask anonymous author identity
+      if (n.postId && n.postId.isAnonymous && n.postId.userId) {
+        const authorIdStr = n.postId.userId.toString();
+        n.actors = n.actors.map(actor => {
+          if (actor && actor._id.toString() === authorIdStr) {
+            return {
+              ...actor,
+              username: 'Anonymous User',
+              profilePicture: null
+            };
+          }
+          return actor;
+        });
+      }
+
       n.actorId = n.actors.length > 0 ? n.actors[0] : null;
       n.groupCount = n.actors.length;
       n.createdAt = n.latestCreatedAt;

@@ -149,8 +149,16 @@ async function processSocialNotification(payload) {
     const wsStartTime = Date.now();
     await savedNotification.populate([
       { path: 'actorId', select: 'username profilePicture', model: 'User' },
-      { path: 'postId', select: 'title company role', model: 'Post' }
+      { path: 'postId', select: 'title company role isAnonymous userId', model: 'Post' }
     ]);
+    
+    if (savedNotification.postId && savedNotification.postId.isAnonymous && savedNotification.postId.userId) {
+      if (savedNotification.actorId && savedNotification.actorId._id.toString() === savedNotification.postId.userId.toString()) {
+        savedNotification.actorId.username = 'Anonymous User';
+        savedNotification.actorId.profilePicture = null;
+      }
+    }
+    
     emitNotificationToUser(recipientId, savedNotification);
     logger.info(`[NotificationWorker] Notification emitted via WebSocket`, {
       event: 'NOTIFICATION_DELIVERED',

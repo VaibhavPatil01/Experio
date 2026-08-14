@@ -887,7 +887,27 @@ export async function getPostComments(req, res) {
     const post = await getPostCommentsService(postId);
     if (!post) return res.status(404).json({ message: 'No such Post found' });
     
-    return res.status(200).json({ message: 'Comments fetched successfully', comments: post.comments });
+    let comments = post.comments;
+    if (post.isAnonymous && post.userId) {
+      const authorIdStr = post.userId.toString();
+      
+      comments = post.comments.map(c => {
+        if (c.userId && c.userId._id && c.userId._id.toString() === authorIdStr) {
+          c.userId = { ...c.userId._doc, username: 'Anonymous User', profilePicture: null };
+        }
+        if (c.replies) {
+          c.replies = c.replies.map(r => {
+            if (r.userId && r.userId._id && r.userId._id.toString() === authorIdStr) {
+              r.userId = { ...r.userId._doc, username: 'Anonymous User', profilePicture: null };
+            }
+            return r;
+          });
+        }
+        return c;
+      });
+    }
+
+    return res.status(200).json({ message: 'Comments fetched successfully', comments });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: 'Something went wrong...' });

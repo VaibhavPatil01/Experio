@@ -295,7 +295,7 @@ export const getPostCountByUserIdService = (userId) => {
 
 export const getPostCommentsService = (postId) => {
   return postModel.findById(postId)
-    .select('comments')
+    .select('comments isAnonymous userId')
     .populate({
       path: 'comments.userId',
       select: 'username profilePicture role badge'
