@@ -353,14 +353,14 @@ function PostForm() {
               <h1 className="text-3xl font-bold text-gray-900">{isEditMode ? 'Update Interview Experience Post' : 'Create Interview Experience Post'}</h1>
               <p className="text-gray-500 mt-1">{isEditMode ? 'Update your interview experience details' : 'Share your interview experience to help other students'}</p>
             </div>
-            <div className="flex gap-4">
-              <button className="cursor-pointer px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 font-medium flex items-center gap-2">
+            <div className="flex gap-4 w-full lg:w-80">
+              <button type="button" className="flex-1 cursor-default px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium flex items-center justify-center gap-2">
                 <BookOpen size={18} />
-                Save as Draft
+                Your Story
               </button>
-              <button disabled={isLoading} onClick={() => { if (formRef.current) formRef.current.handleSubmit() }} className="cursor-pointer px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium flex items-center gap-2">
-                <CheckCircle2 size={18} />
-                {isLoading ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post')}
+              <button type="button" className="flex-1 cursor-default px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center justify-center gap-2">
+                <PenTool size={18} />
+                Your Tips
               </button>
             </div>
           </div>
