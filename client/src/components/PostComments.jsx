@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  MoreHorizontal, ThumbsUp, ThumbsDown, MessageSquare, Share2, 
+import {
+  MoreHorizontal, ThumbsUp, ThumbsDown, MessageSquare, Share2,
   Bold, Italic, Link2, Code, List, ListOrdered, ChevronDown,
   Pencil, Trash2, Flag
 } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useAppSelector } from '../redux/store.js';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserProfileStats } from '../services/userServices.js';
 import { getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote, editComment, deleteComment, editReply, deleteReply } from '../services/postServices.js';
+import defaultUserIcon from '../assets/images/icons/user-profile-icon-vector.jpg';
 
 const formatTimeAgo = (dateString) => {
   if (!dateString) return 'Just now';
@@ -26,10 +27,10 @@ const formatTimeAgo = (dateString) => {
 };
 
 // Extracted CommentItem component to prevent re-mounting on parent re-render
-const CommentItem = ({ 
-  comment, 
-  isReply = false, 
-  isSubReply = false, 
+const CommentItem = ({
+  comment,
+  isReply = false,
+  isSubReply = false,
   parentId = null,
   replyingToId,
   setReplyingToId,
@@ -52,7 +53,7 @@ const CommentItem = ({
   const editEditorRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
-  
+
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const isOwner = currentUser === comment.userId;
@@ -67,7 +68,7 @@ const CommentItem = ({
     if (showDropdown) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showDropdown]);
-  
+
   // Clean up content when closing reply box, or prefill if opening reply box on a reply
   useEffect(() => {
     if (replyingToId !== comment.id) {
@@ -78,7 +79,7 @@ const CommentItem = ({
       const tagHtml = `<span class="text-blue-600 font-medium cursor-pointer hover:underline">@${comment.author}</span>&nbsp;`;
       setReplyContent(tagHtml);
       replyEditorRef.current.innerHTML = tagHtml;
-      
+
       // Move cursor to end
       setTimeout(() => {
         if (replyEditorRef.current) {
@@ -101,7 +102,7 @@ const CommentItem = ({
     if (replyEditorRef.current && document.activeElement !== replyEditorRef.current) {
       replyEditorRef.current.focus();
     }
-    
+
     switch (format) {
       case 'bold': document.execCommand('bold', false, null); break;
       case 'italic': document.execCommand('italic', false, null); break;
@@ -126,7 +127,7 @@ const CommentItem = ({
   const handlePostReply = () => {
     const textContent = replyEditorRef.current?.textContent || '';
     if (!textContent.trim() && !replyContent.includes('<img')) return;
-    
+
     // Always attach to the parent comment if it's a sub-reply
     const targetCommentId = isReply ? parentId : comment.id;
     // If this is a reply to another reply, pass the current reply's ID as parentReplyId
@@ -189,27 +190,27 @@ const CommentItem = ({
   return (
     <div className={`flex gap-3 relative ${isReply ? 'mt-4' : 'mt-6'}`}>
       {comment.avatarUrl ? (
-        <img 
-          src={comment.avatarUrl} 
-          alt={comment.author} 
-          className={`rounded-full object-cover shrink-0 z-10 ${isReply ? 'w-8 h-8' : 'w-10 h-10'}`} 
+        <img
+          src={comment.avatarUrl}
+          alt={comment.author}
+          className={`rounded-full object-cover shrink-0 z-10 ${isReply ? 'w-8 h-8' : 'w-10 h-10'}`}
           onError={(e) => {
             e.target.style.display = 'none';
             if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
           }}
         />
       ) : null}
-      
+
       <div className={`rounded-full bg-primary text-white items-center justify-center font-bold shrink-0 z-10 ${comment.avatarUrl ? 'hidden' : 'flex'} ${isReply ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-base'}`}>
         {comment.author.charAt(0)}
       </div>
-      
+
       {comment.replies && comment.replies.length > 0 && (
-        <div 
+        <div
           className={`absolute ${isReply ? 'left-[15px] top-[32px]' : 'left-[19px] top-[40px]'} bottom-0 w-[2px] bg-gray-200 z-0`}
         ></div>
       )}
-      
+
       <div className="flex-1">
         <div className="flex justify-between items-start">
           <div>
@@ -227,15 +228,15 @@ const CommentItem = ({
             </div>
             <div className="text-gray-500 text-xs mb-1.5">{comment.role}</div>
           </div>
-          
+
           <div className="relative" ref={dropdownRef}>
-            <button 
+            <button
               onClick={() => setShowDropdown(!showDropdown)}
               className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
-            
+
             {showDropdown && (
               <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50">
                 {isOwner ? (
@@ -259,7 +260,7 @@ const CommentItem = ({
             )}
           </div>
         </div>
-        
+
         {isEditing ? (
           <div className="mt-2">
             <div className="border border-primary rounded-lg overflow-hidden ring-1 ring-primary flex flex-col">
@@ -292,9 +293,9 @@ const CommentItem = ({
             dangerouslySetInnerHTML={{ __html: comment.content }}
           />
         )}
-        
+
         <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
-          <button 
+          <button
             onClick={() => {
               if (isReply) {
                 toggleReplyUpvoteMutation.mutate({ commentId: parentId, replyId: comment.id });
@@ -308,8 +309,8 @@ const CommentItem = ({
             <ThumbsUp className={`w-4 h-4 ${comment.hasUpvoted ? 'fill-current' : ''}`} />
             {comment.upvotes}
           </button>
-          
-          <button 
+
+          <button
             onClick={() => {
               if (isReply) {
                 toggleReplyDownvoteMutation.mutate({ commentId: parentId, replyId: comment.id });
@@ -324,14 +325,14 @@ const CommentItem = ({
             {comment.downvotes}
           </button>
 
-          <button 
+          <button
             onClick={() => setReplyingToId(replyingToId === comment.id ? null : comment.id)}
             className="flex items-center gap-1.5 hover:text-gray-900 transition-colors cursor-pointer"
           >
             <MessageSquare className="w-4 h-4" />
             Reply
           </button>
-          
+
           <button className="flex items-center gap-1.5 hover:text-gray-900 transition-colors cursor-pointer">
             <Share2 className="w-4 h-4" />
             Share
@@ -340,13 +341,13 @@ const CommentItem = ({
 
         {replyingToId === comment.id && (
           <div className="mt-4 flex gap-3">
-             <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0 overflow-hidden text-xs">
+            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0 overflow-hidden text-xs">
               {profilePicUrl ? (
                 <img src={profilePicUrl} alt={authorName} className="w-full h-full object-cover" />
               ) : initial}
             </div>
             <div className="flex-1 border border-primary rounded-lg overflow-hidden ring-1 ring-primary transition-all flex flex-col">
-              <div 
+              <div
                 ref={replyEditorRef}
                 contentEditable
                 onInput={(e) => setReplyContent(e.currentTarget.innerHTML)}
@@ -361,13 +362,13 @@ const CommentItem = ({
                   <button onMouseDown={(e) => handleFormat(e, 'code')} className="p-1 hover:text-gray-800 rounded"><Code className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => setReplyingToId(null)}
                     className="cursor-pointer border border-primary text-primary hover:bg-primary/10 px-3 py-1 rounded-md text-xs font-semibold transition-colors"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     onClick={handlePostReply}
                     disabled={addReplyMutation.isLoading}
                     className="cursor-pointer bg-primary hover:bg-primary-dark text-white px-3 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50">
@@ -387,17 +388,17 @@ const CommentItem = ({
                 <div key={reply.id} className="relative">
                   {/* Curved line connecting to the reply */}
                   <div className={`absolute ${isReply ? 'left-[-29px]' : 'left-[-33px]'} top-[-16px] ${isReply ? 'w-[29px]' : 'w-[33px]'} h-[32px] border-b-2 border-l-2 border-gray-200 rounded-bl-xl bg-transparent z-10`}></div>
-                  
+
                   {/* Mask for the last reply to hide the excess vertical line */}
                   {isLast && (
                     <div className={`absolute ${isReply ? 'left-[-31px]' : 'left-[-35px]'} top-[16px] bottom-[-20px] w-[6px] bg-white z-10`}></div>
                   )}
-                  
-                  <CommentItem 
-                    key={reply.id} 
-                    comment={reply} 
-                    isReply={true} 
-                    isSubReply={isReply} 
+
+                  <CommentItem
+                    key={reply.id}
+                    comment={reply}
+                    isReply={true}
+                    isSubReply={isReply}
                     parentId={comment.id}
                     replyingToId={replyingToId}
                     setReplyingToId={setReplyingToId}
@@ -430,12 +431,12 @@ const PostComments = ({ postId }) => {
   const [activeTab, setActiveTab] = useState('Newest');
   const [newComment, setNewComment] = useState('');
   const editorRef = useRef(null);
-  
+
   const [replyingToId, setReplyingToId] = useState(null);
-  
+
   const user = useAppSelector((state) => state.userState.user);
   const queryClient = useQueryClient();
-  
+
   const { data: profileData } = useQuery({
     queryKey: ['profile', user?.userId],
     queryFn: () => getUserProfileStats(user?.userId),
@@ -451,7 +452,7 @@ const PostComments = ({ postId }) => {
   const profilePicUrl = profileData?.profilePicture || user?.profilePicture;
   const initial = user?.username ? user.username[0].toUpperCase() : 'A';
   const authorName = user?.username || 'Anonymous';
-  
+
   const tabs = ['Newest', 'Most Helpful'];
 
   const commentsList = dbComments.map(c => ({
@@ -460,7 +461,7 @@ const PostComments = ({ postId }) => {
     userId: c.userId?._id,
     author: c.userId?.username || 'Anonymous',
     role: c.userId?.role || 'User',
-    avatarUrl: c.userId?.profilePicture || '',
+    avatarUrl: c.userId?.username === 'Anonymous User' ? defaultUserIcon : (c.userId?.profilePicture || ''),
     badge: c.userId?.badge || '',
     time: formatTimeAgo(c.createdAt),
     content: c.content,
@@ -475,7 +476,7 @@ const PostComments = ({ postId }) => {
       userId: r.userId?._id,
       author: r.userId?.username || 'Anonymous',
       role: r.userId?.role || 'User',
-      avatarUrl: r.userId?.profilePicture || '',
+      avatarUrl: r.userId?.username === 'Anonymous User' ? defaultUserIcon : (r.userId?.profilePicture || ''),
       badge: r.userId?.badge || '',
       time: formatTimeAgo(r.createdAt),
       content: r.content,
@@ -525,7 +526,7 @@ const PostComments = ({ postId }) => {
     mutationFn: ({ commentId, replyId }) => toggleReplyUpvote(postId, commentId, replyId),
     onSuccess: () => queryClient.invalidateQueries(['comments', postId])
   });
-  
+
   const toggleCommentDownvoteMutation = useMutation({
     mutationFn: (commentId) => toggleCommentDownvote(postId, commentId),
     onSuccess: () => queryClient.invalidateQueries(['comments', postId])
@@ -561,7 +562,7 @@ const PostComments = ({ postId }) => {
     if (editorRef.current && document.activeElement !== editorRef.current) {
       editorRef.current.focus();
     }
-    
+
     switch (format) {
       case 'bold': document.execCommand('bold', false, null); break;
       case 'italic': document.execCommand('italic', false, null); break;
@@ -604,12 +605,12 @@ const PostComments = ({ postId }) => {
           .comment-content-html a { color: #0D8B4F; text-decoration: underline; }
         `}
       </style>
-      
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h3 className="font-bold text-gray-900 text-lg">Comments <span className="text-gray-500 font-normal">({commentsList.length})</span></h3>
         <div className="flex items-center gap-2 text-sm font-semibold">
           {tabs.map(tab => (
-            <button 
+            <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${activeTab === tab ? 'bg-primary/10 text-primary' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
@@ -627,7 +628,7 @@ const PostComments = ({ postId }) => {
           ) : initial}
         </div>
         <div className="flex-1 border border-primary rounded-lg overflow-hidden ring-1 ring-primary transition-all flex flex-col">
-          <div 
+          <div
             ref={editorRef}
             contentEditable
             onInput={(e) => setNewComment(e.currentTarget.innerHTML)}
@@ -643,7 +644,7 @@ const PostComments = ({ postId }) => {
               <button onMouseDown={(e) => handleFormat(e, 'list')} className="p-1 hover:text-gray-800 rounded"><List className="w-4 h-4" /></button>
               <button onMouseDown={(e) => handleFormat(e, 'list-ordered')} className="p-1 hover:text-gray-800 rounded"><ListOrdered className="w-4 h-4" /></button>
             </div>
-            <button 
+            <button
               onClick={handlePostComment}
               disabled={addCommentMutation.isLoading}
               className="cursor-pointer bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-md text-sm font-semibold transition-colors disabled:opacity-50">
@@ -660,8 +661,8 @@ const PostComments = ({ postId }) => {
           <p className="text-gray-500 text-sm text-center py-4">No comments yet. Be the first to share your thoughts!</p>
         ) : (
           sortedCommentsList.map(comment => (
-            <CommentItem 
-              key={comment.id} 
+            <CommentItem
+              key={comment.id}
               comment={comment}
               replyingToId={replyingToId}
               setReplyingToId={setReplyingToId}
