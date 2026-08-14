@@ -38,7 +38,7 @@ export async function getPost(req, res) {
     }
 
     // get the userId
-    const userId = req.body.authTokenData.id;
+    const userId = req.body.authTokenData?.id;
 
     //check if the user has bookmarked the current post or not?
     const isBookmarked = post.bookmarks.includes(userId);
@@ -51,6 +51,9 @@ export async function getPost(req, res) {
     const isUpVoted = post.upVotes.includes(userId);
     const isDownVoted = post.downVotes.includes(userId);
     const commentCount = post.comments.length;
+
+    const isOwner = userId === postAuthorId;
+    const shouldMask = post.isAnonymous && !isOwner;
 
     return res.status(200).json({
       message: 'post fetched successfully',
@@ -68,14 +71,15 @@ export async function getPost(req, res) {
         bookmarkCount,
         views: post.views,
         tags: post.tags,
-        postAuthorId,
+        postAuthorId: shouldMask ? null : postAuthorId,
         commentCount,
         isBookmarked,
-        postAuthor,
-        postAuthorProfilePicture,
-        authorWorkExperiences,
-        authorJoinedDate,
-        authorContributions,
+        postAuthor: shouldMask ? "Anonymous User" : postAuthor,
+        postAuthorProfilePicture: shouldMask ? "" : postAuthorProfilePicture,
+        authorWorkExperiences: shouldMask ? [] : authorWorkExperiences,
+        authorJoinedDate: shouldMask ? null : authorJoinedDate,
+        authorContributions: shouldMask ? 0 : authorContributions,
+        isOwner,
         _id: post._id,
         isUpVoted,
         isDownVoted,
@@ -649,6 +653,7 @@ export async function getAllPost(req, res) {
 
       return {
         ...post,
+        userId: post.isAnonymous ? { ...(post.userId || {}), username: "Anonymous User", profilePicture: "", _id: null } : post.userId,
         isUpVoted,
         isDownVoted,
         isBookmarked,
@@ -725,6 +730,7 @@ export async function getUserBookmarkedPost(req, res) {
 
       return {
         ...post,
+        userId: post.isAnonymous ? { ...(post.userId || {}), username: "Anonymous User", profilePicture: "", _id: null } : post.userId,
         isUpVoted,
         isDownVoted,
         isBookmarked,
@@ -825,6 +831,7 @@ export async function getUserPost(req, res) {
 
       return {
         ...post,
+        userId: post.isAnonymous ? { ...(post.userId || {}), username: "Anonymous User", profilePicture: "", _id: null } : post.userId,
         isUpVoted,
         isDownVoted,
         isBookmarked,

@@ -74,8 +74,7 @@ function PostPage() {
     return <h3 className="text-center mt-10 text-red-500">Error occurred while fetching post</h3>;
   }
 
-  const authorId = postQuery.data?.postAuthorId;
-  const isEditable = user?.userId === authorId || user?.isAdmin;
+  const isEditable = postQuery.data?.isOwner || user?.isAdmin;
   const post = postQuery.data;
 
   if (!id) {
