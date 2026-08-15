@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import ChatbotModal from './components/ChatbotModal';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, matchPath } from 'react-router-dom';
 import Loading from './pages/Loading';
 import { Toaster } from 'react-hot-toast';
 import NotFound from './pages/NotFound.jsx';
@@ -34,6 +34,15 @@ const App = () => {
   const { pathname } = useLocation();
   const { isLoading, isError } = useUserStatus();
   const theme = useAppSelector((state) => state.themeState.theme);
+
+  const validPaths = [
+    '/', '/login', '/register', '/reset-password/:token', '/events', 
+    '/ai-resume-maker', '/resume', '/ai-mock-interview', '/profile/:id', 
+    '/posts', '/token/google/:token', '/token/github/:token', '/user/search', 
+    '/assistant', '/post', '/profile/edit', '/post/:id', '/post/:id/:slug', 
+    '/post/edit/:id', '/settings'
+  ];
+  const isValidRoute = validPaths.some(path => matchPath({ path, end: true }, pathname));
 
   // Scroll to top when the url changes
   useEffect(() => {
@@ -112,7 +121,7 @@ const App = () => {
           }
         `}
       </style>
-      {!isChatOpen && pathname !== '/assistant' && pathname !== '/login' && pathname !== '/register' && !pathname.startsWith('/reset-password') && (
+      {!isChatOpen && isValidRoute && pathname !== '/assistant' && pathname !== '/login' && pathname !== '/register' && !pathname.startsWith('/reset-password') && (
         <div 
           onClick={() => setIsChatOpen(true)}
           className="fixed bottom-6 right-6 w-[60px] h-[60px] bg-primary rounded-full flex items-center justify-center cursor-pointer z-[9999] transition-all duration-300 shadow-xl text-primary group"

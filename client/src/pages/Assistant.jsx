@@ -6,6 +6,9 @@ import {
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
+import { useAppSelector } from '../redux/store.js';
+import { toast } from 'react-hot-toast';
 
 // Import our new services and hooks
 import { 
@@ -40,6 +43,10 @@ const Assistant = () => {
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   
+  const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState('');
+
   // Real State for Sessions and Messages
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessages, setCurrentMessages] = useState([]);
@@ -156,7 +163,18 @@ const Assistant = () => {
   };
 
   const handleSubmit = async () => {
-    if (!inputValue.trim() || isGenerating) return;
+    if (!isLoggedIn) {
+      setRedirectUrl(window.location.pathname);
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (isGenerating) return;
+
+    if (!inputValue.trim()) {
+      toast('Feature not available');
+      return;
+    }
 
     const userPrompt = inputValue.trim();
     setInputValue(''); // Clear input instantly
@@ -288,6 +306,9 @@ const Assistant = () => {
 
   return (
     <>
+    {isLoginModalOpen && (
+      <LoginRequiredModal redirectUrl={redirectUrl} closeModalCallback={() => setIsLoginModalOpen(false)} />
+    )}
     <div className="flex h-[calc(100vh-72px)] w-full bg-white dark:bg-[#212121] text-gray-900 dark:text-gray-100 font-sans overflow-hidden">
       
       {/* Mobile Sidebar Overlay */}

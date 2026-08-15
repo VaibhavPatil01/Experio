@@ -16,7 +16,7 @@ function LoginRequiredModal({ redirecUrl, closeModalCallback }) {
     <div
       role="alert"
       onClick={handleModalClick}
-      className="fixed inset-0 flex items-center justify-center bg-black/50 bg-opacity-40 z-50"
+      className="fixed inset-0 flex items-center justify-center bg-black/50 bg-opacity-40 z-[100]"
       id="modalBackdrop"
       ref={backdropRef}
     >
