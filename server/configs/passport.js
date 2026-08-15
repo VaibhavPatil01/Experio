@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Strategy as GitHubStrategy } from 'passport-github2';
 import { createUser, findUser } from '../services/userService.js';
 
 const GOOGLE_CLIENT_ID = process.env['GOOGLE_CLIENT_ID'];
@@ -54,8 +55,57 @@ passport.use(
         console.log(error);
         return done('Error while login');
       }
-    },
-  ),
+    }
+  )
 );
+
+const GITHUB_CLIENT_ID = process.env['GITHUB_CLIENT_ID'];
+const GITHUB_CLIENT_SECRET = process.env['GITHUB_CLIENT_SECRET'];
+
+if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+  console.log('GitHub Auth Credential not Found in ENV!!'); 
+} else {
+  passport.use(
+    new GitHubStrategy(
+      {
+        clientID: GITHUB_CLIENT_ID,
+        clientSecret: GITHUB_CLIENT_SECRET,
+        callbackURL: `${SERVER_BASE_URL}/user/auth/github/callback`,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const userEmail = profile.emails && profile.emails.length > 0 
+            ? profile.emails[0].value 
+            : `${profile.username}@github-oauth.com`;
+
+          const user = await findUser(userEmail); 
+
+          if (user) {
+            return done(null, user);
+          }
+
+          const newUser = await createUser({
+            username: profile.displayName || profile.username,
+            email: userEmail,
+            password: randomUUID(),
+            isAdmin: false,
+            isEmailVerified: true,
+            branch: 'NA',
+            passingYear: 'NA',
+            designation: 'NA',
+            about: 'Hey there! Just joined the platform via GitHub.',
+            github: profile.profileUrl,
+            linkedin: null,
+          });
+
+          return done(null, newUser);
+        } catch (error) {
+          console.log(error);
+          return done('Error while GitHub login');
+        }
+      }
+    )
+  );
+}
 
 export default passport;

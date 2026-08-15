@@ -10,6 +10,10 @@ export const deleteUserService = (id) => {
   return UserModel.deleteOne({ _id: id }); 
 };
 
+export const updateUserService = (id, data) => {
+  return UserModel.findByIdAndUpdate(id, data, { new: true });
+};
+
 export const createUser = (user) => { 
   return UserModel.create(user);
 };
@@ -103,7 +107,15 @@ export const searchUserService = (
         designation: 1,
         passingYear: 1,
         branch: 1,
+        profilePicture: 1,
+        createdAt: 1,
+        email: 1,
+        workExperiences: 1,
       },
     },
   ]);
+};
+
+export const countUsersService = () => {
+  return UserModel.countDocuments({ isEmailVerified: true });
 };

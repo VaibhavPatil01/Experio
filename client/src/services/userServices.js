@@ -59,6 +59,30 @@ export function updateUser(user) {
     .then((response) => response.data);
 }
 
+export function uploadResumeFile(formData) {
+  const url = `${BASE_API_URL}/user/resume`;
+  return axios
+    .put(url, formData, { 
+      headers: { 
+        token: getAuthToken(),
+        'Content-Type': 'multipart/form-data'
+      } 
+    })
+    .then((response) => response.data);
+}
+
+export function uploadProfilePicture(formData) {
+  const url = `${BASE_API_URL}/user/profile-picture`;
+  return axios
+    .put(url, formData, { 
+      headers: { 
+        token: getAuthToken(),
+        'Content-Type': 'multipart/form-data'
+      } 
+    })
+    .then((response) => response.data);
+}
+
 export function searchUser(user, page, limit, signal) {
   const url = new URL(`${BASE_API_URL}/user/search`);
   url.searchParams.set('searchparam', user);

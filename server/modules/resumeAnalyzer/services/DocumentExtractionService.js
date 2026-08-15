@@ -1,0 +1,60 @@
+import PdfResumeParser from '../parsers/PdfResumeParser.js';
+import DocxResumeParser from '../parsers/DocxResumeParser.js';
+import crypto from 'crypto';
+import fs from 'fs';
+import logger from '../../../utils/logger.js';
+import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
+
+export default class DocumentExtractionService {
+  /**
+   * Factory method to extract text based on the mimetype.
+   * 
+   * @param {string} filePath - Path to the uploaded file on disk
+   * @param {string} mimetype - Validated MIME type
+   * @param {string} userId - For logging
+   * @returns {Promise<{text: string, metadata: Object}>}
+   */
+  static async extractText(filePath, mimetype, userId) {
+    const startTime = performance.now();
+    let parser;
+
+    if (mimetype === 'application/pdf') {
+      parser = new PdfResumeParser();
+    } else if (
+      mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+      mimetype === 'application/msword'
+    ) {
+      parser = new DocxResumeParser();
+    } else {
+      throw new Error(`Unsupported file type for extraction: ${mimetype}`);
+    }
+
+    try {
+      const result = await parser.parse(filePath);
+      const durationMs = performance.now() - startTime;
+      
+      logger.info('Document extraction successful', {
+        userId,
+        parser: result.metadata.parser,
+        durationMs: Math.round(durationMs),
+        characterCount: result.text.length
+      });
+
+      // Augment metadata with extraction metrics
+      result.metadata.extractionDurationMs = Math.round(durationMs);
+      result.metadata.characterCount = result.text.length;
+
+      // Calculate file hash for fingerprinting
+      const fileBuffer = fs.readFileSync(filePath);
+      result.metadata.fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+
+      return result;
+    } catch (error) {
+      throw new ResumeAnalysisError(
+        ErrorCategories.FILE_PROCESSING_ERROR,
+        'Failed to process the uploaded resume document. Ensure it is a valid PDF or DOCX.',
+        { originalError: error.message, filePath, mimetype }
+      );
+    }
+  }
+}

@@ -80,29 +80,29 @@ function UserRegister() {
   return (
     <>
     <Helmet>
-        <title>User registration | Interview Experience</title>
+        <title>User registration | Experio</title>
         <meta
           name="description"
-          content="User Registration Page for Interview Experience GSMCOE Website"
+          content="User Registration Page for Experio"
         />
         <meta name="twitter:card" content={registrationPageImage} />
         <meta
           name="twitter:title"
-          content="User registration | Interview Experience"
+          content="User registration | Experio"
         />
         <meta
           name="twitter:description"
-          content="User registration Page for Interview Experience GSMCOE Website"
+          content="User registration Page for Experio"
         />
         <meta name="twitter:image" content={registrationPageImage} />
 
         <meta
           property="og:title"
-          content="User registration | Interview Experience"
+          content="User registration | Experio"
         />
         <meta
           property="og:description"
-          content="User registration Page for Interview Experience GSMCOE Website"
+          content="User registration Page for Experio"
         />
         <meta property="og:image" content={registrationPageImage} />
         <meta

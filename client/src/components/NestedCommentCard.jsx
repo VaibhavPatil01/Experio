@@ -4,7 +4,7 @@ import DeleteCommentReplyButton from './DeleteCommentReplyButton';
 
 function NestedCommentCard({ postId, commentId, commentReply }) {
   return (
-    <div className="bg-gray-100 ml-1.75 mb-4 p-2">
+    <div className="bg-gray-100 ml-1.75 mb-4 p-2" id={`comment-${commentReply._id}`}>
       <div className="flex justify-between items-center pr-2.5">
         {commentReply.userId ? (
           <Link

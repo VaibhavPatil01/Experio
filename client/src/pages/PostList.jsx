@@ -5,7 +5,10 @@ import { toast } from 'react-hot-toast';
 import { postTypes } from '../assets/assets.js';
 import PostListElement from '../components/PostListElement';
 import PostSkeleton from '../components/PostSkeleton';
-import { getCompanyAndRoleList, getPostsPaginated } from '../services/postServices.js';
+import PostFilters from '../components/PostFilters';
+import { TopCompaniesWidget } from '../components/SidebarWidgets';
+import { Sparkles, Info } from 'lucide-react';
+import { getCompanyAndRoleList, getPostsPaginated, getBookmarkedPostsPaginated, getRecommendedFeedPaginated } from '../services/postServices.js';
 import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
 import { useAppSelector } from '../redux/store.js';
 import DeletePostModal from '../components/DeletePostModal.jsx';
@@ -19,6 +22,7 @@ function PostList() {
   const [redirectUrl, setRedirectUrl] = useState('');
   const user = useAppSelector((state) => state.userState.user);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('For You');
 
   const filter = {
     search: searchParams.get('search') || '',
@@ -26,7 +30,8 @@ function PostList() {
     articleType: searchParams.get('articleType') || '',
     jobRole: searchParams.get('jobRole') || '',
     company: searchParams.get('company') || '',
-    rating: searchParams.get('rating') || ''
+    rating: searchParams.get('rating') || '',
+    datePosted: searchParams.get('datePosted') || 'Anytime'
   };
 
   const companyAndRoleQuery = useQuery({
@@ -35,9 +40,29 @@ function PostList() {
   });
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['posts', filter],
+    queryKey: ['posts', filter, activeTab],
     getNextPageParam: (prevData) => prevData.page?.nextPage,
-    queryFn: ({ pageParam = 1, signal }) => getPostsPaginated(pageParam, 10, filter, signal)
+    queryFn: ({ pageParam = 1, signal }) => {
+      if (activeTab === 'For You') {
+        if (!user) return Promise.resolve({ data: [], page: {} });
+        return getRecommendedFeedPaginated(pageParam, 10);
+      }
+      if (activeTab === 'Bookmarks') {
+        if (!user) return Promise.resolve({ data: [], page: {} }); 
+        return getBookmarkedPostsPaginated(user.userId, pageParam, 10);
+      }
+      
+      const currentFilter = { ...filter };
+      if (activeTab === 'Recent') {
+        currentFilter.sortBy = 'new';
+      } else if (activeTab === 'Most Upvoted') {
+        currentFilter.sortBy = 'top';
+      } else if (activeTab === 'Trending') {
+        currentFilter.sortBy = 'views';
+      }
+
+      return getPostsPaginated(pageParam, 10, currentFilter, signal);
+    }
   });
 
   let scrollFooterElement = <p className="text-lg">— Nothing More to Load —</p>;
@@ -99,20 +124,20 @@ function PostList() {
   return (
     <>
     <Helmet>
-        <title>Posts | Interview Experience</title>
+        <title>Posts | Experio</title>
         <meta
           name="description"
           content="Search and filter posts about interview experience, discussion, doubts and many more about GSMCOE"
         />
         <meta name="twitter:card" content={postListPageImage} />
-        <meta name="twitter:title" content="Posts | Interview Experience" />
+        <meta name="twitter:title" content="Posts | Experio" />
         <meta
           name="twitter:description"
           content="Search and filter posts about interview experience, discussion, doubts and many more about GSMCOE"
         />
         <meta name="twitter:image" content={postListPageImage} />
 
-        <meta property="og:title" content="Posts | Interview Experience" />
+        <meta property="og:title" content="Posts | Experio" />
         <meta
           property="og:description"
           content="Search and filter posts about interview experience, discussion, doubts and many more about GSMCOE"
@@ -135,181 +160,76 @@ function PostList() {
           isLoading={isDeleting}
         />
       )}
-      <div className="min-h-screen scroll-mt-12 px-5 py-8 bg-primary/10">
-        <section className="posts">
-          <div className="container mx-auto">
-            <h2 className="text-xl mb-2">
-              <span>Recent Experiences</span>
-            </h2>
-            <div className="filter">
-              <div className="searchBar mb-2">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={filter.search}
-                  onChange={(e) =>
-                    setSearchParams({
-                      ...Object.fromEntries(
-                        Object.entries(filter).filter(
-                          ([key, value]) => key && value && value.length > 0
-                        )
-                      ),
-                      search: e.target.value
-                    })
-                  }
-                  className="w-full outline-none text-base text-gray-600 border border-gray-300 rounded-md p-2"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2 mb-6 md:grid-cols-5 md:max-w-2xl md:mb-8">
-                <div className="filterInput">
-                  <label htmlFor="domain">
-                    <select
-                      name="domain"
-                      className="cursor-pointer w-full outline-none text-base text-gray-600 border border-gray-300 bg-white rounded-md p-2"
-                      value={filter.sortBy}
-                      onChange={(e) =>
-                        setSearchParams({
-                          ...Object.fromEntries(
-                            Object.entries(filter).filter(
-                              ([key, value]) => key && value && value.length > 0
-                            )
-                          ),
-                          sortBy: e.target.value
-                        })
-                      }
-                    >
-                      <option value="">Sort By</option>
-                      <option value="new">Newest</option>
-                      <option value="old">Oldest</option>
-                      <option value="views">Most Viewed</option>
-                    </select>
-                  </label>
-                </div>
-                <div className="filterInput">
-                  <label htmlFor="type">
-                    <select
-                      name="type"
-                      className="cursor-pointer w-full outline-none text-base text-gray-600 border border-gray-300 bg-white rounded-md p-2"
-                      value={filter.articleType}
-                      onChange={(e) =>
-                        setSearchParams({
-                          ...Object.fromEntries(
-                            Object.entries(filter).filter(
-                              ([key, value]) => key && value && value.length > 0
-                            )
-                          ),
-                          articleType: e.target.value
-                        })
-                      }
-                    >
-                      <option value="">Post Type</option>
-                      <option value="">All</option>
-                      {postTypes.map((type) => (
-                        <option value={type} key={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                <div className="filterInput">
-                  <label htmlFor="role">
-                    <select
-                      name="role"
-                      className="cursor-pointer w-full outline-none text-base text-gray-600 border border-gray-300 bg-white rounded-md p-2"
-                      value={filter.jobRole}
-                      onChange={(e) =>
-                        setSearchParams({
-                          ...Object.fromEntries(
-                            Object.entries(filter).filter(
-                              ([key, value]) => key && value && value.length > 0
-                            )
-                          ),
-                          jobRole: e.target.value
-                        })
-                      }
-                    >
-                      <option value="">Job Role</option>
-                      <option value="">All</option>
-                      {companyAndRoleQuery.data?.data?.role.map((role) => (
-                        <option value={role} key={role}>
-                          {role}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                <div className="filterInput">
-                  <label htmlFor="company">
-                    <select
-                      name="company"
-                      className="cursor-pointer w-full outline-none text-base text-gray-600 border border-gray-300 bg-white rounded-md p-2"
-                      value={filter.company}
-                      onChange={(e) =>
-                        setSearchParams({
-                          ...Object.fromEntries(
-                            Object.entries(filter).filter(
-                              ([key, value]) => key && value && value.length > 0
-                            )
-                          ),
-                          company: e.target.value
-                        })
-                      }
-                    >
-                      <option value="">Company</option>
-                      <option value="">All</option>
-                      {companyAndRoleQuery.data?.data?.company.map((company) => (
-                        <option value={company} key={company}>
-                          {company}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                <div className="filterInput">
-                  <label htmlFor="rating">
-                    <select
-                      name="rating"
-                      className="cursor-pointer w-full outline-none text-base text-gray-600 border border-gray-300 bg-white rounded-md p-2"
-                      value={filter.rating}
-                      onChange={(e) =>
-                        setSearchParams({
-                          ...Object.fromEntries(
-                            Object.entries(filter).filter(
-                              ([key, value]) => key && value && value.length > 0
-                            )
-                          ),
-                          rating: e.target.value
-                        })
-                      }
-                    >
-                      <option value="">Rating</option>
-                      <option value="">Any</option>
-                      <option value="1">1 Star</option>
-                      <option value="2">2 Star</option>
-                      <option value="3">3 Star</option>
-                      <option value="4">4 Star</option>
-                      <option value="5">5 Star</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
+      <div className="min-h-screen py-8">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_280px] xl:grid-cols-[260px_1fr_320px] gap-6">
+            
+            {/* Left Sidebar (Filters) */}
+            <div className="hidden lg:block">
+              <PostFilters 
+                filter={filter} 
+                setSearchParams={setSearchParams} 
+                companyAndRoleQuery={companyAndRoleQuery} 
+              />
             </div>
-            <div className="postList">
-              {data?.pages
-                .flatMap((page) => page.data)
-                .map((post) => (
-                  <PostListElement
-                    key={post._id}
-                    post={post}
-                    openModal={openLoginModal}
-                    openDeleteModal={openDeleteModal}
-                  />
+
+            {/* Middle Column (Main Content) */}
+            <div>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  Interview Experiences
+                </h1>
+                <p className="text-sm text-gray-500 mt-1">
+                  Personalized for you based on your profile, skills and interests
+                </p>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {['For You', 'Bookmarks', 'Recent', 'Most Upvoted', 'Trending'].map((tab) => (
+                  <button 
+                    key={tab} 
+                    onClick={() => {
+                      if ((tab === 'Bookmarks' || tab === 'For You') && !user) {
+                        openLoginModal(window.location.pathname);
+                        return;
+                      }
+                      setActiveTab(tab);
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                      activeTab === tab 
+                        ? 'bg-primary text-white' 
+                        : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {tab === 'For You' && <Sparkles className={`inline w-3.5 h-3.5 mr-1.5 ${activeTab === 'For You' ? 'text-white' : 'text-primary'}`} />}
+                    {tab}
+                  </button>
                 ))}
+              </div>
+
+              <div className="space-y-4">
+                {data?.pages
+                  .flatMap((page) => page.data)
+                  .map((post) => (
+                    <PostListElement
+                      key={post._id}
+                      post={post}
+                      openModal={openLoginModal}
+                      openDeleteModal={openDeleteModal}
+                    />
+                  ))}
+              </div>
+              <div className="text-center mt-6">{scrollFooterElement}</div>
             </div>
-            <div className="text-center">{scrollFooterElement}</div>
+
+            {/* Right Sidebar */}
+            <div className="hidden lg:block">
+              <TopCompaniesWidget />
+            </div>
+
           </div>
-        </section>
+        </div>
       </div>
     </>
   );

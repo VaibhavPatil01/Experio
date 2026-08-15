@@ -1,0 +1,318 @@
+import React from 'react';
+import DisplayQuill from '../../components/DisplayQuill';
+import { Clock, Tag, MessageSquare, AlertCircle, BookOpen, Banknote, Gift, TrendingUp, Briefcase, Star, Gauge, CheckCircle2 } from 'lucide-react';
+
+const PostContent = ({ activeTab, post }) => {
+  if (!post) return null;
+
+  const getDifficultyColor = (diff) => {
+    if (diff === 'Easy') return 'bg-primary/10 text-primary border-primary/20';
+    if (diff === 'Medium') return 'bg-orange-50 text-orange-600 border-orange-100';
+    if (diff === 'Hard') return 'bg-red-50 text-red-500 border-red-100';
+    return 'bg-gray-50 text-gray-600 border-gray-100';
+  };
+
+  switch (activeTab) {
+    case 'experience':
+      return (
+        <div className="flex flex-col gap-8">
+          <section>
+            <h3 className="text-lg font-bold text-gray-900 mb-3">About the Role & Experience</h3>
+            <div className="text-gray-700 leading-relaxed text-base mb-8">
+              {post.content ? (
+                <DisplayQuill content={post.content} />
+              ) : (
+                <p className="text-gray-500 italic">No overall experience description provided.</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-100">
+              <section className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500" /> Overall Experience
+                </h4>
+                {post?.rating ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star 
+                          key={star} 
+                          className={`w-5 h-5 ${post?.rating >= star ? 'text-yellow-400 fill-current' : 'text-gray-200 fill-current'}`} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-700 font-bold ml-1">{post?.rating} / 5</span>
+                  </div>
+                ) : (
+                  <span className="text-gray-500 italic text-[15px]">Not specified</span>
+                )}
+              </section>
+              
+              <section className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <Gauge className="w-5 h-5 text-red-500" /> Overall Difficulty
+                </h4>
+                {post?.difficulty ? (
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border ${getDifficultyColor(post?.difficulty)}`}>
+                    {post?.difficulty}
+                  </span>
+                ) : (
+                  <span className="text-gray-500 italic text-[15px]">Not specified</span>
+                )}
+              </section>
+            </div>
+          </section>
+        </div>
+      );
+
+    case 'questions':
+      const allQuestions = post.rounds?.flatMap((round, idx) => 
+        round.questionsAsked?.length > 0 
+          ? { roundType: round.roundType || `Round ${idx + 1}`, questions: round.questionsAsked, roundNum: idx + 1 } 
+          : null
+      ).filter(Boolean) || [];
+
+      return (
+        <div className="flex flex-col gap-8">
+          <section>
+            <h3 className="text-lg font-bold text-gray-900 mb-5">Questions Asked</h3>
+            {allQuestions.length > 0 ? (
+              <div className="flex flex-col gap-6">
+                {allQuestions.map((qGroup, idx) => (
+                  <div key={idx} className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                    <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                      <span className="text-gray-500 font-medium">Round {qGroup.roundNum}:</span> {qGroup.roundType}
+                    </h4>
+                    <ul className="flex flex-col gap-3">
+                      {qGroup.questions.map((q, qIdx) => (
+                        <li key={qIdx} className="flex gap-3 items-center bg-white p-3 rounded-md border border-gray-100">
+                          <div className="w-6 h-6 rounded bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                            Q{qIdx + 1}
+                          </div>
+                          <span className="text-gray-700 text-[15px] leading-relaxed">{q}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No specific questions were recorded for this interview.</p>
+            )}
+          </section>
+        </div>
+      );
+
+    case 'process':
+      return (
+        <div className="flex flex-col gap-8">
+          <section>
+            <h3 className="text-lg font-bold text-gray-900 mb-5">Interview Process</h3>
+            <div className="flex flex-col gap-6 relative">
+              {post.rounds && post.rounds.length > 0 ? (
+                <>
+                  <div className="absolute left-3 top-2 bottom-6 w-[2px] bg-gray-200 z-0"></div>
+                  {post.rounds.map((round, index) => (
+                    <div key={index} className="flex gap-4 relative z-10">
+                      <div className="mt-1 bg-white relative z-10 h-6 shrink-0 rounded-full">
+                        <CheckCircle2 className="w-6 h-6 text-primary" fill="currentColor" stroke="white" />
+                      </div>
+                      <div className="flex-1 pb-2">
+                        <div className="flex justify-between items-start gap-4 mb-3">
+                          <div>
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">
+                              Round {index + 1} {round.isMostImportant && <span className="text-red-500 ml-2 normal-case tracking-normal">★ Most Important</span>}
+                            </span>
+                            <h4 className="font-bold text-gray-800 text-[16px]">{round.roundType}</h4>
+                            
+                            {/* Duration and difficulty */}
+                            <div className="flex flex-wrap items-center gap-3 mt-2">
+                              {round.duration && (
+                                <span className="flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                  <Clock className="w-3 h-3" /> {round.duration}
+                                </span>
+                              )}
+                              <span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap ${
+                                (round.difficulty || "Medium").toLowerCase() === 'easy' ? 'bg-primary/10 text-primary' :
+                                (round.difficulty || "Medium").toLowerCase() === 'hard' ? 'bg-red-50 text-red-600' :
+                                'bg-orange-50 text-orange-600'
+                              }`}>
+                                {round.difficulty || "Medium"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Topics Covered */}
+                        {round.topicsCovered && round.topicsCovered.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {round.topicsCovered.map((topic, tIdx) => (
+                              <span key={tIdx} className="flex items-center gap-1 text-[11px] font-medium px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md">
+                                <Tag className="w-3 h-3" /> {topic}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="text-gray-700 text-[14px] mt-2 leading-relaxed bg-gray-50 p-3 rounded-md border border-gray-100">
+                          <strong>Experience & Tips: </strong>
+                          <br />
+                          {round.experienceAndTips || <span className="italic text-gray-400">No experience details provided.</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <p className="text-gray-500 italic">Interview rounds details are not available.</p>
+              )}
+            </div>
+          </section>
+        </div>
+      );
+
+    case 'tips':
+      return (
+        <div className="flex flex-col gap-8">
+          <section>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Overall Tips & Advice</h3>
+            {post.overallTips ? (
+              <div className="bg-white border border-gray-200 p-5 rounded-lg text-gray-700 text-[15px] leading-relaxed">
+                {post.overallTips}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No overall tips provided.</p>
+            )}
+          </section>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section className="bg-white border border-gray-200 rounded-lg p-5">
+              <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-500" /> Preparation Duration
+              </h4>
+              <p className="text-gray-700">{post.preparationDuration || "Not specified"}</p>
+            </section>
+            
+            <section className="bg-white border border-gray-200 rounded-lg p-5">
+              <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-orange-500" /> Resources Used
+              </h4>
+              <p className="text-gray-700">{post.preparationResources || "Not specified"}</p>
+            </section>
+          </div>
+        </div>
+      );
+
+    case 'salary':
+      return (
+        <div className="flex flex-col gap-8">
+          <section>
+            <h3 className="text-lg font-bold text-gray-900 mb-5">Compensation Details</h3>
+            
+            {post.salary && (post.salary.base || post.salary.totalCTC) ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Banknote className="w-5 h-5 text-primary" /> Base Salary
+                  </h4>
+                  <p className="text-gray-700 text-lg font-bold">{post.salary.base || "N/A"} {post.salary.base && post.salary.base !== 'N/A' && !isNaN(post.salary.base) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-purple-500" /> Bonus
+                  </h4>
+                  <p className="text-gray-700 text-lg font-bold">{post.salary.bonus || "N/A"} {post.salary.bonus && post.salary.bonus !== 'N/A' && !isNaN(post.salary.bonus) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-blue-500" /> Stocks
+                  </h4>
+                  <p className="text-gray-700 text-lg font-bold">{post.salary.stocks || "N/A"} {post.salary.stocks && post.salary.stocks !== 'N/A' && !isNaN(post.salary.stocks) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+                <section className="bg-white border border-gray-200 rounded-lg p-5">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-primary" /> Total CTC
+                  </h4>
+                  <p className="text-gray-700 text-xl font-bold">{post.salary.totalCTC || "N/A"} {post.salary.totalCTC && post.salary.totalCTC !== 'N/A' && !isNaN(post.salary.totalCTC) ? (post.salary.currency === 'INR' ? 'LPA' : 'K') : ''} <span className="text-sm font-normal text-gray-500">{post.salary.currency}</span></p>
+                </section>
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-lg p-8 text-center border border-gray-200">
+                <p className="text-gray-600">The author did not provide any salary details for this experience.</p>
+              </div>
+            )}
+          </section>
+        </div>
+      );
+
+    case 'insights':
+      return (
+        <div className="flex flex-col gap-8">
+          <section>
+            <h3 className="text-lg font-bold text-gray-900 mb-5">Tech Stack & Subjects</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              <div className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2">Technologies</h4>
+                {post.technologies && post.technologies.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {post.technologies.map(tech => (
+                      <span key={tech} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded">{tech}</span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-sm text-gray-400 italic">None specified</span>
+                )}
+              </div>
+              
+              <div className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2">DSA Topics</h4>
+                {post.dsaTopics && post.dsaTopics.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {post.dsaTopics.map(topic => (
+                      <span key={topic} className="px-2 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded">{topic}</span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-sm text-gray-400 italic">None specified</span>
+                )}
+              </div>
+              
+              <div className="bg-white border border-gray-200 rounded-lg p-5">
+                <h4 className="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2">Core Subjects</h4>
+                {post.coreSubjects && post.coreSubjects.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {post.coreSubjects.map(sub => (
+                      <span key={sub} className="px-2 py-1 bg-orange-50 text-orange-700 text-xs font-medium rounded">{sub}</span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-sm text-gray-400 italic">None specified</span>
+                )}
+              </div>
+
+            </div>
+          </section>
+        </div>
+      );
+
+    case 'ai-insights':
+      return (
+        <div className="flex flex-col gap-8">
+          <section className="bg-white border border-gray-200 rounded-lg p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
+            {/* Design to be implemented later */}
+          </section>
+        </div>
+      );
+
+    default:
+      return (
+        <div className="py-8 text-center text-gray-500">
+          <p>Select a tab to view details.</p>
+        </div>
+      );
+  }
+};
+
+export default PostContent;

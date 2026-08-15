@@ -1,0 +1,10 @@
+# Winston / Pino log files
+logs/
+*.log
+
+# Ignore node_modules if not already ignored by inner gitignores
+node_modules/
+
+# Environment files
+.env
+.env.*

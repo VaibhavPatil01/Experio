@@ -8,7 +8,7 @@ const sendEmailVerificationMail = async (email, token, username) => {
 
   const verificationURL = SERVER_BASE_URL + '/user/verify-email/' + token;
   const senderEmail = process.env['MAIL_USER'];
-  const emailSubject = 'Verify your Email on Interview Experience';
+  const emailSubject = 'Verify your Email on Experio';
   const emailTemplate = 'user_email_verification';
   const officialName = 'InterviewExperience';
   const context = { verificationURL, username, officialName };

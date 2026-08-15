@@ -6,20 +6,20 @@ function Events() {
   return (
     <>
       <Helmet>
-        <title>Events | Interview Experience</title>
+        <title>Events | Experio</title>
         <meta
           name="description"
           content="Upcoming and Past Events of GSMCOE are displayed here, the page is still in construction"
         />
         <meta name="twitter:card" content={eventsPageImage} />
-        <meta name="twitter:title" content="Events | Interview Experience" />
+        <meta name="twitter:title" content="Events | Experio" />
         <meta
           name="twitter:description"
           content="Upcoming and Past Events of GSMCOE are displayed here, the page is still in construction"
         />
         <meta name="twitter:image" content={eventsPageImage} />
 
-        <meta property="og:title" content="Events | Interview Experience" />
+        <meta property="og:title" content="Events | Experio" />
         <meta
           property="og:description"
           content="Upcoming and Past Events of GSMCOE are displayed here, the page is still in construction"

@@ -52,6 +52,10 @@ export function getPostsPaginated(page, limit, filter, signal) {
     url.searchParams.set('rating', filter.rating);
   }
 
+  if (filter.datePosted && filter.datePosted !== 'Anytime') {
+    url.searchParams.set('datePosted', filter.datePosted);
+  }
+
   const options = {
     headers: { token: getAuthToken() },
     signal
@@ -71,7 +75,7 @@ export function getPostsPaginated(page, limit, filter, signal) {
 
 export function createPost(postData, status) {
   const url = `${BASE_API_URL}/posts`;
-  const tags = getTagsFromString(postData.tags);
+  const tags = postData.tags ? getTagsFromString(postData.tags) : [];
   const body = { ...postData, tags, status };
 
   return axios
@@ -104,6 +108,23 @@ export function getRelatedPosts(postId, limit) {
     .get(url.href, { headers: { token: getAuthToken() } })
     .then((res) => res.data)
     .then((data) => data.relatedPosts);
+}
+
+export function getRecommendedFeedPaginated(page, limit) {
+  const url = new URL(`${BASE_API_URL}/recommendations/feed`);
+  url.searchParams.set('limit', limit.toString());
+  // The backend might not support page for vector search yet, but we pass limit
+
+  return axios
+    .get(url.href, { headers: { token: getAuthToken() } })
+    .then((res) => res.data)
+    .then((data) => {
+      // Mock page object since recommendation API doesn't paginate yet
+      return {
+        data: data.data,
+        page: { nextPage: undefined }
+      };
+    });
 }
 
 export function getUserPostPaginated(userId, page, limit) {
@@ -153,9 +174,15 @@ export function getCompanyAndRoleList() {
   return axios.get(url.href).then((res) => res.data);
 }
 
+export function getTopCompanies() {
+  const url = new URL(`${BASE_API_URL}/posts/data/top-companies`);
+
+  return axios.get(url.href).then((res) => res.data);
+}
+
 export function editPost(editedPostData, postId, status) {
   const url = `${BASE_API_URL}/posts/edit`;
-  const tags = getTagsFromString(editedPostData.tags);
+  const tags = editedPostData.tags ? getTagsFromString(editedPostData.tags) : [];
   const body = {
     ...editedPostData,
     tags,
@@ -182,4 +209,60 @@ export function downVotePost(postId) {
   return axios
     .post(url, {}, { headers: { token: getAuthToken() } })
     .then((response) => response.data);
+}
+
+export function getPostComments(postId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments`;
+  return axios.get(url, { headers: { token: getAuthToken() } }).then((res) => res.data.comments);
+}
+
+export function addComment(postId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments`;
+  return axios.post(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function addReply(postId, commentId, content, parentReplyId = null) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies`;
+  const body = parentReplyId ? { content, parentReplyId } : { content };
+  return axios.post(url, body, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function editComment(postId, commentId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}`;
+  return axios.put(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function deleteComment(postId, commentId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}`;
+  return axios.delete(url, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function editReply(postId, commentId, replyId, content) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`;
+  return axios.put(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function deleteReply(postId, commentId, replyId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`;
+  return axios.delete(url, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleCommentUpvote(postId, commentId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/upvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleReplyUpvote(postId, commentId, replyId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}/upvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleCommentDownvote(postId, commentId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/downvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+}
+
+export function toggleReplyDownvote(postId, commentId, replyId) {
+  const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}/downvote`;
+  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
 }

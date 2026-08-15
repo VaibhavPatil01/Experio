@@ -21,7 +21,7 @@ function CommentCard({ postId, comment }) {
   };
 
   return (
-    <div className="mb-4">
+    <div className="mb-4" id={`comment-${comment._id}`}>
       <div className="flex justify-between items-center pr-2.5">
         {comment.userId ? (
           <Link

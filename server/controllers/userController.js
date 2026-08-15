@@ -6,7 +6,8 @@ import decodeToken from '../utils/token/decodeToken.js';
 import generateAuthToken from '../utils/token/generateAuthToken.js';
 import generateEmailVerificationToken from '../utils/token/generateEmailVerificationToken.js';
 import generateForgotPasswordToken from '../utils/token/generateForgotPasswordToken.js';
-import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, getUserProfileService } from '../services/userService.js';
+import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
+import { eventBus, EVENTS } from '../events/index.js';
 
 
 export async function loginUser(req, res) { 
@@ -62,6 +63,14 @@ export async function loginUser(req, res) {
         about: user.about,
         github: user.github,
         linkedin: user.linkedin,
+        phone: user.phone,
+        skills: user.skills,
+        socialLinks: user.socialLinks,
+        workExperiences: user.workExperiences,
+        coursesAndCertifications: user.coursesAndCertifications,
+        projects: user.projects,
+        awards: user.awards,
+        languages: user.languages,
       },
     });
   } catch (error) {
@@ -225,6 +234,14 @@ export async function getLoginStatus(req, res) {
       about: user.about,
       github: user.github,
       linkedin: user.linkedin,
+      phone: user.phone,
+      skills: user.skills,
+      socialLinks: user.socialLinks,
+      workExperiences: user.workExperiences,
+      coursesAndCertifications: user.coursesAndCertifications,
+      projects: user.projects,
+      awards: user.awards,
+      languages: user.languages,
     };
 
     return res.status(200).json({
@@ -328,6 +345,10 @@ export async function editUserProfile(req, res) {
   const userId = req.body.authTokenData.id;
   try {
     const user = await editProfile(userId, updatedProfile);
+    
+    // AI Layer Sync
+    eventBus.emit(EVENTS.USER_UPDATED, { userId: userId });
+
     return res
       .status(200)
       .json({ message: 'User Profile Edited Successfully', data: user });
@@ -368,6 +389,8 @@ export async function forgotPassword(req, res) {
 
     // Creating a jwt token and sending it to the user
     const token = generateForgotPasswordToken(user._id, email, user.isAdmin);
+
+    console.log("Generated Token", token);
 
     // send email to the user
     sendForgotPasswordEmail(email, token, user.username);
@@ -457,6 +480,27 @@ export async function googleLogin(req, res) {
   return res.redirect(`${clientURL}/token/google/${token}`);
 }
 
+export async function githubLogin(req, res) {
+  if (!req.user) {
+    return res.send('ERROR with GitHub Login');
+  }
+
+  const userData = req.user;
+  const email = userData.email;
+  const user = await findUser(email);
+
+  if (!user) {
+    return res.send('ERROR with GitHub Login');
+  }
+
+  // generate JWT token
+  const token = generateAuthToken(user._id, email, user.isAdmin);
+
+  // Successful authentication, redirect home.
+  const clientURL = process.env['CLIENT_BASE_URL'] || 'http://localhost:3000';
+  return res.redirect(`${clientURL}/token/github/${token}`);
+}
+
 // ----------------------------------------------------------------------------------------------------------- //
 
 export async function searchUser(req, res) {
@@ -475,11 +519,13 @@ export async function searchUser(req, res) {
   const skip = limit * page;
   try {
     const userList = await searchUserService(search, limit, skip);
+    const totalUsers = await countUsersService();
 
     if (userList.length === 0) {
       return res.status(200).json({
         message: 'No posts to display',
         data: [],
+        totalUsers,
         page: { previousPage: page === 0 ? undefined : page },
       });
     }
@@ -492,6 +538,7 @@ export async function searchUser(req, res) {
     return res.status(200).json({
       message: 'Users fetched successfully',
       data: userList,
+      totalUsers,
       page: { nextPage, previousPage },
     });
   } catch (error) {
@@ -500,3 +547,104 @@ export async function searchUser(req, res) {
   }
 }
 
+// ----------------------------------------------------------------------------------------------------------- //
+
+export async function updateUserProfile(req, res) {
+  let token = req.headers['token'];
+
+  if (Array.isArray(token)) {
+    token = token[0];
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const authTokenData = decodeToken(token);
+    const user = await findUser(authTokenData.email);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const updatedUser = await updateUserService(user._id, req.body);
+
+    // AI Layer Sync
+    eventBus.emit(EVENTS.USER_UPDATED, { userId: user._id });
+
+    return res.status(200).json({ message: 'Profile updated successfully', data: updatedUser });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong while updating profile' });
+  }
+}
+
+export async function updateProfilePicture(req, res) {
+  try {
+    const authTokenData = req.authTokenData;
+    const user = await findUser(authTokenData.email);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // The Cloudinary URL is available in req.file.path
+    const profilePictureUrl = req.file.path;
+    
+    const updatedUser = await updateUserService(user._id, { profilePicture: profilePictureUrl });
+    
+    return res.status(200).json({ 
+      message: 'Profile picture updated successfully', 
+      data: updatedUser 
+    });
+  } catch (error) {
+    console.error("Error in updateProfilePicture:", error);
+    return res.status(500).json({ 
+      message: 'Something went wrong while updating profile picture',
+      error: error.message || error.toString(),
+      stack: error.stack
+    });
+  }
+}
+
+export async function uploadUserResume(req, res) {
+  try {
+    const authTokenData = req.authTokenData;
+    const user = await findUser(authTokenData.email);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const resumeUrl = req.file.path;
+    const originalFilename = req.file.originalname || req.file.filename;
+    
+    const resumeData = {
+      url: resumeUrl,
+      filename: originalFilename
+    };
+    
+    const updatedUser = await updateUserService(user._id, { resume: resumeData });
+    
+    return res.status(200).json({ 
+      message: 'Resume updated successfully', 
+      data: updatedUser 
+    });
+  } catch (error) {
+    console.error("Error in uploadUserResume:", error);
+    return res.status(500).json({ 
+      message: 'Something went wrong while uploading resume',
+      error: error.message || error.toString(),
+      stack: error.stack
+    });
+  }
+}
