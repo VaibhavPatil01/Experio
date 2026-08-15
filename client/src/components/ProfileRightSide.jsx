@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser, uploadResumeFile } from '../services/userServices.js';
 import penIcon from '../assets/images/icons/pen-svgrepo-com.svg';
+import toast from 'react-hot-toast';
 
 const navItems = [
   'Profile summary',
@@ -510,7 +511,7 @@ const ProfileRightSide = ({ profileData }) => {
         <p className="text-gray-600 text-[15px] leading-relaxed mb-6 whitespace-pre-wrap">
           {profileData?.about || "No summary provided."}
         </p>
-        <button className="flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-primary/10 transition-colors shadow-sm cursor-pointer">
+        <button onClick={() => toast('Feature not available')} className="flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-primary/10 transition-colors shadow-sm cursor-pointer">
           <Sparkles className="w-4 h-4 text-primary" /> Generate by AI
         </button>
       </div>
