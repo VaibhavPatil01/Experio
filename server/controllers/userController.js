@@ -625,8 +625,15 @@ export async function uploadUserResume(req, res) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const resumeUrl = req.file.path;
-    const originalFilename = req.file.originalname || req.file.filename;
+    let resumeUrl = req.file.path;
+    const originalFilename = req.file.originalname || req.file.filename || 'resume.pdf';
+    
+    // Add extension if missing so browser knows the file type
+    const extMatch = originalFilename.match(/\.[0-9a-z]+$/i);
+    const ext = extMatch ? extMatch[0] : '.pdf';
+    if (!resumeUrl.endsWith(ext)) {
+      resumeUrl += ext;
+    }
 
     const resumeData = {
       url: resumeUrl,

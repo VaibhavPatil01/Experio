@@ -29,7 +29,7 @@ const resumeStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'interview_experience_resumes',
-    resource_type: 'raw',
+    resource_type: 'auto',
     public_id: (req, file) => {
       const originalName = file.originalname || 'resume.pdf';
       const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
