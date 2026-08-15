@@ -1,6 +1,6 @@
 import express from "express";
 import passport from 'passport';
-import { deleteUser, updateUserProfile, updateProfilePicture, uploadUserResume, forgotPassword, getLoginStatus, getUserProfile, googleLogin, loginUser, logoutUser, registerUser, resetPassword, searchUser, verifyEmail } from '../controllers/userController.js';
+import { deleteUser, updateUserProfile, updateProfilePicture, uploadUserResume, forgotPassword, getLoginStatus, getUserProfile, googleLogin, githubLogin, loginUser, logoutUser, registerUser, resetPassword, searchUser, verifyEmail } from '../controllers/userController.js';
 import isUserAuth from '../middleware/isUserAuth.js';
 import upload, { uploadResume } from '../middleware/upload.js';
 
@@ -48,5 +48,10 @@ userRouter.get('/search', searchUser);
 userRouter.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 userRouter.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/user/auth/google/failed', session: false, }), googleLogin);
 userRouter.get('/auth/google/failed', (req, res) => { return res.status(401).json({ message: 'Login Failure' }); });
+
+// User Routes for GitHub Auth
+userRouter.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+userRouter.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/user/auth/github/failed', session: false, }), githubLogin);
+userRouter.get('/auth/github/failed', (req, res) => { return res.status(401).json({ message: 'GitHub Login Failure' }); });
 
 export default userRouter;  

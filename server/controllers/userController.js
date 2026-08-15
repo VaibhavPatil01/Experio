@@ -480,6 +480,27 @@ export async function googleLogin(req, res) {
   return res.redirect(`${clientURL}/token/google/${token}`);
 }
 
+export async function githubLogin(req, res) {
+  if (!req.user) {
+    return res.send('ERROR with GitHub Login');
+  }
+
+  const userData = req.user;
+  const email = userData.email;
+  const user = await findUser(email);
+
+  if (!user) {
+    return res.send('ERROR with GitHub Login');
+  }
+
+  // generate JWT token
+  const token = generateAuthToken(user._id, email, user.isAdmin);
+
+  // Successful authentication, redirect home.
+  const clientURL = process.env['CLIENT_BASE_URL'] || 'http://localhost:3000';
+  return res.redirect(`${clientURL}/token/github/${token}`);
+}
+
 // ----------------------------------------------------------------------------------------------------------- //
 
 export async function searchUser(req, res) {

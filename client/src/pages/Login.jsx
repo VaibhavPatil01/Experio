@@ -130,7 +130,12 @@ function Login() {
 
   const handleGoogleSignIn = () => {
     setLocalStorage('google-login-redirect', redirectURLOnLogin);
-    window.open(`${BASE_API_URL}/user/auth/google/callback`, '_self');
+    window.open(`${BASE_API_URL}/user/auth/google`, '_self');
+  };
+
+  const handleGithubSignIn = () => {
+    setLocalStorage('github-login-redirect', redirectURLOnLogin);
+    window.open(`${BASE_API_URL}/user/auth/github`, '_self');
   };
 
   const getFieldError = (fieldName, label) =>
@@ -187,7 +192,7 @@ function Login() {
                     <button
                       type="button"
                       onClick={handleGoogleSignIn}
-                      className="flex h-12 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+                      className="flex h-12 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:shadow-md cursor-pointer"
                     >
                       <img
                         src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -199,8 +204,8 @@ function Login() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => toast.error('GitHub login is not available yet')}
-                      className="flex h-12 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+                      onClick={handleGithubSignIn}
+                      className="flex h-12 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:shadow-md cursor-pointer"
                     >
                       <img
                         src="https://www.svgrepo.com/show/512317/github-142.svg"
@@ -303,7 +308,7 @@ function Login() {
                       <button
                         type="button"
                         onClick={() => setShowPassword((currentValue) => !currentValue)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-slate-400 transition hover:text-primary"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-slate-400 transition hover:text-primary cursor-pointer"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
@@ -341,7 +346,7 @@ function Login() {
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword((currentValue) => !currentValue)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-slate-400 transition hover:text-primary"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-slate-400 transition hover:text-primary cursor-pointer"
                         aria-label={
                           showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'
                         }
@@ -365,7 +370,7 @@ function Login() {
                     <button
                       type="button"
                       onClick={() => setIsForgotPasswordMode(true)}
-                      className="font-semibold text-primary hover:underline"
+                      className="font-semibold text-primary hover:underline cursor-pointer"
                     >
                       Forgot Password?
                     </button>

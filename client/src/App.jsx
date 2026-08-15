@@ -9,6 +9,7 @@ import { applyThemeColor } from './utils/theme.js';
 import useUserStatus from './hooks/useUserStatus.js';
 import Error from './pages/Error.jsx';
 import GoogleTokenSetter from './pages/GoogleTokenSetter.jsx';
+import GithubTokenSetter from './pages/GithubTokenSetter.jsx';
 import Events from './pages/Events.jsx';
 import AuthRouteLayout from './pages/AuthRouteLayout.jsx';
 import { useAppSelector } from './redux/store.js';
@@ -74,6 +75,7 @@ const App = () => {
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/posts" element={<PostList />} />
             <Route path="/token/google/:token" element={<GoogleTokenSetter />} />
+            <Route path="/token/github/:token" element={<GithubTokenSetter />} />
             <Route path="/user/search" element={<UserSearch />} />
             <Route path="/assistant" element={<Assistant />} />
             <Route element={<AuthRouteLayout />}>
@@ -110,7 +112,7 @@ const App = () => {
           }
         `}
       </style>
-      {!isChatOpen && pathname !== '/assistant' && (
+      {!isChatOpen && pathname !== '/assistant' && pathname !== '/login' && pathname !== '/register' && !pathname.startsWith('/reset-password') && (
         <div 
           onClick={() => setIsChatOpen(true)}
           className="fixed bottom-6 right-6 w-[60px] h-[60px] bg-primary rounded-full flex items-center justify-center cursor-pointer z-[9999] transition-all duration-300 shadow-xl text-primary group"
