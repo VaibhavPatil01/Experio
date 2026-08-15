@@ -16,7 +16,7 @@ import {
 } from '../services/userServices.js';
 import { BASE_API_URL } from '../services/serverConfig.js';
 import { setLocalStorage } from '../utils/localStorage.js';
-import loginPageImage from '../assets/images/pages/login.png';
+import loginPageImage from '../assets/images/icons/updatedloginimage.png';
 
 function Login() {
   const queryClient = useQueryClient();
@@ -168,7 +168,7 @@ function Login() {
 
       <main className="h-screen overflow-hidden bg-white">
         <div className="grid h-full min-h-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-          <section className="flex h-full min-h-0 flex-col px-5 py-6 sm:px-8 lg:px-12">
+          <section className="flex h-full min-h-0 flex-col px-5 py-6 sm:px-8 lg:px-12 relative z-10">
             <Link to="/" className="inline-flex w-fit" aria-label="Go to homepage">
               <Logo className="h-10 sm:h-12 w-auto text-primary" />
             </Link>
@@ -422,14 +422,12 @@ function Login() {
             </div>
           </section>
 
-          <div className="hidden  p-5 lg:block">
-            <div className="flex h-full items-center justify-center overflow-hidden rounded-lg ">
-              <img
-                src={assets.loginpagegreenlogo}
-                alt="Login illustration"
-                className="h-130 w-130 object-cover"
-              />
-            </div>
+          <div className="hidden lg:block relative h-full w-full overflow-hidden">
+            <img
+              src={loginPageImage}
+              alt="Login illustration"
+              className="absolute bottom-0 right-0 max-h-full max-w-full object-contain"
+            />
           </div>
         </div>
       </main>
