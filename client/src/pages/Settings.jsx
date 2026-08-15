@@ -15,7 +15,7 @@ function SettingsPage() {
   });
   
   const [selectedThemeColor, setSelectedThemeColor] = useState(
-    localStorage.getItem('primaryColor') || 'green'
+    localStorage.getItem('primaryColor') || 'darkblue'
   );
 
   const handleThemeChange = (colorKey) => {

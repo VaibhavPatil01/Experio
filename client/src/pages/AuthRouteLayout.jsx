@@ -11,8 +11,8 @@ function AuthRouteLayout() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary/10">
-      <div className="flex items-center min-h-screen gap-3.75 max-w-7xl mx-auto px-5">
+    <div className="h-[calc(100vh-80px)] flex items-center justify-center">
+      <div className="flex items-center gap-3.75 max-w-7xl mx-auto px-5">
         <div className="flex-1 max-w-prose">
           <h3 className="text-4xl md:text-5xl font-bold text-primary uppercase">
             Login Required!!

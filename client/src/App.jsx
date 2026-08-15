@@ -47,7 +47,7 @@ const App = () => {
 
   // Load primary theme color on mount
   useEffect(() => {
-    const savedColor = localStorage.getItem('primaryColor') || 'green';
+    const savedColor = localStorage.getItem('primaryColor') || 'darkblue';
     applyThemeColor(savedColor);
   }, []);
 

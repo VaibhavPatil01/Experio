@@ -8,7 +8,13 @@ import { BrowserRouter } from 'react-router-dom';
 import { store } from './redux/store.js';
 import { NotificationProvider } from './context/NotificationContext.jsx';
 
+import { applyThemeColor } from './utils/theme.js';
+
 const queryClient = new QueryClient();
+
+// Apply theme synchronously before React renders to prevent flash of default color
+const savedColor = localStorage.getItem('primaryColor') || 'darkblue';
+applyThemeColor(savedColor);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

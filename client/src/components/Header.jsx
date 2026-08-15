@@ -342,6 +342,7 @@ const Navbar = () => {
           )}
         </div>
 
+        {/* Dark/Light mode toggle - Commented out for now
         <div className="relative group">
           <button
             type="button"
@@ -356,7 +357,6 @@ const Navbar = () => {
             )}
           </button>
 
-          {/* Tooltip */}
           <div
             className="
       pointer-events-none absolute left-1/2 top-12 z-50
@@ -370,7 +370,6 @@ const Navbar = () => {
     "
           >
             Switch to {theme === 'light' ? 'dark' : 'light'} mode
-            {/* Tooltip Arrow */}
             <div
               className="
         absolute left-1/2 top-0 h-2 w-2
@@ -380,6 +379,7 @@ const Navbar = () => {
             />
           </div>
         </div>
+        */}
         {!isLoggedIn ? (
           <Link
             to="/login"
