@@ -7,6 +7,7 @@ import { createSession, fetchSessionMessages, syncGuestSession } from '../servic
 import ChatHistoryModal from './ChatHistoryModal';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
 import { useAppSelector } from '../redux/store.js';
+import { toast } from 'react-hot-toast';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
   const user = useAppSelector((state) => state.userState.user);
@@ -340,35 +341,39 @@ const ChatbotModal = ({ isOpen, onClose }) => {
 
         <div className="flex gap-2">
           {/* New Chat Button */}
-          <div className="relative flex">
-            <button 
-              onClick={handleNewChat}
-              disabled={isCreatingSession}
-              className={`peer cursor-pointer w-8 h-8 rounded-full flex items-center justify-center transition-colors text-gray-800 ${
-                isCreatingSession ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'bg-gray-200/50 hover:bg-gray-200'
-              }`}
-            >
-              <Plus className="w-[18px] h-[18px]" />
-            </button>
-            <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
-              New Chat
-              <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
+          {isAuthenticated && (
+            <div className="relative flex">
+              <button 
+                onClick={handleNewChat}
+                disabled={isCreatingSession}
+                className={`peer cursor-pointer w-8 h-8 rounded-full flex items-center justify-center transition-colors text-gray-800 ${
+                  isCreatingSession ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'bg-gray-200/50 hover:bg-gray-200'
+                }`}
+              >
+                <Plus className="w-[18px] h-[18px]" />
+              </button>
+              <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
+                New Chat
+                <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* History Button */}
-          <div className="relative flex">
-            <button 
-              onClick={() => setIsHistoryOpen(true)}
-              className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
-            >
-              <History className="w-[18px] h-[18px]" />
-            </button>
-            <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
-              Past Conversations
-              <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
+          {isAuthenticated && (
+            <div className="relative flex">
+              <button 
+                onClick={() => setIsHistoryOpen(true)}
+                className="peer cursor-pointer w-8 h-8 rounded-full bg-gray-200/50 hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-800"
+              >
+                <History className="w-[18px] h-[18px]" />
+              </button>
+              <div className="pointer-events-none absolute left-1/2 top-10 z-50 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 peer-hover:translate-y-0 peer-hover:opacity-100">
+                Past Conversations
+                <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gray-900" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Options Button */}
           <div className="relative flex">
@@ -390,7 +395,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsOptionsOpen(false)}></div>
                 <div className="absolute right-0 top-10 mt-1 w-[200px] bg-white rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.1)] border border-gray-100 py-1.5 z-50 flex flex-col">
-                  <button className="cursor-pointer flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-800 transition-colors w-full text-left text-[14px]">
+                  <button 
+                    onClick={() => toast('Feature not available')}
+                    className="cursor-pointer flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-800 transition-colors w-full text-left text-[14px]"
+                  >
                     <Mail className="w-5 h-5" />
                     <span>Send transcript</span>
                   </button>
