@@ -60,3 +60,8 @@ export const submitFeedback = async (sessionId, messageId, feedback) => {
   const response = await apiClient.post(`/${sessionId}/messages/${messageId}/feedback`, { feedback });
   return response.data;
 };
+
+export const syncGuestSession = async (messages) => {
+  const response = await apiClient.post(`/guest/sync`, { messages });
+  return response.data;
+};

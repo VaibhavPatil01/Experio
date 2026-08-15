@@ -48,6 +48,40 @@ export const streamChatGeneration = async (req, res) => {
 };
 
 /**
+ * Handles guest chat streaming. Does not save to the database.
+ */
+export const streamGuestChatGeneration = async (req, res) => {
+  const { prompt, model, history } = req.body;
+
+  if (!prompt || prompt.trim() === '') {
+    return res.status(400).json({ message: 'Prompt is required' });
+  }
+
+  // Setup SSE Headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  try {
+    const generator = pipelineService.executeGuestPipeline(prompt, history, model);
+
+    for await (const chunk of generator) {
+      if (req.aborted || res.closed) {
+        logger.warn('Client aborted guest SSE connection mid-stream');
+        break;
+      }
+      res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+      if (chunk.type === 'error') break;
+    }
+  } catch (error) {
+    logger.error('Fatal error in streamGuestChatGeneration', { error: error.message, stack: error.stack });
+    res.write(`data: ${JSON.stringify({ type: 'error', error: 'Internal streaming error' })}\n\n`);
+  } finally {
+    res.end();
+  }
+};
+
+/**
  * Regenerates a response from a specific point in time.
  * This deletes all messages AFTER the target message, and re-triggers the pipeline.
  */

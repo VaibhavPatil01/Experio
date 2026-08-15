@@ -7,7 +7,7 @@ export default class AnalyzerPromptBuilder {
   static buildPrompt(contextObject) {
     const { candidateFacts, targetFacts, platformFacts } = contextObject;
 
-    let prompt = `You are an elite, highly experienced technical recruiter, hiring manager, and career advisor who deeply understands the Mozify platform.
+    let prompt = `You are an elite, highly experienced technical recruiter, hiring manager, and career advisor who deeply understands the Experio platform.
 Your objective is to provide an in-depth, structured, and actionable critique of a candidate's resume, tailoring it specifically to their target role and company.
 
 ### STRICT RULES FOR ANALYSIS:

@@ -6,8 +6,16 @@ import { sanitizeInput, verifySessionOwnership } from '../../../middlewares/chat
 
 const router = express.Router();
 
+import * as chatStreamController from '../controllers/chatStreamController.js';
+
+// Unauthenticated Guest Route (Must be before isUserAuth)
+router.post('/guest/chat', strictChatLimiter, sanitizeInput, chatStreamController.streamGuestChatGeneration);
+
 // Apply auth middleware to all session routes
 router.use(isUserAuth);
+
+// Sync guest session (Authenticated)
+router.post('/guest/sync', sanitizeInput, chatSessionController.syncGuestSession);
 
 // Create session (Sanitize input)
 router.post('/', sanitizeInput, chatSessionController.createSession);
@@ -33,7 +41,7 @@ router.put('/:sessionId/restore', verifySessionOwnership, chatSessionController.
 // ==========================================
 // Stream & Generation Sub-Routes
 // ==========================================
-import * as chatStreamController from '../controllers/chatStreamController.js';
+
 
 router.post('/:sessionId/chat', verifySessionOwnership, strictChatLimiter, sanitizeInput, chatStreamController.streamChatGeneration);
 router.post('/:sessionId/messages/:messageId/regenerate', verifySessionOwnership, strictChatLimiter, chatStreamController.regenerateChat);

@@ -11,6 +11,18 @@ export const createSession = asyncHandler(async (req, res) => {
   res.status(201).json(session);
 });
 
+export const syncGuestSession = asyncHandler(async (req, res) => {
+  const { messages } = req.body;
+  const userId = req.authTokenData.id;
+
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ message: 'Messages array is required' });
+  }
+
+  const session = await chatSessionService.syncGuestSession(userId, messages);
+  res.status(201).json(session);
+});
+
 export const getRecentSessions = asyncHandler(async (req, res) => {
   const userId = req.authTokenData.id;
   const page = parseInt(req.query.page) || 1;

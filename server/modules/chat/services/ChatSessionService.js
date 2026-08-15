@@ -1,10 +1,12 @@
 import geminiClient from '../../../configs/gemini.js';
 import ChatSessionRepository from '../repositories/ChatSessionRepository.js';
+import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
 import logger from '../../../utils/logger.js';
 
 export default class ChatSessionService {
-  constructor(repo = new ChatSessionRepository()) {
+  constructor(repo = new ChatSessionRepository(), messageRepo = new ChatMessageRepository()) {
     this.repo = repo;
+    this.messageRepo = messageRepo;
   }
 
   /**
@@ -39,6 +41,28 @@ export default class ChatSessionService {
 
     const session = await this.repo.createSession(userId, title);
     logger.info('Chat session created successfully', { category: 'db', sessionId: session._id });
+    
+    return session;
+  }
+
+  async syncGuestSession(userId, messages) {
+    logger.info('Syncing guest chat session to DB', { userId, messageCount: messages.length });
+    
+    let title = 'New Conversation';
+    if (messages.length > 0 && messages[0].content) {
+      title = await this.generateTitle(messages[0].content);
+    }
+
+    const session = await this.repo.createSession(userId, title);
+    
+    const messagesToInsert = messages.map(msg => ({
+      sessionId: session._id,
+      role: msg.sender === 'user' ? 'user' : 'assistant',
+      content: msg.content
+    }));
+
+    await this.messageRepo.model.insertMany(messagesToInsert);
+    logger.info('Guest session synced successfully', { sessionId: session._id });
     
     return session;
   }

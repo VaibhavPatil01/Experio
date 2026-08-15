@@ -170,7 +170,7 @@ export default class ChatRetrievalService {
   formatSystemContext(userProfile, summary) {
     const { username, branch, passingYear, designation, skills } = userProfile;
     
-    let ctx = `System Role: You are the AI Assistant for Mozify, a platform dedicated to career growth, interview preparation, and professional networking.\n`;
+    let ctx = `System Role: You are the AI Assistant for Experio, a platform dedicated to career growth, interview preparation, and professional networking.\n`;
     ctx += `User Context: You are talking to ${username}. `;
     
     const details = [];

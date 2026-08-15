@@ -3,11 +3,15 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useChatStream } from '../hooks/useChatStream';
-import { createSession, fetchSessionMessages } from '../services/chatServices';
+import { createSession, fetchSessionMessages, syncGuestSession } from '../services/chatServices';
 import ChatHistoryModal from './ChatHistoryModal';
 import robotIcon from '../assets/images/icons/chatroboticon.png';
+import { useAppSelector } from '../redux/store.js';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
+  const user = useAppSelector((state) => state.userState.user);
+  const isAuthenticated = !!user;
+
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -21,24 +25,74 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [inputValue, setInputValue] = useState('');
   const [isCreatingSession, setIsCreatingSession] = useState(false);
 
-  const { isGenerating, streamText, streamError, startStream, stopStream } = useChatStream();
+  const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
   const messagesEndRef = useRef(null);
+
+  // Initialize messages
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const storedGuestHistory = localStorage.getItem('guestChatHistory');
+      if (storedGuestHistory) {
+        try {
+          setMessages(JSON.parse(storedGuestHistory));
+        } catch (e) {
+          console.error("Failed to parse guest history", e);
+        }
+      } else {
+        setMessages([]);
+      }
+    }
+  }, [isAuthenticated]);
+
+  // Sync Guest History on Login
+  useEffect(() => {
+    const syncGuestHistory = async () => {
+      const storedGuestHistory = localStorage.getItem('guestChatHistory');
+      if (isAuthenticated && storedGuestHistory) {
+        try {
+          const parsedHistory = JSON.parse(storedGuestHistory);
+          if (parsedHistory.length > 0) {
+            setIsCreatingSession(true);
+            const session = await syncGuestSession(parsedHistory);
+            setActiveSessionId(session._id);
+            localStorage.removeItem('guestChatHistory');
+            setIsCreatingSession(false);
+          }
+        } catch (e) {
+          console.error("Failed to sync guest history", e);
+          setIsCreatingSession(false);
+        }
+      }
+    };
+    syncGuestHistory();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamText]);
 
   useEffect(() => {
-    if (activeSessionId) {
-      localStorage.setItem('sharedActiveChatId', activeSessionId);
-    } else {
-      localStorage.setItem('sharedActiveChatId', 'new');
+    if (isAuthenticated) {
+      if (activeSessionId) {
+        localStorage.setItem('sharedActiveChatId', activeSessionId);
+      } else {
+        localStorage.setItem('sharedActiveChatId', 'new');
+      }
     }
-  }, [activeSessionId]);
+  }, [activeSessionId, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated && messages.length > 0) {
+      // Don't save if it's currently generating because streamText is temporary
+      if (!isGenerating) {
+        localStorage.setItem('guestChatHistory', JSON.stringify(messages));
+      }
+    }
+  }, [messages, isAuthenticated, isGenerating]);
 
   useEffect(() => {
     const loadActiveSessionMessages = async () => {
-      if (!activeSessionId) return;
+      if (!activeSessionId || !isAuthenticated) return;
       try {
         const messagesData = await fetchSessionMessages(activeSessionId);
         const formattedMessages = (Array.isArray(messagesData) ? messagesData : messagesData.messages || [])
@@ -55,10 +109,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       }
     };
     
-    if (activeSessionId && messages.length === 0) {
+    if (activeSessionId && messages.length === 0 && isAuthenticated) {
       loadActiveSessionMessages();
     }
-  }, [activeSessionId]); // Only fetch when activeSessionId changes and messages are empty
+  }, [activeSessionId, isAuthenticated]);
 
 
   const handleNewChat = () => {
@@ -68,6 +122,9 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     }
     setActiveSessionId(null);
     setMessages([]);
+    if (!isAuthenticated) {
+      localStorage.removeItem('guestChatHistory');
+    }
   };
 
   const handleSend = async (textToSend = inputValue) => {
@@ -85,6 +142,23 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       setInputValue('');
     }
 
+    if (!isAuthenticated) {
+      // Guest Chat Flow
+      try {
+        await startGuestStream([...messages, newUserMsg], userPrompt, 'gemini-3.5-flash', (finalMessage) => {
+          setMessages(prev => [...prev, {
+            id: finalMessage._id || Date.now().toString(),
+            sender: finalMessage.role === 'user' ? 'user' : 'system',
+            content: finalMessage.content
+          }]);
+        });
+      } catch (error) {
+        console.error("Guest chat generation error", error);
+      }
+      return;
+    }
+
+    // Authenticated Flow
     let targetSessionId = activeSessionId;
 
     try {
@@ -427,24 +501,49 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         {/* Suggested Prompts */}
         {messages.length === 0 && (
           <div className="flex flex-col gap-2.5 items-start mt-auto">
-            <button 
-              onClick={() => handleSend('What are the top 5 most important skills one should have to crack Amazon?')}
-              className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
-            >
-              What are the top 5 most important skills one should have to crack Amazon?
-            </button>
-            <button 
-              onClick={() => handleSend('What are some common interview questions for a software engineer?')}
-              className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
-            >
-              What are some common interview questions for a software engineer?
-            </button>
-            <button 
-              onClick={() => handleSend('Can we do a mock interview for a frontend developer role?')}
-              className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
-            >
-              Can we do a mock interview for a frontend developer role?
-            </button>
+            {isAuthenticated ? (
+              <>
+                <button 
+                  onClick={() => handleSend('What are the top 5 most important skills one should have to crack Amazon?')}
+                  className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+                >
+                  What are the top 5 most important skills one should have to crack Amazon?
+                </button>
+                <button 
+                  onClick={() => handleSend('What are some common interview questions for a software engineer?')}
+                  className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+                >
+                  What are some common interview questions for a software engineer?
+                </button>
+                <button 
+                  onClick={() => handleSend('Can we do a mock interview for a frontend developer role?')}
+                  className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+                >
+                  Can we do a mock interview for a frontend developer role?
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={() => handleSend('What is Experio and how can it help me?')}
+                  className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+                >
+                  What is Experio and how can it help me?
+                </button>
+                <button 
+                  onClick={() => handleSend('Is this platform completely free to use?')}
+                  className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+                >
+                  Is this platform completely free to use?
+                </button>
+                <button 
+                  onClick={() => handleSend('What kind of AI features do you provide?')}
+                  className="cursor-pointer text-left bg-gray-200/60 hover:bg-gray-200 transition-colors rounded-[20px] px-4 py-2.5 text-[13.5px] text-gray-700 max-w-[90%]"
+                >
+                  What kind of AI features do you provide?
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -492,7 +591,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       <div className="py-2.5 flex justify-center items-center text-[12.5px] text-gray-500">
         <Zap className="w-3.5 h-3.5 text-primary mr-1" fill="currentColor" stroke="none" />
         <span>Powered by</span>
-        <span className="font-bold text-gray-700 ml-0.5 tracking-tight">Mozify</span>
+        <span className="font-bold text-gray-700 ml-0.5 tracking-tight">Experio</span>
       </div>
     </div>
 

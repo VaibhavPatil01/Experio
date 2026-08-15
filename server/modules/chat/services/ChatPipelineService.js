@@ -135,4 +135,41 @@ export default class ChatPipelineService {
       yield { type: 'error', error: error.message };
     }
   }
+
+  /**
+   * Guest pipeline: Bypasses DB and user profile retrieval.
+   * Strict system prompt is applied via ChatPromptBuilder.
+   */
+  async *executeGuestPipeline(prompt, history = [], modelSelection = 'gemini-3.5-flash') {
+    const pipelineId = Math.random().toString(36).substring(7);
+    logger.info(`[Pipeline ${pipelineId}] Starting GUEST Chat Pipeline`);
+
+    let fullAiResponse = '';
+
+    try {
+      // Stage 1: Build Prompt with strict guest rules
+      const finalPrompt = ChatPromptBuilder.buildGuestPrompt(prompt, history);
+      
+      // Stage 2: Stream response
+      const streamGenerator = GeminiChatService.streamChat(finalPrompt, 'guest', modelSelection);
+      
+      for await (const chunk of streamGenerator) {
+        if (chunk.text) {
+          fullAiResponse += chunk.text;
+          yield { type: 'chunk', text: chunk.text };
+        }
+      }
+
+      logger.info(`[Pipeline ${pipelineId}] Guest Pipeline Complete`);
+
+      yield { 
+        type: 'done', 
+        message: { _id: Date.now().toString(), role: 'assistant', content: fullAiResponse }
+      };
+
+    } catch (error) {
+      logger.error(`[Pipeline ${pipelineId}] Guest Pipeline Failed`, { error: error.message });
+      yield { type: 'error', error: error.message };
+    }
+  }
 }

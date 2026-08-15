@@ -129,4 +129,35 @@ ${coreInstructions}
       return `${rankedContext.systemContext}\n\nUser Question: ${rankedContext.currentPrompt}`;
     }
   }
+
+  /**
+   * Constructs a strict prompt for unauthenticated guest users.
+   */
+  static buildGuestPrompt(prompt, history) {
+    const systemInstruction = `You are Experio's helpful AI assistant. 
+You MUST ONLY answer questions about the Experio platform, its features, and pricing.
+Experio is a platform for sharing interview experiences, preparing for tech interviews, and AI resume analysis.
+If the user asks general coding questions, mock interview questions, or requests any complex assistance, politely decline and instruct them to log in or create an account to access the full AI Assistant features.
+Keep your responses short, friendly, and engaging.`;
+
+    let formattedHistory = '\n[Conversation History]\n';
+    if (history && history.length > 0) {
+      history.forEach(msg => {
+        const role = msg.sender === 'user' ? 'USER' : 'ASSISTANT';
+        formattedHistory += `${role}: ${msg.content}\n`;
+      });
+    } else {
+      formattedHistory += 'No previous history.\n';
+    }
+
+    const finalPrompt = `
+[System Instructions]
+${systemInstruction}
+${formattedHistory}
+[Current User Question]
+${prompt}
+    `.trim();
+
+    return finalPrompt;
+  }
 }
