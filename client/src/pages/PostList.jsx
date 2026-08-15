@@ -22,7 +22,7 @@ function PostList() {
   const [redirectUrl, setRedirectUrl] = useState('');
   const user = useAppSelector((state) => state.userState.user);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('For You');
+  const [activeTab, setActiveTab] = useState(user ? 'For You' : 'Recent');
 
   const filter = {
     search: searchParams.get('search') || '',
