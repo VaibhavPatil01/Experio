@@ -25,7 +25,7 @@ const dropdownItems = [
 
 const allNavItems = [...navItems, ...dropdownItems];
 
-const ProfileRightSide = ({ profileData }) => {
+const ProfileRightSide = ({ profileData, isEditable }) => {
   const { id } = useParams();
   const queryClient = useQueryClient();
 
@@ -504,16 +504,20 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Profile-summary" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold text-gray-900">Profile summary</h3>
-          <button onClick={() => setIsSummaryModalOpen(true)} className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+          {isEditable && (
+<button onClick={() => setIsSummaryModalOpen(true)} className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
             <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
+)}
         </div>
         <p className="text-gray-600 text-[15px] leading-relaxed mb-6 whitespace-pre-wrap">
           {profileData?.about || "No summary provided."}
         </p>
-        <button onClick={() => toast('Feature not available')} className="flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-primary/10 transition-colors shadow-sm cursor-pointer">
+        {isEditable && (
+<button onClick={() => toast('Feature not available')} className="flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-5 py-2 rounded-full font-semibold text-[15px] hover:bg-primary/10 transition-colors shadow-sm cursor-pointer">
           <Sparkles className="w-4 h-4 text-primary" /> Generate by AI
         </button>
+)}
       </div>
 
       {/* Resume Card */}
@@ -528,13 +532,15 @@ const ProfileRightSide = ({ profileData }) => {
                 {profileData.resume.filename || 'Resume.pdf'}
               </a>
             </div>
-            <button 
+            {isEditable && (
+<button 
               onClick={() => updateProfileMutation.mutate({ resume: null })}
               disabled={updateProfileMutation.isLoading}
               className="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer disabled:opacity-50"
             >
               <Trash2 className="w-5 h-5" />
             </button>
+)}
           </div>
         ) : (
           <div className="mb-4">
@@ -550,20 +556,23 @@ const ProfileRightSide = ({ profileData }) => {
           onChange={handleResumeUpload}
         />
         
-        <button 
+        {isEditable && (
+<button 
           onClick={() => resumeFileInputRef.current.click()}
           disabled={uploadResumeMutation.isLoading}
           className="text-primary font-semibold text-[15px] hover:text-primary/80 transition-colors cursor-pointer disabled:opacity-50"
         >
           {uploadResumeMutation.isLoading ? 'Uploading...' : (profileData?.resume?.url ? 'Replace resume' : 'Upload resume')}
         </button>
+)}
       </div>
 
       {/* Work Experience Card */}
       <div id="Work-experience" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Work experience</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => {
                setWorkExpForm({
                   jobTitle: '',
@@ -585,6 +594,7 @@ const ProfileRightSide = ({ profileData }) => {
           >
             <Plus className="w-5 h-5" />
           </button>
+)}
         </div>
         
         <div className="flex flex-col gap-5">
@@ -593,7 +603,8 @@ const ProfileRightSide = ({ profileData }) => {
             <div key={index} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
               <div className="flex items-center gap-2 mb-1.5">
                 <h4 className="text-[15.5px] font-semibold text-gray-800">{exp.jobTitle}</h4>
-                <button 
+                {isEditable && (
+<button 
                   onClick={() => { 
                     setWorkExpForm(exp);
                     setEditingWorkExpIndex(index);
@@ -603,6 +614,7 @@ const ProfileRightSide = ({ profileData }) => {
                 >
                   <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
+)}
               </div>
               <p className="text-[14.5px] text-gray-700 font-medium">{exp.company}</p>
               <p className="text-[13px] text-gray-500">{exp.startMonth} {exp.startYear} - {exp.isCurrentlyWorking ? 'Present' : ''} • {exp.employmentType}</p>
@@ -616,7 +628,8 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Skills" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Skills</h3>
-            <button 
+            {isEditable && (
+<button 
               onClick={() => {
                 setLocalSkills(skillsList);
                 setIsSkillsModalOpen(true);
@@ -625,6 +638,7 @@ const ProfileRightSide = ({ profileData }) => {
             >
             <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
+)}
         </div>
         
         <div className="flex flex-wrap gap-2.5">
@@ -654,7 +668,8 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Education" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Education</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => { 
               setIsNewEducation(true); 
               setEducationForm({ qualification: '', university: '', passingYear: '', educationType: '' }); 
@@ -664,6 +679,7 @@ const ProfileRightSide = ({ profileData }) => {
           >
             <Plus className="w-5 h-5 pointer-events-none" />
           </button>
+)}
         </div>
         
         <div className="flex flex-col gap-6">
@@ -672,7 +688,8 @@ const ProfileRightSide = ({ profileData }) => {
             <div key={index} className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <h4 className="text-[15.5px] font-semibold text-gray-800">{edu.qualification}</h4>
-                <button 
+                {isEditable && (
+<button 
                   onClick={() => { 
                     setIsNewEducation(false); 
                     setEducationForm(edu); 
@@ -683,6 +700,7 @@ const ProfileRightSide = ({ profileData }) => {
                 >
                   <img src={penIcon} alt="edit" className="w-[16px] h-[16px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
+)}
               </div>
               <p className="text-[14.5px] text-gray-600">{edu.university}</p>
               <p className="text-[13.5px] text-gray-500 flex items-center gap-1.5 mt-0.5">
@@ -699,7 +717,8 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Job-preferences" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Job preferences</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => {
               setJobPrefForm(jobPreferencesData);
               setIsJobPrefModalOpen(true);
@@ -708,6 +727,7 @@ const ProfileRightSide = ({ profileData }) => {
           >
             <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
+)}
         </div>
         
         <div className="flex flex-col gap-5">
@@ -730,7 +750,8 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Personal-details" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Personal details</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => {
               setPersonalDetailsForm({
                 ...personalDetailsData,
@@ -743,6 +764,7 @@ const ProfileRightSide = ({ profileData }) => {
           >
             <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
+)}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -785,12 +807,14 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Courses-&-certifications" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Courses & certifications</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => { setIsNewCourse(true); setCourseForm({ certificationName: '', issuedBy: '' }); setIsCoursesModalOpen(true); }}
             className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5 pointer-events-none" />
           </button>
+)}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -799,7 +823,8 @@ const ProfileRightSide = ({ profileData }) => {
             <div key={index} className="border border-gray-200 rounded-lg p-4 flex flex-col gap-1">
               <div className="flex items-center justify-between">
                 <h4 className="text-[15.5px] font-semibold text-gray-800">{course.certificationName}</h4>
-                <button 
+                {isEditable && (
+<button 
                   onClick={() => { 
                     setIsNewCourse(false); 
                     setCourseForm(course); 
@@ -810,6 +835,7 @@ const ProfileRightSide = ({ profileData }) => {
                 >
                   <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
+)}
               </div>
               <p className="text-[14.5px] text-gray-600">{course.issuedBy}</p>
             </div>
@@ -821,12 +847,14 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Projects" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Projects</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => { setIsNewProject(true); setProjectForm({ title: '', description: '' }); setIsProjectsModalOpen(true); }}
             className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5 pointer-events-none" />
           </button>
+)}
         </div>
         
         <div className="flex flex-col gap-5">
@@ -835,7 +863,8 @@ const ProfileRightSide = ({ profileData }) => {
             <div key={index}>
               <div className="flex items-center gap-2 mb-1.5">
                 <h4 className="text-[15.5px] font-semibold text-gray-800">{project.title}</h4>
-                <button 
+                {isEditable && (
+<button 
                   onClick={() => { 
                     setIsNewProject(false); 
                     setProjectForm(project); 
@@ -846,6 +875,7 @@ const ProfileRightSide = ({ profileData }) => {
                 >
                   <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
+)}
               </div>
               <p className="text-[14.5px] text-gray-600 whitespace-pre-wrap">{project.description}</p>
             </div>
@@ -868,12 +898,14 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Awards" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Awards</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => { setIsNewAward(true); setAwardTitle(''); setAwardDescription(''); setIsAwardModalOpen(true); }}
             className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5 pointer-events-none" />
           </button>
+)}
         </div>
         
         <div className="flex flex-col gap-5">
@@ -882,7 +914,8 @@ const ProfileRightSide = ({ profileData }) => {
             <div key={index}>
               <div className="flex items-center gap-2 mb-1.5">
                 <h4 className="text-[15.5px] font-semibold text-gray-800">{award.title}</h4>
-                <button 
+                {isEditable && (
+<button 
                   onClick={() => { 
                     setIsNewAward(false); 
                     setAwardTitle(award.title); 
@@ -894,6 +927,7 @@ const ProfileRightSide = ({ profileData }) => {
                 >
                   <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
+)}
               </div>
               <p className="text-[14.5px] text-gray-600">{award.description}</p>
             </div>
@@ -905,12 +939,14 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Social-links" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Social Links</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => { setIsNewLink(true); setCurrentLink(''); setIsSocialLinkModalOpen(true); }}
             className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5" />
           </button>
+)}
         </div>
         
         <div className="flex flex-col gap-4">
@@ -921,7 +957,8 @@ const ProfileRightSide = ({ profileData }) => {
                 <Link2 className="w-5 h-5 text-gray-600 shrink-0 transform -rotate-45" />
                 <a href={link} target="_blank" rel="noreferrer" className="text-[15px] text-gray-600 hover:text-blue-600 truncate transition-colors">{link}</a>
               </div>
-              <button 
+              {isEditable && (
+<button 
                 onClick={() => { 
                   setIsNewLink(false); 
                   setCurrentLink(link); 
@@ -932,6 +969,7 @@ const ProfileRightSide = ({ profileData }) => {
               >
                 <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
               </button>
+)}
             </div>
           ))}
         </div>
@@ -941,12 +979,14 @@ const ProfileRightSide = ({ profileData }) => {
       <div id="Language" className="bg-white rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900">Languages</h3>
-          <button 
+          {isEditable && (
+<button 
             onClick={() => { setIsNewLanguage(true); setLanguageForm({ language: '', proficiency: '', read: false, write: false, speak: false }); setIsLanguagesModalOpen(true); }}
             className="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5 pointer-events-none" />
           </button>
+)}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -955,7 +995,8 @@ const ProfileRightSide = ({ profileData }) => {
             <div key={index} className="border border-gray-200 rounded-lg p-4 flex flex-col gap-1">
               <div className="flex items-center justify-between">
                 <h4 className="text-[15.5px] font-semibold text-gray-800">{lang.language}</h4>
-                <button 
+                {isEditable && (
+<button 
                   onClick={() => { 
                     setIsNewLanguage(false); 
                     setLanguageForm(lang); 
@@ -966,6 +1007,7 @@ const ProfileRightSide = ({ profileData }) => {
                 >
                   <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
+)}
               </div>
               <p className="text-[14.5px] text-gray-600">{lang.proficiency}</p>
             </div>
@@ -1007,9 +1049,11 @@ const ProfileRightSide = ({ profileData }) => {
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   className="w-full h-56 border border-gray-200 rounded-xl p-4 pr-4 pb-14 text-[15px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-green-400 resize-none leading-relaxed [&::-webkit-scrollbar]:hidden"
                 />
-                <button onClick={() => toast('Feature not available')} className="absolute bottom-4 right-4 flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-4 py-2 rounded-full font-semibold text-[14px] hover:bg-primary/10 transition-colors bg-white shadow-sm cursor-pointer">
+                {isEditable && (
+<button onClick={() => toast('Feature not available')} className="absolute bottom-4 right-4 flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-4 py-2 rounded-full font-semibold text-[14px] hover:bg-primary/10 transition-colors bg-white shadow-sm cursor-pointer">
                   <Sparkles className="w-4 h-4 text-primary" /> Generate by AI
                 </button>
+)}
               </div>
               
               <p className="text-[13px] text-gray-400">Max. {summaryText.length}/4000 character</p>

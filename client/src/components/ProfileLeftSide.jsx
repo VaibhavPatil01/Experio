@@ -7,7 +7,7 @@ import starIcon from '../assets/images/icons/star-06-svgrepo-com.svg';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser, uploadProfilePicture } from '../services/userServices.js';
 
-const ProfileLeftSide = ({ profileData }) => {
+const ProfileLeftSide = ({ profileData, isEditable }) => {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   
@@ -123,12 +123,14 @@ const ProfileLeftSide = ({ profileData }) => {
       {/* Card 1: Main Profile Info */}
       <div className="bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <div className="flex flex-col items-center text-center relative mb-6">
-          <button onClick={handleOpenBasicModal} className="absolute right-0 top-0 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
-          </button>
+          {isEditable && (
+            <button onClick={handleOpenBasicModal} className="absolute right-0 top-0 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+              <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+            </button>
+          )}
           <div 
-            className="w-[84px] h-[84px] rounded-full bg-black flex items-center justify-center text-white text-3xl font-bold mb-4 relative group cursor-pointer overflow-hidden"
-            onClick={() => fileInputRef.current?.click()}
+            className={`w-[84px] h-[84px] rounded-full bg-black flex items-center justify-center text-white text-3xl font-bold mb-4 relative ${isEditable ? 'group cursor-pointer' : ''} overflow-hidden`}
+            onClick={() => isEditable && fileInputRef.current?.click()}
           >
             {profileData?.profilePicture ? (
               <img src={profileData.profilePicture} alt="Profile" className="w-full h-full object-cover" />
@@ -136,9 +138,11 @@ const ProfileLeftSide = ({ profileData }) => {
               profileData?.username ? profileData.username[0].toUpperCase() : 'V'
             )}
             
-            <div className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center transition-colors">
-              <Camera className="w-6 h-6 text-white" />
-            </div>
+            {isEditable && (
+              <div className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center transition-colors">
+                <Camera className="w-6 h-6 text-white" />
+              </div>
+            )}
 
             {uploadImageMutation.isLoading && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -197,9 +201,11 @@ const ProfileLeftSide = ({ profileData }) => {
         <div className="flex items-center gap-3 text-gray-700 mb-4">
           <Phone className="w-5 h-5 text-primary" />
           <span className="text-[15px]">{profileData?.phone || '+91 7249412825'}</span>
-          <button onClick={() => setIsPhoneModalOpen(true)} className="ml-auto text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-            <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
-          </button>
+          {isEditable && (
+            <button onClick={() => setIsPhoneModalOpen(true)} className="ml-auto text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+              <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-3 text-gray-700">
           <Mail className="w-5 h-5 text-primary" />
@@ -219,9 +225,11 @@ const ProfileLeftSide = ({ profileData }) => {
         <div>
           <h3 className="font-bold text-gray-900 text-[15px] mb-1">Profile Completion</h3>
           <p className="text-[13px] text-gray-500 leading-snug">
-            {completionPercentage === 100 
-              ? "Congratulations! Your profile is 100% complete and ready to go." 
-              : "Complete your profile for better experience."}
+            {isEditable 
+              ? (completionPercentage === 100 
+                ? "Congratulations! Your profile is 100% complete and ready to go." 
+                : "Complete your profile for better experience.")
+              : `This profile is ${completionPercentage}% completed.`}
           </p>
         </div>
       </div>

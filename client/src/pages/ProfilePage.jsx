@@ -98,10 +98,10 @@ const ProfilePage = () => {
     <div className="pt-4 pb-4 lg:pt-8 lg:pb-8 min-h-screen">
       <div className="lg:flex max-w-[1200px] mx-auto gap-6 px-4">
         <div className="w-full lg:w-[340px] shrink-0">
-          <ProfileLeftSide profileData={profileData} />
+          <ProfileLeftSide profileData={profileData} isEditable={isEditable} />
         </div>
         <div className="flex-1 min-w-0 mt-4 lg:mt-0">
-          <ProfileRightSide profileData={profileData} />
+          <ProfileRightSide profileData={profileData} isEditable={isEditable} />
         </div>
       </div>
     </div>
