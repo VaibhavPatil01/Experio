@@ -49,17 +49,20 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     const syncGuestHistory = async () => {
       const storedGuestHistory = localStorage.getItem('guestChatHistory');
       if (isAuthenticated && storedGuestHistory) {
+        // Remove immediately to prevent React Strict Mode from double-firing the sync
+        localStorage.removeItem('guestChatHistory');
         try {
           const parsedHistory = JSON.parse(storedGuestHistory);
           if (parsedHistory.length > 0) {
             setIsCreatingSession(true);
             const session = await syncGuestSession(parsedHistory);
             setActiveSessionId(session._id);
-            localStorage.removeItem('guestChatHistory');
             setIsCreatingSession(false);
           }
         } catch (e) {
           console.error("Failed to sync guest history", e);
+          // Optionally restore if failed
+          localStorage.setItem('guestChatHistory', storedGuestHistory);
           setIsCreatingSession(false);
         }
       }

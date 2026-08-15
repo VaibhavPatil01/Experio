@@ -68,6 +68,8 @@ const Assistant = () => {
     const syncGuestHistory = async () => {
       const storedGuestHistory = localStorage.getItem('guestChatHistory');
       if (isLoggedIn && storedGuestHistory) {
+        // Remove immediately to prevent React Strict Mode from double-firing the sync
+        localStorage.removeItem('guestChatHistory');
         try {
           const parsedHistory = JSON.parse(storedGuestHistory);
           if (parsedHistory.length > 0) {
@@ -76,11 +78,12 @@ const Assistant = () => {
             setActiveChatId(session._id);
             // Also add to chatHistory so it appears in the sidebar
             setChatHistory(prev => [{ id: session._id, label: session.title || 'New Conversation', isPinned: false }, ...prev]);
-            localStorage.removeItem('guestChatHistory');
             setIsCreatingSession(false);
           }
         } catch (e) {
           console.error("Failed to sync guest history", e);
+          // Optionally restore if failed
+          localStorage.setItem('guestChatHistory', storedGuestHistory);
           setIsCreatingSession(false);
         }
       }

@@ -55,10 +55,12 @@ export default class ChatSessionService {
 
     const session = await this.repo.createSession(userId, title);
     
-    const messagesToInsert = messages.map(msg => ({
+    const now = Date.now();
+    const messagesToInsert = messages.map((msg, idx) => ({
       sessionId: session._id,
       role: msg.sender === 'user' ? 'user' : 'assistant',
-      content: msg.content
+      content: msg.content,
+      createdAt: new Date(now + idx) // stagger by 1ms to preserve chronological order in sorting
     }));
 
     await this.messageRepo.model.insertMany(messagesToInsert);
