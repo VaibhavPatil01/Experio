@@ -90,6 +90,34 @@ const ProfileLeftSide = ({ profileData }) => {
     };
   }, [isPhoneModalOpen, isBasicModalOpen]);
 
+  const calculateProfileCompletion = (data) => {
+    if (!data) return 0;
+    let score = 0;
+    const totalFields = 15;
+
+    if (data.profilePicture) score += 1;
+    if (data.username && data.location) score += 1;
+    if (data.phone) score += 1;
+    if (data.about) score += 1;
+    if (data.workExperiences && data.workExperiences.length > 0) score += 1;
+    if (data.skills && data.skills.length > 0) score += 1;
+    if (data.education && data.education.length > 0) score += 1;
+    if (data.jobPreferences && (data.jobPreferences.preferredJobTitles?.length > 0 || data.jobPreferences.preferredLocations?.length > 0)) score += 1;
+    if (data.personalDetails && (data.personalDetails.dob?.day || data.personalDetails.equalOpportunity || data.personalDetails.countriesOfResidency?.length > 0)) score += 1;
+    if (data.coursesAndCertifications && data.coursesAndCertifications.length > 0) score += 1;
+    if (data.projects && data.projects.length > 0) score += 1;
+    if (data.awards && data.awards.length > 0) score += 1;
+    if (data.socialLinks && data.socialLinks.length > 0) score += 1;
+    if (data.languages && data.languages.length > 0) score += 1;
+    if (data.resume && data.resume.url) score += 1;
+
+    return Math.round((score / totalFields) * 100);
+  };
+
+  const completionPercentage = calculateProfileCompletion(profileData);
+  const circleCircumference = 24 * 2 * Math.PI;
+  const strokeDashoffset = circleCircumference - (completionPercentage / 100) * circleCircumference;
+
   return (
     <div className="relative py-1 lg:sticky lg:top-20 h-fit flex flex-col gap-4">
       {/* Card 1: Main Profile Info */}
@@ -184,14 +212,16 @@ const ProfileLeftSide = ({ profileData }) => {
         <div className="relative flex items-center justify-center w-14 h-14 shrink-0">
           <svg className="w-14 h-14 transform -rotate-90">
             <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4.5" fill="transparent" className="text-gray-100" />
-            <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4.5" fill="transparent" strokeDasharray={24 * 2 * Math.PI} strokeDashoffset="0" className="text-primary" />
+            <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4.5" fill="transparent" strokeDasharray={circleCircumference} strokeDashoffset={strokeDashoffset} className="text-primary transition-all duration-1000 ease-out" />
           </svg>
-          <span className="absolute text-[13px] font-bold text-gray-900">100%</span>
+          <span className="absolute text-[13px] font-bold text-gray-900">{completionPercentage}%</span>
         </div>
         <div>
-          <h3 className="font-bold text-gray-900 text-[15px] mb-1">Profile score</h3>
+          <h3 className="font-bold text-gray-900 text-[15px] mb-1">Profile Completion</h3>
           <p className="text-[13px] text-gray-500 leading-snug">
-            Congratulations! Your profile is 100% complete and ready to impress recruiters.
+            {completionPercentage === 100 
+              ? "Congratulations! Your profile is 100% complete and ready to go." 
+              : "Complete your profile for better experience."}
           </p>
         </div>
       </div>
