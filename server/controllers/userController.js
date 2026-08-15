@@ -627,7 +627,7 @@ export async function uploadUserResume(req, res) {
 
     const resumeUrl = req.file.path;
     const originalFilename = req.file.originalname || req.file.filename;
-    
+
     const resumeData = {
       url: resumeUrl,
       filename: originalFilename

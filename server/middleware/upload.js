@@ -29,11 +29,27 @@ const resumeStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'interview_experience_resumes',
-    allowed_formats: ['pdf', 'doc', 'docx'],
-    resource_type: 'auto'
+    resource_type: 'raw',
+    public_id: (req, file) => {
+      const originalName = file.originalname || 'resume.pdf';
+      const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+      const safeName = nameWithoutExt.replace(/[^a-zA-Z0-9]/g, '_');
+      return `${safeName}_${Date.now()}`;
+    }
   }
 });
 
-export const uploadResume = multer({ storage: resumeStorage });
+export const uploadResume = multer({ 
+  storage: resumeStorage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf' || 
+        file.mimetype === 'application/msword' || 
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF, DOC, and DOCX formats are allowed!'), false);
+    }
+  }
+});
 
 export default upload;
