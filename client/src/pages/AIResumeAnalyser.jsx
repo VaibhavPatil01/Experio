@@ -11,6 +11,8 @@ import {
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import getAuthToken from '../utils/getAuthToken';
+import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
+import { useAppSelector } from '../redux/store.js';
 
 const AIResumeAnalyser = () => {
   const [file, setFile] = useState(null);
@@ -24,6 +26,10 @@ const AIResumeAnalyser = () => {
   
   const [history, setHistory] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+
+  const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState('');
 
   // Fetch history on mount
   useEffect(() => {
@@ -142,6 +148,11 @@ const AIResumeAnalyser = () => {
   };
 
   const handleAnalyze = async () => {
+    if (!isLoggedIn) {
+      setRedirectUrl(window.location.pathname);
+      setIsLoginModalOpen(true);
+      return;
+    }
     if (!file) {
       toast.error('Please upload a resume first.');
       return;
@@ -209,6 +220,10 @@ const AIResumeAnalyser = () => {
           content="Analyse your resume and discover personalized, practical improvements with AI backed by real interview data."
         />
       </Helmet>
+
+      {isLoginModalOpen && (
+        <LoginRequiredModal redirectUrl={redirectUrl} closeModalCallback={() => setIsLoginModalOpen(false)} />
+      )}
 
       <main className="min-h-screen text-slate-800 dark:text-gray-100 font-sans pb-20">
         {/* Header Section */}
