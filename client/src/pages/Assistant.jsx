@@ -18,7 +18,8 @@ import {
   pinSession, 
   deleteSession, 
   fetchSessionMessages,
-  submitFeedback
+  submitFeedback,
+  syncGuestSession
 } from '../services/chatServices';
 import { useChatStream } from '../hooks/useChatStream';
 import ChatHistoryModal from '../components/ChatHistoryModal';
@@ -61,6 +62,31 @@ const Assistant = () => {
   useEffect(() => {
     loadSessions();
   }, []);
+
+  // Sync Guest History on Login/Mount
+  useEffect(() => {
+    const syncGuestHistory = async () => {
+      const storedGuestHistory = localStorage.getItem('guestChatHistory');
+      if (isLoggedIn && storedGuestHistory) {
+        try {
+          const parsedHistory = JSON.parse(storedGuestHistory);
+          if (parsedHistory.length > 0) {
+            setIsCreatingSession(true);
+            const session = await syncGuestSession(parsedHistory);
+            setActiveChatId(session._id);
+            // Also add to chatHistory so it appears in the sidebar
+            setChatHistory(prev => [{ id: session._id, label: session.title || 'New Conversation', isPinned: false }, ...prev]);
+            localStorage.removeItem('guestChatHistory');
+            setIsCreatingSession(false);
+          }
+        } catch (e) {
+          console.error("Failed to sync guest history", e);
+          setIsCreatingSession(false);
+        }
+      }
+    };
+    syncGuestHistory();
+  }, [isLoggedIn]);
 
   const loadSessions = async () => {
     try {
