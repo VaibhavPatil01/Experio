@@ -10,21 +10,20 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 // Setup Node Mailer
-const MAIL_USER = process.env['MAIL_USER'];
-const MAIL_PASSWORD = process.env['MAIL_PASSWORD']; 
+const SMTP_LOGIN = process.env['SMTP_LOGIN'];
+const SMTP_KEY = process.env['SMTP_KEY']; 
 
-if (!MAIL_USER || !MAIL_PASSWORD) {
-  throw new Error('MAIL_USER or MAIL_PASSWORD not defined in .env');
+if (!SMTP_LOGIN || !SMTP_KEY) {
+  throw new Error('SMTP_LOGIN or SMTP_KEY not defined in .env');
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp-relay.brevo.com',
+  port: 587,
   auth: {
-    user: MAIL_USER,
-    pass: MAIL_PASSWORD,
+    user: SMTP_LOGIN,
+    pass: SMTP_KEY,
   },
-  host: 'smtp.gmail.com',
-  port: 465,
 });
 
 // Config Handlebars options
