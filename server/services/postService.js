@@ -1,4 +1,6 @@
 import {Post as postModel} from '../models/Post.js';  
+import { QdrantRepository } from '../repositories/qdrantRepository.js';
+import qdrantClient from '../configs/qdrant.js';
 
 // Tested working fine
 export const createPostService = (post) => {
@@ -201,62 +203,112 @@ export const getRelatedPostsService = async (postId, limit) => {
     throw 'No Post Found with the Given ID';
   }
 
-  const postList = await postModel
-    .find({
-      $and: [{ company: post.company }, { _id: { $ne: post._id } }],
-    })
-    .limit(limit)
-    .select({
-      _id: 1,
-      title: 1,
+  const excludePostIds = [post._id.toString()];
+  let relatedPosts = [];
+
+  try {
+    const uuid = QdrantRepository.mongoIdToUuid(postId.toString());
+    
+    // Check if the current post exists in Qdrant before recommending
+    const pointInfo = await qdrantClient.retrieve('interviews', {
+      ids: [uuid]
     });
 
-  if (postList.length === limit) return postList;
+    if (pointInfo && pointInfo.length > 0) {
+      // Use Qdrant recommend API
+      const qdrantResponse = await qdrantClient.recommend('interviews', {
+        positive: [uuid],
+        limit: limit + 1, // Add 1 because the post itself might be returned
+        with_payload: true,
+      });
 
-  const excludePostIds = [post._id];
-  for (let i = 0; i < postList.length; i++) {
-    excludePostIds.push(postList[i]._id);
+      // Map Qdrant response and filter out the current post
+      const qdrantMatches = qdrantResponse
+        .filter(match => match.payload && match.payload.mongoId !== post._id.toString())
+        .slice(0, limit);
+
+      if (qdrantMatches.length > 0) {
+        const matchIds = qdrantMatches.map(match => match.payload.mongoId);
+        
+        // Fetch full post details from DB
+        const dbPosts = await postModel.find({ _id: { $in: matchIds } })
+          .select('_id title company userId isAnonymous')
+          .populate('userId', 'username profilePicture')
+          .lean();
+
+        // Map them back to the sorted order from Qdrant and attach match percentage
+        relatedPosts = qdrantMatches.map(match => {
+          const dbPost = dbPosts.find(p => p._id.toString() === match.payload.mongoId);
+          if (dbPost) {
+            return {
+              _id: dbPost._id,
+              title: dbPost.title,
+              company: dbPost.company,
+              userId: dbPost.isAnonymous ? { ...dbPost.userId, username: 'Anonymous User', profilePicture: '' } : dbPost.userId,
+              matchPercentage: Math.round(match.score * 100)
+            };
+          }
+          return null;
+        }).filter(Boolean);
+        
+        excludePostIds.push(...relatedPosts.map(p => p._id.toString()));
+      }
+    }
+  } catch (error) {
+    console.error('[Qdrant Search] Failed to get similar experiences:', error);
   }
 
-  limit -= postList.length;
+  // Fallback if Qdrant didn't return enough results
+  if (relatedPosts.length < limit) {
+    const remainingLimit = limit - relatedPosts.length;
+    
+    // First try by company
+    const fallbackByCompany = await postModel.find({
+      company: post.company,
+      _id: { $nin: excludePostIds }
+    })
+    .select('_id title company userId isAnonymous')
+    .populate('userId', 'username profilePicture')
+    .limit(remainingLimit)
+    .lean();
 
-  const relatedPostList = await postModel.aggregate([
-    {
-      $search: {
-        index: 'RecommendPost',
-        compound: {
-          must: [
-            {
-              moreLikeThis: {
-                like: {
-                  title: post.title,
-                  content: post.content,
-                  postType: post.postType,
-                },
-              },
-            },
-          ],
-          mustNot: [
-            {
-              in: {
-                path: '_id',
-                value: excludePostIds,
-              },
-            },
-          ],
-        },
-      },
-    },
-    { $limit: limit },
-    {
-      $project: {
-        _id: 1,
-        title: 1,
-      },
-    },
-  ]);
+    fallbackByCompany.forEach(p => {
+      relatedPosts.push({
+        _id: p._id,
+        title: p.title,
+        company: p.company,
+        userId: p.isAnonymous ? { ...p.userId, username: 'Anonymous User', profilePicture: '' } : p.userId,
+        matchPercentage: 75 // Fallback generic match percentage for same company
+      });
+      excludePostIds.push(p._id.toString());
+    });
 
-  return postList.concat(relatedPostList);
+    // If still not enough, try by role
+    if (relatedPosts.length < limit) {
+      const stillRemainingLimit = limit - relatedPosts.length;
+      const fallbackByRole = await postModel.find({
+        role: post.role,
+        _id: { $nin: excludePostIds }
+      })
+      .select('_id title company userId isAnonymous')
+      .populate('userId', 'username profilePicture')
+      .limit(stillRemainingLimit)
+      .lean();
+
+      fallbackByRole.forEach(p => {
+        relatedPosts.push({
+          _id: p._id,
+          title: p.title,
+          company: p.company,
+          userId: p.isAnonymous ? { ...p.userId, username: 'Anonymous User', profilePicture: '' } : p.userId,
+          matchPercentage: 65 // Fallback generic match percentage for same role
+        });
+        excludePostIds.push(p._id.toString());
+      });
+    }
+  }
+
+  return relatedPosts;
 };
 
 export const getUserPostsService = (userId, limit, skip) => {

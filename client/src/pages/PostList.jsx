@@ -127,20 +127,20 @@ function PostList() {
         <title>Posts | Experio</title>
         <meta
           name="description"
-          content="Search and filter posts about interview experience, discussion, doubts and many more about GSMCOE"
+          content="Search and filter posts about interview experience, discussion, doubts and many more on Experio"
         />
         <meta name="twitter:card" content={postListPageImage} />
         <meta name="twitter:title" content="Posts | Experio" />
         <meta
           name="twitter:description"
-          content="Search and filter posts about interview experience, discussion, doubts and many more about GSMCOE"
+          content="Search and filter posts about interview experience, discussion, doubts and many more on Experio"
         />
         <meta name="twitter:image" content={postListPageImage} />
 
         <meta property="og:title" content="Posts | Experio" />
         <meta
           property="og:description"
-          content="Search and filter posts about interview experience, discussion, doubts and many more about GSMCOE"
+          content="Search and filter posts about interview experience, discussion, doubts and many more on Experio"
         />
         <meta property="og:image" content={postListPageImage} />
         <meta

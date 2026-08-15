@@ -16,20 +16,20 @@ const Home = () => {
         <title>Experio</title>
         <meta
           name="description"
-          content="Share and discover interview experiences at GSMCOE to inspire and learn from the community."
+          content="Share and discover interview experiences on Experio to inspire and learn from the community."
         />
         <meta name="twitter:card" content={homePageImage} />
         <meta name="twitter:title" content="Experio" />
         <meta
           name="twitter:description"
-          content="Share and discover interview experiences at GSMCOE to inspire and learn from the community."
+          content="Share and discover interview experiences on Experio to inspire and learn from the community."
         />
         <meta name="twitter:image" content={homePageImage} />
 
         <meta property="og:title" content="Experio" />
         <meta
           property="og:description"
-          content="Share and discover interview experiences at GSMCOE to inspire and learn from the community."
+          content="Share and discover interview experiences on Experio to inspire and learn from the community."
         />
         <meta property="og:image" content={homePageImage} />
         <meta property="og:url" content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}`} />

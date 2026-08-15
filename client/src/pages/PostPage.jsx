@@ -92,19 +92,19 @@ function PostPage() {
         <title>{`${post.title || post.company} | Experio`}</title>
         <meta
           name="description"
-          content={`${post.postType} titled "${post.title}" specially for GSMCOE on Interview Experience. ${generateTextFromHTML(post.content || '')}`}
+          content={`${post.postType} titled "${post.title}" on Experio. ${generateTextFromHTML(post.content || '')}`}
         />
         <meta name="twitter:card" content={postImage} />
         <meta name="twitter:title" content={`${post.title || post.company} | Experio`} />
         <meta
           name="twitter:description"
-          content={`${post.postType} titled "${post.title}" specially for GSMCOE on Interview Experience. ${generateTextFromHTML(post.content || '')}`}
+          content={`${post.postType} titled "${post.title}" on Experio. ${generateTextFromHTML(post.content || '')}`}
         />
         <meta name="twitter:image" content={postImage} />
         <meta property="og:title" content={`${post.title || post.company} | Experio`} />
         <meta
           property="og:description"
-          content={`${post.postType} titled "${post.title}" specially for GSMCOE on Interview Experience. ${generateTextFromHTML(post.content || '')}`}
+          content={`${post.postType} titled "${post.title}" on Experio. ${generateTextFromHTML(post.content || '')}`}
         />
         <meta property="og:image" content={postImage} />
         <meta
