@@ -1007,7 +1007,7 @@ const ProfileRightSide = ({ profileData }) => {
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   className="w-full h-56 border border-gray-200 rounded-xl p-4 pr-4 pb-14 text-[15px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-green-400 resize-none leading-relaxed [&::-webkit-scrollbar]:hidden"
                 />
-                <button className="absolute bottom-4 right-4 flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-4 py-2 rounded-full font-semibold text-[14px] hover:bg-primary/10 transition-colors bg-white shadow-sm cursor-pointer">
+                <button onClick={() => toast('Feature not available')} className="absolute bottom-4 right-4 flex items-center gap-2 border-[1.5px] border-primary/30 text-primary px-4 py-2 rounded-full font-semibold text-[14px] hover:bg-primary/10 transition-colors bg-white shadow-sm cursor-pointer">
                   <Sparkles className="w-4 h-4 text-primary" /> Generate by AI
                 </button>
               </div>
