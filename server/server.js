@@ -22,7 +22,7 @@ import notificationRouter from './routes/notificationRoutes.js';
 import recommendationRouter from './routes/recommendationRoutes.js';
 import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
 import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
-import preventServerSleep from './utils/preventServerSleep.js'; 
+import preventServerSleep from './utils/preventServerSleep.js';
 import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
 import { httpLogger } from './middlewares/httpLogger.js';
 import { globalLimiter } from './middlewares/rateLimiter.js';
@@ -41,6 +41,9 @@ const allowedOrigins = [
   "http://localhost:5174",
   "https://interview-experience-gsmcoe.vercel.app",
   "https://interview-experience-gsmcoe.onrender.com",
+  "https://experio-beryl.vercel.app",
+  "https://experio-mll8.onrender.com"
+
 ];
 
 app.use(
@@ -104,17 +107,17 @@ const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, async () => {
   console.log(`✅ Server is running on PORT ${PORT}`);
-  
+
   // Initialize WebSockets
   initSocket(server);
   console.log('✅ Socket.io Initialized');
 
   // Initialize AI Knowledge Layer
   await initQdrant();
-  
+
   console.log('[Workers] Init sync queue worker...');
   initEmbeddingSyncWorker();
-  
+
   console.log('[Workers] Init notification queue worker...');
   initNotificationWorker();
   console.log('✅ AI Knowledge Layer Initialized');
