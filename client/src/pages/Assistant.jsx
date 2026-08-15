@@ -58,10 +58,17 @@ const Assistant = () => {
   const { isGenerating, streamText, streamError, startStream, stopStream } = useChatStream();
   const messagesEndRef = useRef(null);
 
-  // Initial Load of Sessions
+  // Handle Authentication State Changes
   useEffect(() => {
-    loadSessions();
-  }, []);
+    if (isLoggedIn) {
+      loadSessions();
+    } else {
+      setChatHistory([]);
+      setCurrentMessages([]);
+      setActiveChatId('new');
+      localStorage.removeItem('sharedActiveChatId');
+    }
+  }, [isLoggedIn]);
 
   // Sync Guest History on Login/Mount
   useEffect(() => {

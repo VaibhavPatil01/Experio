@@ -29,15 +29,18 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
   const messagesEndRef = useRef(null);
 
-  // Initialize messages
+  // Handle Authentication State Changes (Logout/Init Guest)
   useEffect(() => {
     if (!isAuthenticated) {
+      setActiveSessionId(null);
+      localStorage.removeItem('sharedActiveChatId');
       const storedGuestHistory = localStorage.getItem('guestChatHistory');
       if (storedGuestHistory) {
         try {
           setMessages(JSON.parse(storedGuestHistory));
         } catch (e) {
           console.error("Failed to parse guest history", e);
+          setMessages([]);
         }
       } else {
         setMessages([]);
