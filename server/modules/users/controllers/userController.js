@@ -10,13 +10,14 @@ import { findUser, deleteUserService, createUser, resetPasswordService, verifyUs
 import { eventBus, EVENTS } from '../../posts/events/index.js';
 
 
-export async function loginUser(req, res) { 
+export async function loginUser(req, res) {
   const email = req.body.email;
   const password = req.body.password;
 
   // if email or password is undefined
   if (!email || !password) {
-    return res.status(401).json({success: false, 
+    return res.status(401).json({
+      success: false,
       message: 'Incorrect Username or Password',
     });
   }
@@ -28,7 +29,7 @@ export async function loginUser(req, res) {
     if (!user) {
       return res
         .status(401)
-        .json({success: false, message: 'Incorrect Username or Password' });
+        .json({ success: false, message: 'Incorrect Username or Password' });
     }
 
     // compare the passwords
@@ -37,7 +38,7 @@ export async function loginUser(req, res) {
     if (!isPasswordCorrect) {
       return res
         .status(401)
-        .json({success: false, message: 'Incorrect Username or Password' });
+        .json({ success: false, message: 'Incorrect Username or Password' });
     }
 
     // Check if email is verified or not
@@ -50,7 +51,7 @@ export async function loginUser(req, res) {
 
     // Remove the password
     return res.status(200).json({
-      message: 'Login Successful', 
+      message: 'Login Successful',
       token,
       user: {
         id: user._id,
@@ -59,7 +60,7 @@ export async function loginUser(req, res) {
         isAdmin: user.isAdmin,
         branch: user.branch,
         passingYear: user.passingYear,
-        designation: user.designation, 
+        designation: user.designation,
         about: user.about,
         github: user.github,
         linkedin: user.linkedin,
@@ -106,7 +107,7 @@ export async function registerUser(req, res) {
   ) {
     return res
       .status(401)
-      .json({success:false, message: 'Please enter all required fields ' });
+      .json({ success: false, message: 'Please enter all required fields ' });
   }
 
   try {
@@ -114,7 +115,7 @@ export async function registerUser(req, res) {
     const oldUser = await findUser(email);
 
     if (oldUser && oldUser.isEmailVerified) {
-      return res.status(404).json({success:false, message: 'Email already exists' });
+      return res.status(404).json({ success: false, message: 'Email already exists' });
     }
 
     if (oldUser && !oldUser.isEmailVerified) {
@@ -153,7 +154,7 @@ export async function registerUser(req, res) {
     await sendEmailVerificationMail(email, token, user.username);
 
     return res.status(200).json({
-      success: true, 
+      success: true,
       message: 'Account created successfully, please verify your email....',
     });
   } catch (error) {
@@ -260,7 +261,7 @@ export async function getLoginStatus(req, res) {
 
 // ----------------------------------------------------------------------------------------------------------- //
 
-export async function getUserProfile(req, res) { 
+export async function getUserProfile(req, res) {
   const paramId = req.params['id'];
 
   // if not a valid user id
@@ -345,7 +346,7 @@ export async function editUserProfile(req, res) {
   const userId = req.body.authTokenData.id;
   try {
     const user = await editProfile(userId, updatedProfile);
-    
+
     // AI Layer Sync
     eventBus.emit(EVENTS.USER_UPDATED, { userId: userId });
 
@@ -424,7 +425,7 @@ export async function resetPassword(req, res) {
   try {
     const tokenData = decodeToken(resetPasswordToken);
 
-    
+
 
     if (email !== tokenData.email) {
       return res.status(403).json({ message: 'Reset Link is not valid' });
@@ -432,18 +433,18 @@ export async function resetPassword(req, res) {
 
     const user = await findUser(tokenData.email);
 
-    
+
 
     if (!user) {
       return res
         .status(401)
         .json({ message: 'Please create a new Reset Password Link' });
     }
-    
+
     console.log("Before Hashing The Password")
 
     // Hash the password
-    const hashedNewPassword = await bcrypt.hash(newPassword, 12); 
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
 
     // Resetting the password
     await resetPasswordService(tokenData.email, hashedNewPassword);
@@ -506,7 +507,7 @@ export async function githubLogin(req, res) {
 export async function searchUser(req, res) {
   let search = req.query['searchparam'];
   let page = parseInt(req.query['page']) - 1;
-  let limit = parseInt(req.query['limit']); 
+  let limit = parseInt(req.query['limit']);
 
   if (!search) search = '';
   if (!page || page < 0) page = 0;
@@ -595,16 +596,16 @@ export async function updateProfilePicture(req, res) {
 
     // The Cloudinary URL is available in req.file.path
     const profilePictureUrl = req.file.path;
-    
+
     const updatedUser = await updateUserService(user._id, { profilePicture: profilePictureUrl });
-    
-    return res.status(200).json({ 
-      message: 'Profile picture updated successfully', 
-      data: updatedUser 
+
+    return res.status(200).json({
+      message: 'Profile picture updated successfully',
+      data: updatedUser
     });
   } catch (error) {
     console.error("Error in updateProfilePicture:", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: 'Something went wrong while updating profile picture',
       error: error.message || error.toString(),
       stack: error.stack
@@ -627,7 +628,7 @@ export async function uploadUserResume(req, res) {
 
     let resumeUrl = req.file.path;
     const originalFilename = req.file.originalname || req.file.filename || 'resume.pdf';
-    
+
     // Add extension if missing so browser knows the file type
     const extMatch = originalFilename.match(/\.[0-9a-z]+$/i);
     const ext = extMatch ? extMatch[0] : '.pdf';
@@ -639,16 +640,16 @@ export async function uploadUserResume(req, res) {
       url: resumeUrl,
       filename: originalFilename
     };
-    
+
     const updatedUser = await updateUserService(user._id, { resume: resumeData });
-    
-    return res.status(200).json({ 
-      message: 'Resume updated successfully', 
-      data: updatedUser 
+
+    return res.status(200).json({
+      message: 'Resume updated successfully',
+      data: updatedUser
     });
   } catch (error) {
     console.error("Error in uploadUserResume:", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: 'Something went wrong while uploading resume',
       error: error.message || error.toString(),
       stack: error.stack
