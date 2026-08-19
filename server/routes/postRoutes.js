@@ -1,6 +1,6 @@
 import express from 'express';
-import tokenDataParser from '../middleware/tokenDataParser.js';
-import isUserAuth from '../middleware/isUserAuth.js';
+import tokenDataParser from '../middlewares/tokenDataParser.js';
+import isUserAuth from '../middlewares/isUserAuth.js';
 import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAllPost, getCompanyAndRole, getTopCompanies, getPost, getRelatedPosts, getUserBookmarkedPost, getUserPost, removeUserBookmark, upVotePost, getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote, editComment, deleteComment, editReply, deleteReply } from '../controllers/postController.js';
 
 const postRouter = express.Router(); 

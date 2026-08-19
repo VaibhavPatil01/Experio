@@ -13,7 +13,7 @@ import {
   retryAnalysis,
   reanalyzeResume
 } from '../controllers/AnalyzerController.js';
-import isUserAuth from '../../../middleware/isUserAuth.js';
+import isUserAuth from '../../../middlewares/isUserAuth.js';
 
 const router = express.Router();
 

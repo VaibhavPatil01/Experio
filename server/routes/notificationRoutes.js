@@ -1,6 +1,6 @@
 import express from 'express';
 import { getNotifications, markAsRead, getUnreadCount, markAllRead, deleteNotification } from '../controllers/notificationController.js';
-import isUserAuth from '../middleware/isUserAuth.js';
+import isUserAuth from '../middlewares/isUserAuth.js';
 
 const notificationRouter = express.Router();
 

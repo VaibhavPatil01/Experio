@@ -1,8 +1,8 @@
 import express from "express";
 import passport from 'passport';
 import { deleteUser, updateUserProfile, updateProfilePicture, uploadUserResume, forgotPassword, getLoginStatus, getUserProfile, googleLogin, githubLogin, loginUser, logoutUser, registerUser, resetPassword, searchUser, verifyEmail } from '../controllers/userController.js';
-import isUserAuth from '../middleware/isUserAuth.js';
-import upload, { uploadResume } from '../middleware/upload.js';
+import isUserAuth from '../middlewares/isUserAuth.js';
+import upload, { uploadResume } from '../middlewares/upload.js';
 
 const userRouter = express.Router(); 
 

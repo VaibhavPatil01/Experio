@@ -4,7 +4,7 @@ import notificationRouter from '../routes/notificationRoutes.js';
 import * as notificationRepo from '../repositories/notificationRepository.js';
 
 jest.mock('../repositories/notificationRepository.js');
-jest.mock('../middleware/isUserAuth.js', () => (req, res, next) => {
+jest.mock('../middlewares/isUserAuth.js', () => (req, res, next) => {
   req.body = { authTokenData: { id: 'test_user_id' } };
   next();
 });

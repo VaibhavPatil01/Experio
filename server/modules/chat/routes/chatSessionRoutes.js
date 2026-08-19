@@ -1,6 +1,6 @@
 import express from 'express';
 import * as chatSessionController from '../controllers/chatSessionController.js';
-import isUserAuth from '../../../middleware/isUserAuth.js';
+import isUserAuth from '../../../middlewares/isUserAuth.js';
 import { strictChatLimiter } from '../../../middlewares/rateLimiter.js';
 import { sanitizeInput, verifySessionOwnership } from '../../../middlewares/chatSecurity.js';
 

@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 
 // Mock auth middleware
-jest.unstable_mockModule('../../../../middleware/isUserAuth.js', () => ({
+jest.unstable_mockModule('../../../../middlewares/isUserAuth.js', () => ({
   default: (req, res, next) => {
     req.authTokenData = { id: 'test-user-123' };
     next();
