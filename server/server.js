@@ -1,31 +1,28 @@
 // Load environment variables automatically (shorthand)
 import 'dotenv/config';
-
-// Import necessary modules
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import passport from 'passport';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
+import express from 'express';
 import './configs/passport.js';
+import passport from 'passport';
+import { fileURLToPath } from 'url';
 import connectDB from './configs/db.js';
+import cookieParser from 'cookie-parser';
+import postRouter from './routes/postRoutes.js';
+import userRouter from './routes/userRoutes.js';
 import { initQdrant } from './configs/qdrant.js';
 import { initSocket } from './configs/socket.js';
-import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
-import { initNotificationWorker } from './workers/notificationWorker.js';
-import userRouter from './routes/userRoutes.js';
-import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
-import notificationRouter from './routes/notificationRoutes.js';
-import recommendationRouter from './routes/recommendationRoutes.js';
-import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
-import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
-import preventServerSleep from './utils/preventServerSleep.js';
-import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
 import { httpLogger } from './middlewares/httpLogger.js';
 import { globalLimiter } from './middlewares/rateLimiter.js';
+import preventServerSleep from './utils/preventServerSleep.js';
+import notificationRouter from './routes/notificationRoutes.js';
+import recommendationRouter from './routes/recommendationRoutes.js';
+import { initNotificationWorker } from './workers/notificationWorker.js';
+import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
+import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
+import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
+import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
 
 import Sentiment from 'sentiment';
 
