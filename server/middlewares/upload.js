@@ -52,4 +52,30 @@ export const uploadResume = multer({
   }
 });
 
+export const handleImageUpload = (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error("Multer upload error:", err);
+      return res.status(500).json({ 
+        message: 'Image upload to Cloudinary failed', 
+        error: err.message || err.toString() 
+      });
+    }
+    next();
+  });
+};
+
+export const handleResumeUpload = (req, res, next) => {
+  uploadResume.single('resumeFile')(req, res, (err) => {
+    if (err) {
+      console.error("Multer upload error:", err);
+      return res.status(500).json({ 
+        message: 'Resume upload to Cloudinary failed', 
+        error: err.message || err.toString() 
+      });
+    }
+    next();
+  });
+};
+
 export default upload;
