@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const generateAuthToken = (id, email, isAdmin) => {
   if (!process.env['SECRET_KEY']) {
-    console.log('JWT key is undefined');
-    throw new Error('JWT SECRET_KEY key not defined'); 
+    throw new Error('JWT SECRET_KEY key not defined');
   }
 
   const tokenBody = {
