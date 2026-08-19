@@ -4,7 +4,7 @@ import isUserAuth from '../../../middlewares/isUserAuth.js';
 
 const router = express.Router();
 
-// Recommendations
+// Recommendation routes
 router.get('/feed', isUserAuth, getRecommendedFeed);
 
 export default router;

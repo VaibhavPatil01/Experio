@@ -21,3 +21,9 @@ export const strictChatLimiter = rateLimit({
     message: 'Rate limit exceeded. Please wait a moment before sending another message.'
   }
 });
+
+export const analysisLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: { error: 'Too many resume analysis requests, please try again after an hour' }
+});
