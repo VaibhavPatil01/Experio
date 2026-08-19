@@ -60,27 +60,31 @@ app.get('/', (req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 3000;
+async function startServer() {
+  try {
+    // 1. Initialize Databases & Third-Party Services FIRST
+    await connectDB();
+    await initQdrant();
+    console.log('✅ AI Knowledge Layer Initialized');
+    // 2. Initialize Background Workers
+    initEmbeddingSyncWorker();
+    initNotificationWorker();
+    preventServerSleep();
+    // 3. Start the HTTP Server LAST (Only when everything else is ready)
+    const PORT = process.env.PORT || 3000;
+    const server = app.listen(PORT, () => {
+      console.log(`✅ Server is running on PORT ${PORT}`);
+    });
+    // 4. Attach WebSockets to the running server
+    initSocket(server);
+    console.log('✅ Socket.io Initialized');
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1); // Exit strictly if dependencies fail
+  }
+}
 
-const server = app.listen(PORT, async () => {
-  console.log(`✅ Server is running on PORT ${PORT}`);
-
-  // Initialize WebSockets
-  initSocket(server);
-  console.log('✅ Socket.io Initialized');
-
-  // Initialize AI Knowledge Layer
-  await initQdrant();
-
-  console.log('[Workers] Init sync queue worker...');
-  initEmbeddingSyncWorker();
-
-  console.log('[Workers] Init notification queue worker...');
-  initNotificationWorker();
-  console.log('✅ AI Knowledge Layer Initialized');
-
-  preventServerSleep(); // Schedule background task
-});
+startServer();
 
 app.use(globalErrorHandler);
 
