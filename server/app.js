@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import postRouter from './modules/posts/routes/postRoutes.js';
 import userRouter from './modules/users/routes/userRoutes.js';
 import corsOptions from './configs/corsConfig.js';
-import commentRouter from './modules/posts/routes/commentRoutes.js';
+
 import { httpLogger } from './middlewares/httpLogger.js';
 import { globalLimiter } from './middlewares/rateLimiter.js';
 import notificationRouter from './modules/posts/routes/notificationRoutes.js';
@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/user', userRouter);
 app.use('/posts', globalLimiter, postRouter);
-app.use('/comments', globalLimiter, commentRouter);
+
 app.use('/api/notifications', notificationRouter);
 app.use('/recommendations', recommendationRouter);
 app.use('/api/chat/sessions', chatSessionRoutes);
