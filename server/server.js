@@ -41,12 +41,12 @@ app.use(passport.initialize());
 app.use(httpLogger);
 app.use('/api', globalLimiter); // Apply global limit to all APIs
 
-// --------------------- Static Files ---------------------
+// Static Files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --------------------- Test Route ---------------------
+// Test Route
 app.post('/test-sentiment', (req, res) => {
   const sentiment = new Sentiment();
   const result = sentiment.analyze(req.body.content || "");
