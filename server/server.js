@@ -1,4 +1,3 @@
-// Load environment variables automatically (shorthand)
 import 'dotenv/config';
 import cors from 'cors';
 import path from 'path';
