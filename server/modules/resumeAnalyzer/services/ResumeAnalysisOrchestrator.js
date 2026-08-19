@@ -7,7 +7,7 @@ import ResumeAnalysisRepository from '../repositories/ResumeAnalysisRepository.j
 import ResumeAnalysisRetrievalService from './ResumeAnalysisRetrievalService.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
-import { withExponentialBackoff } from '../../../utils/retry.js';
+import { withExponentialBackoff } from '../utils/retry.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';

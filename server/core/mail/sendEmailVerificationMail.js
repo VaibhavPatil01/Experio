@@ -1,4 +1,4 @@
-import sendMail from '../../core/mail/sendMail.js';
+import sendMail from './sendMail.js';
 
 const sendEmailVerificationMail = async (email, token, username) => { 
   const SERVER_BASE_URL = process.env['SERVER_BASE_URL'];

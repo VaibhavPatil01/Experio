@@ -2,7 +2,7 @@ import { Type } from '@google/genai';
 import geminiClient from '../../../configs/gemini.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
-import { withExponentialBackoff } from '../../../utils/retry.js';
+import { withExponentialBackoff } from '../utils/retry.js';
 
 export default class GeminiAnalyzerService {
   /**

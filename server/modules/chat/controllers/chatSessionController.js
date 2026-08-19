@@ -1,5 +1,5 @@
 import ChatSessionService from '../services/ChatSessionService.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
 const chatSessionService = new ChatSessionService();
 

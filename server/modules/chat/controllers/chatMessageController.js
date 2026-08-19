@@ -1,5 +1,5 @@
 import ChatMessageService from '../services/ChatMessageService.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 import ChatMessage from '../models/ChatMessage.js';
 
 const chatMessageService = new ChatMessageService();
