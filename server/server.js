@@ -4,7 +4,6 @@ import path from 'path';
 import express from 'express';
 import './configs/passport.js';
 import passport from 'passport';
-import Sentiment from 'sentiment';
 import { fileURLToPath } from 'url';
 import connectDB from './configs/db.js';
 import cookieParser from 'cookie-parser';
@@ -45,20 +44,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Test Route
-app.post('/test-sentiment', (req, res) => {
-  const sentiment = new Sentiment();
-  const result = sentiment.analyze(req.body.content || "");
-  const sentimentLabel =
-    result.score > 0 ? "positive" : result.score < 0 ? "negative" : "neutral";
-
-  res.json({
-    score: result.score,
-    comparative: result.comparative,
-    sentiment: sentimentLabel,
-    words: result.words,
-  });
-});
 
 // --------------------- API Routes ---------------------
 app.use('/user', userRouter);
