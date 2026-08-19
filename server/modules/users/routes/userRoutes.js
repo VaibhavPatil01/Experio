@@ -6,20 +6,25 @@ import { handleImageUpload, handleResumeUpload } from '../../../middlewares/uplo
 
 const userRouter = express.Router();
 
-userRouter.post('/login', loginUser);
-userRouter.get('/verify-email/:token', verifyEmail);
+// Authentication & Onboarding
 userRouter.post('/register', registerUser);
+userRouter.get('/verify-email/:token', verifyEmail);
+userRouter.post('/login', loginUser);
 userRouter.get('/status', getLoginStatus);
-userRouter.get('/profile/:id', getUserProfile);
-userRouter.delete('/', isUserAuth, deleteUser);
-userRouter.put('/profile', isUserAuth, updateUserProfile);
-userRouter.put('/profile-picture', isUserAuth, handleImageUpload, updateProfilePicture);
-
-userRouter.put('/resume', isUserAuth, handleResumeUpload, uploadUserResume);
-
 userRouter.post('/logout', logoutUser);
+
+// Password Management
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/reset-password/:token', resetPassword);
+
+// Profile Management
+userRouter.get('/profile/:id', getUserProfile);
+userRouter.put('/profile', isUserAuth, updateUserProfile);
+userRouter.put('/profile-picture', isUserAuth, handleImageUpload, updateProfilePicture);
+userRouter.put('/resume', isUserAuth, handleResumeUpload, uploadUserResume);
+userRouter.delete('/', isUserAuth, deleteUser);
+
+// User Search
 userRouter.get('/search', searchUser);
 
 // User Routes for Google Auth 
