@@ -4,9 +4,12 @@ import isUserAuth from '../../../middlewares/isUserAuth.js';
 
 const notificationRouter = express.Router();
 
+// Collection level routes
 notificationRouter.get('/', isUserAuth, getNotifications);
 notificationRouter.get('/unread-count', isUserAuth, getUnreadCount);
 notificationRouter.patch('/read-all', isUserAuth, markAllRead);
+
+// Item level routes
 notificationRouter.patch('/:id/read', isUserAuth, markAsRead);
 notificationRouter.delete('/:id', isUserAuth, deleteNotification);
 
