@@ -25,6 +25,7 @@ import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
 import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
 
 import Sentiment from 'sentiment';
+import corsOptions from './configs/corsConfig.js';
 
 // --------------------- Connect to MongoDB ---------------------
 await connectDB();
@@ -32,32 +33,8 @@ await connectDB();
 // --------------------- Express App ---------------------
 const app = express();
 
-// --------------------- CORS ---------------------
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "https://interview-experience-gsmcoe.vercel.app",
-  "https://interview-experience-gsmcoe.onrender.com",
-  "https://experio-beryl.vercel.app",
-  "https://experio-mll8.onrender.com"
-
-];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  })
-);
-
 // --------------------- Middlewares ---------------------
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
