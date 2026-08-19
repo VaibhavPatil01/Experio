@@ -4,7 +4,7 @@ import { deleteUser, updateUserProfile, updateProfilePicture, uploadUserResume, 
 import isUserAuth from '../../../middlewares/isUserAuth.js';
 import { handleImageUpload, handleResumeUpload } from '../../../middlewares/upload.js';
 
-const userRouter = express.Router(); 
+const userRouter = express.Router();
 
 userRouter.post('/login', loginUser);
 userRouter.get('/verify-email/:token', verifyEmail);
@@ -12,14 +12,14 @@ userRouter.post('/register', registerUser);
 userRouter.get('/status', getLoginStatus);
 userRouter.get('/profile/:id', getUserProfile);
 userRouter.delete('/', isUserAuth, deleteUser);
-userRouter.put('/profile', isUserAuth, updateUserProfile); 
+userRouter.put('/profile', isUserAuth, updateUserProfile);
 userRouter.put('/profile-picture', isUserAuth, handleImageUpload, updateProfilePicture);
 
 userRouter.put('/resume', isUserAuth, handleResumeUpload, uploadUserResume);
 
 userRouter.post('/logout', logoutUser);
 userRouter.post('/forgot-password', forgotPassword);
-userRouter.post('/reset-password/:token', resetPassword); 
+userRouter.post('/reset-password/:token', resetPassword);
 userRouter.get('/search', searchUser);
 
 // User Routes for Google Auth 
