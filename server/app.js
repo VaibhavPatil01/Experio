@@ -34,6 +34,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Home Route
+app.get('/', (req, res) => {
+  res.status(200).json({ name: 'Experio API' });
+});
+
 // API Routes
 app.use('/user', userRouter);
 app.use('/posts', globalLimiter, postRouter);
@@ -43,12 +48,7 @@ app.use('/recommendations', recommendationRouter);
 app.use('/api/chat/sessions', chatSessionRoutes);
 app.use('/api/resume-analyzer', analyzerRoutes);
 
-// Home Route
-app.get('/', (req, res) => {
-  res.status(200).json({ name: 'Experio API' });
-});
-
-// Global Error Handler MUST be the last middleware
+// Global Error Handler must be the last middleware
 app.use(globalErrorHandler);
 
 export default app;
