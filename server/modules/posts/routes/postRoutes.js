@@ -5,33 +5,41 @@ import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAll
 
 const postRouter = express.Router(); 
 
-// Working Routes
-postRouter.get('/:id', isUserAuth, getPost); 
-postRouter.post('', isUserAuth, createPost);
-postRouter.delete('/:id', isUserAuth, deletePost); 
-postRouter.post('/upvote/:id', isUserAuth, upVotePost);
-postRouter.post('/downvote/:id', isUserAuth, downVotePost);
-postRouter.put('/edit', isUserAuth, editPost);
+// Static data routes
 postRouter.get('/data/company-roles', getCompanyAndRole);
 postRouter.get('/data/top-companies', getTopCompanies);
-postRouter.post('/bookmark/:id', isUserAuth, addUserBookmark);
-postRouter.delete('/bookmark/:id', isUserAuth, removeUserBookmark); 
-postRouter.get('', tokenDataParser, getAllPost);
-postRouter.get('/user/bookmarked/:userId', tokenDataParser, getUserBookmarkedPost);
-postRouter.get('/related/:id', isUserAuth, getRelatedPosts);
-postRouter.get('/user/all/:userId', tokenDataParser, getUserPost); 
 
-// Comment and Reply Routes
+// Collection level routes
+postRouter.get('', tokenDataParser, getAllPost);
+postRouter.post('', isUserAuth, createPost);
+postRouter.get('/user/all/:userId', tokenDataParser, getUserPost);
+postRouter.get('/user/bookmarked/:userId', tokenDataParser, getUserBookmarkedPost);
+
+// Individual post routes
+postRouter.get('/:id', isUserAuth, getPost);
+postRouter.put('/edit', isUserAuth, editPost);
+postRouter.delete('/:id', isUserAuth, deletePost);
+postRouter.get('/related/:id', isUserAuth, getRelatedPosts);
+
+// Interactions
+postRouter.post('/upvote/:id', isUserAuth, upVotePost);
+postRouter.post('/downvote/:id', isUserAuth, downVotePost);
+postRouter.post('/bookmark/:id', isUserAuth, addUserBookmark);
+postRouter.delete('/bookmark/:id', isUserAuth, removeUserBookmark);
+
+// Comments
 postRouter.get('/:id/comments', tokenDataParser, getPostComments);
 postRouter.post('/:id/comments', isUserAuth, addComment);
 postRouter.put('/:id/comments/:commentId', isUserAuth, editComment);
 postRouter.delete('/:id/comments/:commentId', isUserAuth, deleteComment);
+postRouter.post('/:id/comments/:commentId/upvote', isUserAuth, toggleCommentUpvote);
+postRouter.post('/:id/comments/:commentId/downvote', isUserAuth, toggleCommentDownvote);
+
+// Comment replies
 postRouter.post('/:id/comments/:commentId/replies', isUserAuth, addReply);
 postRouter.put('/:id/comments/:commentId/replies/:replyId', isUserAuth, editReply);
 postRouter.delete('/:id/comments/:commentId/replies/:replyId', isUserAuth, deleteReply);
-postRouter.post('/:id/comments/:commentId/upvote', isUserAuth, toggleCommentUpvote);
 postRouter.post('/:id/comments/:commentId/replies/:replyId/upvote', isUserAuth, toggleReplyUpvote);
-postRouter.post('/:id/comments/:commentId/downvote', isUserAuth, toggleCommentDownvote);
 postRouter.post('/:id/comments/:commentId/replies/:replyId/downvote', isUserAuth, toggleReplyDownvote);
 
 export default postRouter;
