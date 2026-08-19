@@ -5,6 +5,7 @@ import path from 'path';
 import express from 'express';
 import './configs/passport.js';
 import passport from 'passport';
+import Sentiment from 'sentiment';
 import { fileURLToPath } from 'url';
 import connectDB from './configs/db.js';
 import cookieParser from 'cookie-parser';
@@ -12,6 +13,7 @@ import postRouter from './routes/postRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import { initQdrant } from './configs/qdrant.js';
 import { initSocket } from './configs/socket.js';
+import corsOptions from './configs/corsConfig.js';
 import commentRouter from './routes/commentRoutes.js';
 import { httpLogger } from './middlewares/httpLogger.js';
 import { globalLimiter } from './middlewares/rateLimiter.js';
@@ -24,10 +26,7 @@ import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
 import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
 import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
 
-import Sentiment from 'sentiment';
-import corsOptions from './configs/corsConfig.js';
-
-// --------------------- Connect to MongoDB ---------------------
+// Connect to MongoDB
 await connectDB();
 
 // --------------------- Express App ---------------------
