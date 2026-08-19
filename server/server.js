@@ -70,12 +70,12 @@ app.use('/recommendations', recommendationRouter);
 app.use('/api/chat/sessions', chatSessionRoutes);
 app.use('/api/resume-analyzer', analyzerRoutes);
 
-// --------------------- Home Route ---------------------
+// Home Route
 app.get('/', (req, res) => {
   res.status(200).json({ name: 'Experio API' });
 });
 
-// --------------------- Start Server ---------------------
+// Start Server
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, async () => {
