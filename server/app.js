@@ -34,7 +34,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --------------------- API Routes ---------------------
+// API Routes
 app.use('/user', userRouter);
 app.use('/posts', globalLimiter, postRouter);
 app.use('/comments', globalLimiter, commentRouter);
