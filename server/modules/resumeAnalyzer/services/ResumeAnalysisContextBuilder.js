@@ -1,4 +1,4 @@
-import User from '../../../models/User.js';
+import User from '../../users/models/User.js';
 import ResumeAnalysisRetrievalService from './ResumeAnalysisRetrievalService.js';
 import logger from '../../../utils/logger.js';
 import NodeCache from 'node-cache';

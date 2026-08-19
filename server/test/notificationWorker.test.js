@@ -1,7 +1,8 @@
-import { initNotificationWorker } from '../workers/notificationWorker.js';
+import { jest } from '@jest/globals';
+import { initNotificationWorker } from '../modules/posts/workers/notificationWorker.js';
 import qdrantClient from '../configs/qdrant.js';
-import { Post } from '../models/Post.js';
-import * as notificationRepo from '../repositories/notificationRepository.js';
+import { Post } from '../modules/posts/models/Post.js';
+import * as notificationRepo from '../modules/posts/repositories/notificationRepository.js';
 import * as socketConfig from '../configs/socket.js';
 import { Worker } from 'bullmq';
 
@@ -9,12 +10,12 @@ jest.mock('bullmq');
 jest.mock('../configs/qdrant.js', () => ({
   search: jest.fn()
 }));
-jest.mock('../models/Post.js', () => ({
+jest.mock('../modules/posts/models/Post.js', () => ({
   Post: {
     findById: jest.fn()
   }
 }));
-jest.mock('../repositories/notificationRepository.js', () => ({
+jest.mock('../modules/posts/repositories/notificationRepository.js', () => ({
   createNotificationsBatch: jest.fn(),
   createNotification: jest.fn()
 }));

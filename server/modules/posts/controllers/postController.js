@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLContent.js';
+import generateSummaryFromHTMLContent from '../../../utils/generateSummaryFromHTMLContent.js';
 import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, editCommentService, deleteCommentService, editReplyService, deleteReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
-import { findUserById } from '../services/userService.js';
+import { findUserById } from '../../users/services/userService.js';
 import { eventBus, EVENTS } from '../events/index.js';
 import winston from 'winston';
 

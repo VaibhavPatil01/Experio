@@ -1,8 +1,8 @@
-import { QdrantRepository } from '../repositories/qdrantRepository.js';
+import { QdrantRepository } from '../core/qdrant/qdrantRepository.js';
 import { EmbeddingService } from './embeddingService.js';
 import { PromptBuilder } from './promptBuilder.js';
-import { Post } from '../models/Post.js';
-import User from '../models/User.js';
+import { Post } from '../modules/posts/models/Post.js';
+import User from '../modules/users/models/User.js';
 
 export class RetrievalService {
   /**

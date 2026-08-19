@@ -4,8 +4,8 @@ import connectDB from './configs/db.js';
 import { initQdrant } from './configs/qdrant.js';
 import { initSocket } from './configs/socket.js';
 import preventServerSleep from './utils/preventServerSleep.js';
-import { initNotificationWorker } from './workers/notificationWorker.js';
-import { initEmbeddingSyncWorker } from './workers/embeddingSyncWorker.js';
+import { initNotificationWorker } from './modules/posts/workers/notificationWorker.js';
+import { initEmbeddingSyncWorker } from './core/qdrant/embeddingSyncWorker.js';
 
 // Start Server
 async function startServer() {

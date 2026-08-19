@@ -1,12 +1,12 @@
 import { Worker } from 'bullmq';
-import { redisConnection } from '../configs/redis.js';
+import { redisConnection } from '../../../configs/redis.js';
 import { NOTIFICATION_QUEUE_NAME } from '../queues/notificationQueue.js';
 import { createNotification, createNotificationsBatch, deleteNotificationByEventId } from '../repositories/notificationRepository.js';
-import { QdrantRepository } from '../repositories/qdrantRepository.js';
-import { emitNotificationToUser, emitNotificationRemove } from '../configs/socket.js';
-import qdrantClient from '../configs/qdrant.js';
+import { QdrantRepository } from '../../../core/qdrant/qdrantRepository.js';
+import { emitNotificationToUser, emitNotificationRemove } from '../../../configs/socket.js';
+import qdrantClient from '../../../configs/qdrant.js';
 import { Post } from '../models/Post.js';
-import User from '../models/User.js';
+import User from '../../users/models/User.js';
 import winston from 'winston';
 
 const logger = winston.createLogger({

@@ -1,4 +1,4 @@
-import sendMail from './sendMail.js';
+import sendMail from '../../core/mail/sendMail.js';
 
 const sendForgotPasswordMail = async (email, token, username) => {
   const CLIENT_BASE_URL = process.env['CLIENT_BASE_URL'];

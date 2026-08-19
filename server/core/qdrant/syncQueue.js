@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import { redisConnection } from '../configs/redis.js';
+import { redisConnection } from '../../configs/redis.js';
 
 export const SYNC_QUEUE_NAME = 'embedding-sync-queue';
 

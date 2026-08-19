@@ -1,6 +1,6 @@
-import { QdrantRepository } from '../../../repositories/qdrantRepository.js';
+import { QdrantRepository } from '../../../core/qdrant/qdrantRepository.js';
 import { EmbeddingService } from '../../../ai/embeddingService.js';
-import { Post } from '../../../models/Post.js';
+import { Post } from '../../posts/models/Post.js';
 import logger from '../../../utils/logger.js';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';

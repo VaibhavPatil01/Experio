@@ -1,6 +1,6 @@
 import {Post as postModel} from '../models/Post.js';  
-import { QdrantRepository } from '../repositories/qdrantRepository.js';
-import qdrantClient from '../configs/qdrant.js';
+import { QdrantRepository } from '../../../core/qdrant/qdrantRepository.js';
+import qdrantClient from '../../../configs/qdrant.js';
 
 // Tested working fine
 export const createPostService = (post) => {

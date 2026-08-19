@@ -1,13 +1,13 @@
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
-import sendEmailVerificationMail from '../services/mail/sendEmailVerificationMail.js';
-import sendForgotPasswordEmail from '../services/mail/sendForgotPasswordMail.js';
-import decodeToken from '../utils/token/decodeToken.js';
-import generateAuthToken from '../utils/token/generateAuthToken.js';
-import generateEmailVerificationToken from '../utils/token/generateEmailVerificationToken.js';
-import generateForgotPasswordToken from '../utils/token/generateForgotPasswordToken.js';
+import sendEmailVerificationMail from '../../../services/mail/sendEmailVerificationMail.js';
+import sendForgotPasswordEmail from '../../../services/mail/sendForgotPasswordMail.js';
+import decodeToken from '../../../utils/token/decodeToken.js';
+import generateAuthToken from '../../../utils/token/generateAuthToken.js';
+import generateEmailVerificationToken from '../../../utils/token/generateEmailVerificationToken.js';
+import generateForgotPasswordToken from '../../../utils/token/generateForgotPasswordToken.js';
 import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
-import { eventBus, EVENTS } from '../events/index.js';
+import { eventBus, EVENTS } from '../../posts/events/index.js';
 
 
 export async function loginUser(req, res) { 

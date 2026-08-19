@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { 
   createNotification, 
   createNotificationsBatch, 
@@ -6,10 +7,10 @@ import {
   markNotificationAsRead, 
   markMultipleNotificationsAsRead, 
   markAllNotificationsAsRead 
-} from '../repositories/notificationRepository.js';
-import { Notification } from '../models/Notification.js';
+} from '../modules/posts/repositories/notificationRepository.js';
+import { Notification } from '../modules/posts/models/Notification.js';
 
-jest.mock('../models/Notification.js', () => ({
+jest.mock('../modules/posts/models/Notification.js', () => ({
   Notification: {
     create: jest.fn(),
     findOne: jest.fn(),

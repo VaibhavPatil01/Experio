@@ -1,12 +1,13 @@
-import { addReply } from '../controllers/postController.js';
-import * as postService from '../services/postService.js';
-import { eventBus, EVENTS } from '../events/index.js';
+import { jest } from '@jest/globals';
+import { addReply } from '../modules/posts/controllers/postController.js';
+import * as postService from '../modules/posts/services/postService.js';
+import { eventBus, EVENTS } from '../modules/posts/events/index.js';
 
-jest.mock('../services/postService.js', () => ({
+jest.mock('../modules/posts/services/postService.js', () => ({
   addReplyService: jest.fn()
 }));
 
-jest.mock('../events/index.js', () => ({
+jest.mock('../modules/posts/events/index.js', () => ({
   eventBus: { emit: jest.fn() },
   EVENTS: {
     REPLY_REPLIED: 'reply.replied',

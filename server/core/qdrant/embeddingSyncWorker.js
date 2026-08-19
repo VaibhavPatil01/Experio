@@ -1,12 +1,12 @@
 import { Worker } from 'bullmq';
-import { redisConnection } from '../configs/redis.js';
-import { SYNC_QUEUE_NAME } from '../queues/syncQueue.js';
-import { Post } from '../models/Post.js';
-import User from '../models/User.js';
-import { PromptBuilder } from '../ai/promptBuilder.js';
-import { EmbeddingService } from '../ai/embeddingService.js';
-import { QdrantRepository } from '../repositories/qdrantRepository.js';
-import { eventBus, EVENTS } from '../events/index.js';
+import { redisConnection } from '../../configs/redis.js';
+import { SYNC_QUEUE_NAME } from './syncQueue.js';
+import { Post } from '../../modules/posts/models/Post.js';
+import User from '../../modules/users/models/User.js';
+import { PromptBuilder } from '../../ai/promptBuilder.js';
+import { EmbeddingService } from '../../ai/embeddingService.js';
+import { QdrantRepository } from './qdrantRepository.js';
+import { eventBus, EVENTS } from '../../modules/posts/events/index.js';
 
 export const initEmbeddingSyncWorker = () => {
   const worker = new Worker(SYNC_QUEUE_NAME, async (job) => {

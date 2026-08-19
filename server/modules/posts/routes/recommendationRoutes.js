@@ -1,6 +1,6 @@
 import express from 'express';
 import { getRecommendedFeed } from '../controllers/recommendationController.js';
-import isUserAuth from '../middlewares/isUserAuth.js';
+import isUserAuth from '../../../middlewares/isUserAuth.js';
 
 const router = express.Router();
 

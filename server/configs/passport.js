@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GitHubStrategy } from 'passport-github2';
-import { createUser, findUser } from '../services/userService.js';
+import { createUser, findUser } from '../modules/users/services/userService.js';
 
 const GOOGLE_CLIENT_ID = process.env['GOOGLE_CLIENT_ID'];
 const GOOGLE_CLIENT_SECRET = process.env['GOOGLE_CLIENT_SECRET'];

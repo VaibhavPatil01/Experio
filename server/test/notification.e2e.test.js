@@ -1,9 +1,10 @@
+import { jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import notificationRouter from '../routes/notificationRoutes.js';
-import * as notificationRepo from '../repositories/notificationRepository.js';
+import notificationRouter from '../modules/posts/routes/notificationRoutes.js';
+import * as notificationRepo from '../modules/posts/repositories/notificationRepository.js';
 
-jest.mock('../repositories/notificationRepository.js');
+jest.mock('../modules/posts/repositories/notificationRepository.js');
 jest.mock('../middlewares/isUserAuth.js', () => (req, res, next) => {
   req.body = { authTokenData: { id: 'test_user_id' } };
   next();

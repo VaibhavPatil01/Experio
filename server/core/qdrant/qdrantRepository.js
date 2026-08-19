@@ -1,4 +1,4 @@
-import qdrantClient from '../configs/qdrant.js';
+import qdrantClient from '../../configs/qdrant.js';
 
 export class QdrantRepository {
   /**

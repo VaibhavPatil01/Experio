@@ -1,7 +1,7 @@
-import User from '../../../models/User.js';
-import { Post } from '../../../models/Post.js';
+import User from '../../users/models/User.js';
+import { Post } from '../../posts/models/Post.js';
 import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
-import { QdrantRepository } from '../../../repositories/qdrantRepository.js';
+import { QdrantRepository } from '../../../core/qdrant/qdrantRepository.js';
 import { EmbeddingService } from '../../../ai/embeddingService.js';
 import logger from '../../../utils/logger.js';
 import NodeCache from 'node-cache';

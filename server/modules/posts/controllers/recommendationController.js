@@ -1,4 +1,4 @@
-import { RetrievalService } from '../ai/retrievalService.js';
+import { RetrievalService } from '../../../ai/retrievalService.js';
 import mongoose from 'mongoose';
 
 export async function getRecommendedFeed(req, res) {

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { syncQueue } from '../queues/syncQueue.js';
+import { syncQueue } from '../../../core/qdrant/syncQueue.js';
 
 class AppEventBus extends EventEmitter {}
 export const eventBus = new AppEventBus();

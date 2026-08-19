@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Notification } from '../models/Notification.js';
-import User from '../models/User.js';
-import { Post } from '../models/Post.js';
-import { getUserNotifications } from '../repositories/notificationRepository.js';
+import { Notification } from '../modules/posts/models/Notification.js';
+import User from '../modules/users/models/User.js';
+import { Post } from '../modules/posts/models/Post.js';
+import { getUserNotifications } from '../modules/posts/repositories/notificationRepository.js';
 
 let mongoServer;
 

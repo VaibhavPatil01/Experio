@@ -1,5 +1,5 @@
 import { getUserNotifications, markNotificationAsRead, getUnreadNotificationCount, markAllNotificationsAsRead, markMultipleNotificationsAsRead } from '../repositories/notificationRepository.js';
-import { emitNotificationRead, emitNotificationReadAll } from '../configs/socket.js';
+import { emitNotificationRead, emitNotificationReadAll } from '../../../configs/socket.js';
 import { Notification } from '../models/Notification.js';
 import winston from 'winston';
 
