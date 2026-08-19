@@ -80,7 +80,7 @@ export async function loginUser(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function registerUser(req, res) {
   const {
@@ -163,7 +163,7 @@ export async function registerUser(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function verifyEmail(req, res) {
   const emailVerificationToken = req.params['token'];
@@ -192,7 +192,7 @@ export async function verifyEmail(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function getLoginStatus(req, res) {
   let token = req.headers['token'];
@@ -259,7 +259,7 @@ export async function getLoginStatus(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function getUserProfile(req, res) {
   const paramId = req.params['id'];
@@ -293,7 +293,7 @@ export async function getUserProfile(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function deleteUser(req, res) {
   const userData = req.body.authTokenData;
@@ -316,7 +316,7 @@ export async function deleteUser(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function editUserProfile(req, res) {
   const {
@@ -359,13 +359,13 @@ export async function editUserProfile(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export function logoutUser(req, res) {
   return res.status(200).json({ message: 'User Logout successful' });
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function forgotPassword(req, res) {
   const email = req.body?.email;
@@ -405,7 +405,7 @@ export async function forgotPassword(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function resetPassword(req, res) {
   const email = req.body.email;
@@ -458,7 +458,7 @@ export async function resetPassword(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function googleLogin(req, res) {
   if (!req.user) {
@@ -502,7 +502,7 @@ export async function githubLogin(req, res) {
   return res.redirect(`${clientURL}/token/github/${token}`);
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function searchUser(req, res) {
   let search = req.query['searchparam'];
@@ -548,7 +548,7 @@ export async function searchUser(req, res) {
   }
 }
 
-// ----------------------------------------------------------------------------------------------------------- //
+
 
 export async function updateUserProfile(req, res) {
   let token = req.headers['token'];
