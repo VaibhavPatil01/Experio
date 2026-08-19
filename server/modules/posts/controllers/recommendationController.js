@@ -1,5 +1,5 @@
-import { RetrievalService } from '../../../ai/retrievalService.js';
 import mongoose from 'mongoose';
+import { getProcessedRecommendationsForUser } from '../services/recommendationService.js';
 
 export async function getRecommendedFeed(req, res) {
   const userId = req.body.authTokenData?.id || req.body.userId; // Depending on how auth middleware attaches it
@@ -13,35 +13,14 @@ export async function getRecommendedFeed(req, res) {
   if (limit > 50) limit = 50;
 
   try {
-    const recommendedPosts = await RetrievalService.getRecommendationsForUser(userId, limit);
+    const response = await getProcessedRecommendationsForUser(userId, limit);
 
-    if (recommendedPosts.length === 0) {
+    if (response.length === 0) {
       return res.status(200).json({
         message: 'No recommendations found. Try updating your profile.',
         data: []
       });
     }
-
-    // Process posts for frontend consumption (similar to getAllPost)
-    const response = recommendedPosts.map((post) => {
-      const { upVotes, downVotes, bookmarks } = post;
-      
-      const isUpVoted = Array.isArray(upVotes) && upVotes.some((id) => id.toString() === userId.toString());
-      const isDownVoted = !isUpVoted && Array.isArray(downVotes) && downVotes.some((id) => id.toString() === userId.toString());
-      const isBookmarked = Array.isArray(bookmarks) && bookmarks.some((id) => id.toString() === userId.toString());
-
-      return {
-        ...post,
-        userId: post.isAnonymous ? { ...(post.userId || {}), username: "Anonymous User", profilePicture: "", _id: null } : post.userId,
-        isUpVoted,
-        isDownVoted,
-        isBookmarked,
-        votes: (Array.isArray(upVotes) ? upVotes.length : 0) - (Array.isArray(downVotes) ? downVotes.length : 0),
-        upVotes: undefined,
-        downVotes: undefined,
-        bookmarks: undefined,
-      };
-    });
 
     return res.status(200).json({
       message: 'Recommended feed fetched successfully',

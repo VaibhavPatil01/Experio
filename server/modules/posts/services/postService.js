@@ -1,62 +1,32 @@
-import {Post as postModel} from '../models/Post.js';  
+import * as postRepository from '../repositories/postRepository.js';
 import { QdrantRepository } from '../../../core/qdrant/qdrantRepository.js';
 import qdrantClient from '../../../configs/qdrant.js';
 
-// Tested working fine
 export const createPostService = (post) => {
-  return postModel.create(post);
+  return postRepository.createPost(post);
 };
 
 export const deletePostService = (postId) => { 
-  return postModel.deleteOne({ _id: postId }); 
+  return postRepository.deletePostById(postId); 
 };
 
 export const upVotePostService = (postId, userId) => {
-  const conditions = {
-      _id: postId,
-      upVotes: { $ne: userId },
-    };
-
-    // We are adding the upvote and also removing the user id from downvote if present
-    const update = {
-      $addToSet: { upVotes: userId },
-      $pull: { downVotes: userId },
-    };
-
-    return postModel.updateOne(conditions, update);
+  return postRepository.addUpVote(postId, userId);
 };
 
 export const downVotePostService = (postId, userId) => {
-    const conditions = {
-      _id: postId,
-      downVotes: { $ne: userId },
-    };
-
-    // We are adding the upvote and also removing the user id from downvote if present
-    const update = {
-      $addToSet: { downVotes: userId },
-      $pull: { upVotes: userId },
-    };
-
-    return postModel.updateOne(conditions, update);
+  return postRepository.addDownVote(postId, userId);
 };
 
 export const nullifyUserVote = (postId, userId) => {
-    const condition = { _id: postId };
-
-    // We are adding the upvote and also removing the user id from downvote if present
-    const update = { $pull: { upVotes: userId, downVotes: userId } };
-
-    return postModel.updateOne(condition, update);
+  return postRepository.removeUserVotes(postId, userId);
 };
 
 export const editPostService = (postId, userId, editedPostData, isEditorAdmin = false) => {
   let filter = { _id: postId };
-
   if (!isEditorAdmin) {
     filter = { _id: postId, userId };
   }
-
   const update = {
     title: editedPostData.title,
     content: editedPostData.content,
@@ -68,8 +38,6 @@ export const editPostService = (postId, userId, editedPostData, isEditorAdmin = 
     rating: editedPostData.rating,
     status: editedPostData.status,
     tags: editedPostData.tags,
-    
-    // New Fields
     hiringType: editedPostData.hiringType,
     interviewMode: editedPostData.interviewMode,
     interviewDate: editedPostData.interviewDate,
@@ -85,120 +53,38 @@ export const editPostService = (postId, userId, editedPostData, isEditorAdmin = 
     salary: editedPostData.salary,
     isAnonymous: editedPostData.isAnonymous,
   };
-
-  return postModel.findOneAndUpdate(filter, update);
+  return postRepository.updatePost(filter, update);
 };
 
 export const getCompanyAndRoleService = () => {
-  return postModel.aggregate([
-    {
-      $group: {
-        _id: null,
-        company: { $addToSet: '$company' },
-        role: { $addToSet: '$role' },
-      },
-    },
-  ]);
+  return postRepository.getCompanyAndRoleAggregation();
 };
 
 export const getTopCompaniesService = () => {
-  return postModel.aggregate([
-    {
-      $group: {
-        _id: '$company',
-        count: { $sum: 1 }
-      }
-    },
-    { $sort: { count: -1 } },
-    { $limit: 5 }
-  ]);
+  return postRepository.getTopCompaniesAggregation();
 };
 
 export const addUserToBookmark = (postId, userId) => {
-  const conditions = {
-    _id: postId,
-    bookmarks: { $ne: userId },
-  };
-
-  const update = { $addToSet: { bookmarks: userId } };
-
-  return postModel.updateOne(conditions, update);
+  return postRepository.addBookmark(postId, userId);
 };
 
 export const removeUserFromBookmark = (postId, userId) => {
-  const conditions = {
-    _id: postId,
-    bookmarks: userId,
-  };
-
-  const update = { $pull: { bookmarks: userId } };
-
-  return postModel.updateOne(conditions, update);
+  return postRepository.removeBookmark(postId, userId);
 };
 
 export const getAllPostsService = async (filter, sort, limit, skip) => {
   if (sort === 'top') {
-    return postModel.aggregate([
-      { $match: filter },
-      { $addFields: { 
-          voteCount: { 
-            $subtract: [
-              { $size: { $ifNull: ["$upVotes", []] } }, 
-              { $size: { $ifNull: ["$downVotes", []] } }
-            ] 
-          } 
-      }},
-      { $sort: { voteCount: -1, createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
-      { $project: { comments: 0, status: 0, tags: 0, voteCount: 0 } },
-      { $lookup: { 
-          from: 'users', 
-          localField: 'userId', 
-          foreignField: '_id', 
-          as: 'userId' 
-      }},
-      { $unwind: "$userId" },
-      { $project: {
-          "userId.password": 0,
-          "userId.email": 0,
-          "userId.isAdmin": 0,
-          "userId.isEmailVerified": 0
-      }}
-    ]);
+    return postRepository.getTopPostsAggregation(filter, limit, skip);
   }
-
-  return postModel
-    .find(filter)
-    .sort(sort)
-    .select({
-      comments: 0,
-      status: 0,
-      tags: 0,
-    })
-    .populate('userId', 'username profilePicture')
-    .limit(limit)
-    .skip(skip)
-    .lean();
+  return postRepository.findPosts(filter, sort, limit, skip);
 };
 
 export const getUserBookmarkedPostService = (userId, limit, skip) => {
-  return postModel
-    .find({ bookmarks: { $in: [userId] } })
-    .select({
-      comments: 0,
-      tags: 0,
-      views: 0,
-      status: 0,
-    })
-    .populate('userId', 'username profilePicture')
-    .limit(limit)
-    .skip(skip)
-    .lean();
+  return postRepository.getUserBookmarkedPosts(userId, limit, skip);
 };
 
 export const getRelatedPostsService = async (postId, limit) => {
-  const post = await getPostService(postId);
+  const post = await postRepository.getPostById(postId);
   if (!post) {
     throw 'No Post Found with the Given ID';
   }
@@ -208,35 +94,23 @@ export const getRelatedPostsService = async (postId, limit) => {
 
   try {
     const uuid = QdrantRepository.mongoIdToUuid(postId.toString());
-    
-    // Check if the current post exists in Qdrant before recommending
-    const pointInfo = await qdrantClient.retrieve('interviews', {
-      ids: [uuid]
-    });
+    const pointInfo = await qdrantClient.retrieve('interviews', { ids: [uuid] });
 
     if (pointInfo && pointInfo.length > 0) {
-      // Use Qdrant recommend API
       const qdrantResponse = await qdrantClient.recommend('interviews', {
         positive: [uuid],
-        limit: limit + 1, // Add 1 because the post itself might be returned
+        limit: limit + 1,
         with_payload: true,
       });
 
-      // Map Qdrant response and filter out the current post
       const qdrantMatches = qdrantResponse
         .filter(match => match.payload && match.payload.mongoId !== post._id.toString())
         .slice(0, limit);
 
       if (qdrantMatches.length > 0) {
         const matchIds = qdrantMatches.map(match => match.payload.mongoId);
-        
-        // Fetch full post details from DB
-        const dbPosts = await postModel.find({ _id: { $in: matchIds } })
-          .select('_id title company userId isAnonymous')
-          .populate('userId', 'username profilePicture')
-          .lean();
+        const dbPosts = await postRepository.findPostsByIds(matchIds);
 
-        // Map them back to the sorted order from Qdrant and attach match percentage
         relatedPosts = qdrantMatches.map(match => {
           const dbPost = dbPosts.find(p => p._id.toString() === match.payload.mongoId);
           if (dbPost) {
@@ -258,19 +132,9 @@ export const getRelatedPostsService = async (postId, limit) => {
     console.error('[Qdrant Search] Failed to get similar experiences:', error);
   }
 
-  // Fallback if Qdrant didn't return enough results
   if (relatedPosts.length < limit) {
     const remainingLimit = limit - relatedPosts.length;
-    
-    // First try by company
-    const fallbackByCompany = await postModel.find({
-      company: post.company,
-      _id: { $nin: excludePostIds }
-    })
-    .select('_id title company userId isAnonymous')
-    .populate('userId', 'username profilePicture')
-    .limit(remainingLimit)
-    .lean();
+    const fallbackByCompany = await postRepository.findPostsByCompanyExcluding(post.company, excludePostIds, remainingLimit);
 
     fallbackByCompany.forEach(p => {
       relatedPosts.push({
@@ -278,22 +142,14 @@ export const getRelatedPostsService = async (postId, limit) => {
         title: p.title,
         company: p.company,
         userId: p.isAnonymous ? { ...p.userId, username: 'Anonymous User', profilePicture: '' } : p.userId,
-        matchPercentage: 75 // Fallback generic match percentage for same company
+        matchPercentage: 75
       });
       excludePostIds.push(p._id.toString());
     });
 
-    // If still not enough, try by role
     if (relatedPosts.length < limit) {
       const stillRemainingLimit = limit - relatedPosts.length;
-      const fallbackByRole = await postModel.find({
-        role: post.role,
-        _id: { $nin: excludePostIds }
-      })
-      .select('_id title company userId isAnonymous')
-      .populate('userId', 'username profilePicture')
-      .limit(stillRemainingLimit)
-      .lean();
+      const fallbackByRole = await postRepository.findPostsByRoleExcluding(post.role, excludePostIds, stillRemainingLimit);
 
       fallbackByRole.forEach(p => {
         relatedPosts.push({
@@ -301,7 +157,7 @@ export const getRelatedPostsService = async (postId, limit) => {
           title: p.title,
           company: p.company,
           userId: p.isAnonymous ? { ...p.userId, username: 'Anonymous User', profilePicture: '' } : p.userId,
-          matchPercentage: 65 // Fallback generic match percentage for same role
+          matchPercentage: 65
         });
         excludePostIds.push(p._id.toString());
       });
@@ -312,70 +168,35 @@ export const getRelatedPostsService = async (postId, limit) => {
 };
 
 export const getUserPostsService = (userId, limit, skip) => {
-  return postModel
-    .find({ userId })
-    .select({ comments: 0, tags: 0 })
-    .populate('userId', 'username profilePicture')
-    .limit(limit)
-    .skip(skip)
-    .lean();
+  return postRepository.getUserPosts(userId, limit, skip);
 };
 
 export const deletePostUsingAuthorId = (postId, userId) => {
-  return postModel.deleteOne({ _id: postId, userId: userId }); 
+  return postRepository.deletePostByAuthorId(postId, userId);
 };
 
 export const getPostService = (postId) => {
-  return postModel
-    .findByIdAndUpdate({ _id: postId }, { $inc: { views: 1 } }, { new: true })
-    .populate('userId', 'username profilePicture workExperiences createdAt');
+  return postRepository.incrementViewsAndGetPost(postId);
 };
 
 export const getPostCountByUserIdService = (userId) => {
-  return postModel.countDocuments({ userId });
+  return postRepository.countPostsByUserId(userId);
 };
 
-
-
-
-
-
-
-
-
-
-
 export const getPostCommentsService = (postId) => {
-  return postModel.findById(postId)
-    .select('comments isAnonymous userId')
-    .populate({
-      path: 'comments.userId',
-      select: 'username profilePicture role badge'
-    })
-    .populate({
-      path: 'comments.replies.userId',
-      select: 'username profilePicture role badge'
-    });
+  return postRepository.getPostWithComments(postId);
 };
 
 export const addCommentService = (postId, userId, content) => {
-  return postModel.findByIdAndUpdate(
-    postId,
-    { $push: { comments: { userId, content, upVotes: [], downVotes: [], replies: [] } } },
-    { new: true }
-  );
+  return postRepository.addComment(postId, userId, content);
 };
 
 export const addReplyService = (postId, commentId, userId, content) => {
-  return postModel.findOneAndUpdate(
-    { _id: postId, "comments._id": commentId },
-    { $push: { "comments.$.replies": { userId, content, upVotes: [], downVotes: [] } } },
-    { new: true }
-  );
+  return postRepository.addReply(postId, commentId, userId, content);
 };
 
 export const editCommentService = async (postId, commentId, userId, content) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
   const comment = post.comments.id(commentId);
   if (!comment) throw new Error("Comment not found");
@@ -387,7 +208,7 @@ export const editCommentService = async (postId, commentId, userId, content) => 
 };
 
 export const deleteCommentService = async (postId, commentId, userId, isAdmin = false) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
   const comment = post.comments.id(commentId);
   if (!comment) throw new Error("Comment not found");
@@ -397,7 +218,7 @@ export const deleteCommentService = async (postId, commentId, userId, isAdmin = 
 };
 
 export const editReplyService = async (postId, commentId, replyId, userId, content) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
   const comment = post.comments.id(commentId);
   if (!comment) throw new Error("Comment not found");
@@ -411,7 +232,7 @@ export const editReplyService = async (postId, commentId, replyId, userId, conte
 };
 
 export const deleteReplyService = async (postId, commentId, replyId, userId, isAdmin = false) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
   const comment = post.comments.id(commentId);
   if (!comment) throw new Error("Comment not found");
@@ -423,81 +244,65 @@ export const deleteReplyService = async (postId, commentId, replyId, userId, isA
 };
 
 export const toggleCommentUpvoteService = async (postId, commentId, userId) => {
-
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
-  
   const comment = post.comments.id(commentId);
   const upvoteIndex = comment.upVotes.indexOf(userId);
   const downvoteIndex = comment.downVotes.indexOf(userId);
-  
   if (upvoteIndex === -1) {
     comment.upVotes.push(userId);
     if (downvoteIndex !== -1) comment.downVotes.splice(downvoteIndex, 1);
   } else {
     comment.upVotes.splice(upvoteIndex, 1);
   }
-  
   return post.save();
 };
 
 export const toggleReplyUpvoteService = async (postId, commentId, replyId, userId) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
-  
   const comment = post.comments.id(commentId);
   const reply = comment.replies.id(replyId);
   if (!reply) throw new Error("Reply not found");
-  
   const upvoteIndex = reply.upVotes.indexOf(userId);
   const downvoteIndex = reply.downVotes.indexOf(userId);
-
   if (upvoteIndex === -1) {
     reply.upVotes.push(userId);
     if (downvoteIndex !== -1) reply.downVotes.splice(downvoteIndex, 1);
   } else {
     reply.upVotes.splice(upvoteIndex, 1);
   }
-  
   return post.save();
 };
 
 export const toggleCommentDownvoteService = async (postId, commentId, userId) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
-  
   const comment = post.comments.id(commentId);
   const downvoteIndex = comment.downVotes.indexOf(userId);
   const upvoteIndex = comment.upVotes.indexOf(userId);
-  
   if (downvoteIndex === -1) {
     comment.downVotes.push(userId);
     if (upvoteIndex !== -1) comment.upVotes.splice(upvoteIndex, 1);
   } else {
     comment.downVotes.splice(downvoteIndex, 1);
   }
-  
   return post.save();
 };
 
 export const toggleReplyDownvoteService = async (postId, commentId, replyId, userId) => {
-  const post = await postModel.findOne({ _id: postId, "comments._id": commentId });
+  const post = await postRepository.findPostWithSpecificComment(postId, commentId);
   if (!post) throw new Error("Post or comment not found");
-  
   const comment = post.comments.id(commentId);
   const reply = comment.replies.id(replyId);
   if (!reply) throw new Error("Reply not found");
-  
   const downvoteIndex = reply.downVotes.indexOf(userId);
   const upvoteIndex = reply.upVotes.indexOf(userId);
-  
   if (downvoteIndex === -1) {
     reply.downVotes.push(userId);
     if (upvoteIndex !== -1) reply.upVotes.splice(upvoteIndex, 1);
   } else {
     reply.downVotes.splice(downvoteIndex, 1);
   }
-  
   return post.save();
 };
-
