@@ -1,10 +1,55 @@
-# Winston / Pino log files
+# Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
-# Ignore node_modules if not already ignored by inner gitignores
+# Dependencies
 node_modules/
+jspm_packages/
+web_modules/
+/.pnp
+.pnp.*
 
-# Environment files
+# OS Files
+.DS_Store
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# Build & Production
+build/
+dist/
+out/
+.next/
+.nuxt/
+.vuepress/dist
+
+# Environment variables
 .env
-.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Caches
+.npm
+.eslintcache
+.stylelintcache
+.cache
+.parcel-cache
+.fusebox/
+.yarn/cache
+
+# Misc / Personal
+todo.txt
+*.pid
+*.seed
+*.pid.lock
+.node_repl_history
+.vscode-test
