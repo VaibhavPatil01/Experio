@@ -114,3 +114,10 @@ export const regenerateChat = async (req, res) => {
     res.end();
   }
 };
+
+/**
+ * Handles explicit abort requests from the client.
+ */
+export const abortChatStream = (req, res) => {
+  return res.status(200).json({ message: 'Stream aborted via client connection' });
+};

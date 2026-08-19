@@ -1,60 +1,40 @@
 import express from 'express';
 import * as chatSessionController from '../controllers/chatSessionController.js';
+import * as chatStreamController from '../controllers/chatStreamController.js';
+import * as chatMessageController from '../controllers/chatMessageController.js';
 import isUserAuth from '../../../middlewares/isUserAuth.js';
 import { strictChatLimiter } from '../../../middlewares/rateLimiter.js';
 import { sanitizeInput, verifySessionOwnership } from '../../../middlewares/chatSecurity.js';
 
 const router = express.Router();
 
-import * as chatStreamController from '../controllers/chatStreamController.js';
-
-// Unauthenticated Guest Route (Must be before isUserAuth)
+// Guest / Unauthenticated Routes
 router.post('/guest/chat', strictChatLimiter, sanitizeInput, chatStreamController.streamGuestChatGeneration);
 
-// Apply auth middleware to all session routes
+// Global Authentication Middleware
 router.use(isUserAuth);
 
-// Sync guest session (Authenticated)
+// Session Management (Root Level)
+router.post('/', sanitizeInput, chatSessionController.createSession);
+router.get('/', chatSessionController.getRecentSessions);
+router.get('/search', chatSessionController.searchSessions);
 router.post('/guest/sync', sanitizeInput, chatSessionController.syncGuestSession);
 
-// Create session (Sanitize input)
-router.post('/', sanitizeInput, chatSessionController.createSession);
-
-// Get recent sessions
-router.get('/', chatSessionController.getRecentSessions);
-
-// Search sessions
-router.get('/search', chatSessionController.searchSessions);
-
-// Rename session (Ownership & Sanitization)
+// Individual Session Management
 router.put('/:sessionId/rename', verifySessionOwnership, sanitizeInput, chatSessionController.renameSession);
-
-// Pin / Unpin session
 router.put('/:sessionId/pin', verifySessionOwnership, chatSessionController.togglePinSession);
-
-// Soft delete session
 router.delete('/:sessionId', verifySessionOwnership, chatSessionController.softDeleteSession);
-
-// Restore session
 router.put('/:sessionId/restore', verifySessionOwnership, chatSessionController.restoreSession);
 
-// ==========================================
-// Stream & Generation Sub-Routes
-// ==========================================
-
-
+// Chat Streams & AI Generation
 router.post('/:sessionId/chat', verifySessionOwnership, strictChatLimiter, sanitizeInput, chatStreamController.streamChatGeneration);
 router.post('/:sessionId/messages/:messageId/regenerate', verifySessionOwnership, strictChatLimiter, chatStreamController.regenerateChat);
-router.post('/:sessionId/stop', verifySessionOwnership, (req, res) => res.status(200).json({ message: 'Stream aborted via client connection' }));
+router.post('/:sessionId/stop', verifySessionOwnership, chatStreamController.abortChatStream);
 
-// ==========================================
-// Message Sub-Routes
-// ==========================================
-import * as chatMessageController from '../controllers/chatMessageController.js';
-
+// Message CRUD & Feedback
+router.get('/:sessionId/messages', verifySessionOwnership, chatMessageController.getSessionMessages);
 router.post('/:sessionId/messages/user', verifySessionOwnership, sanitizeInput, chatMessageController.saveUserMessage);
 router.post('/:sessionId/messages/assistant', verifySessionOwnership, chatMessageController.saveAssistantMessage);
-router.get('/:sessionId/messages', verifySessionOwnership, chatMessageController.getSessionMessages);
 router.delete('/:sessionId/messages/:messageId', verifySessionOwnership, chatMessageController.deleteMessage);
 router.post('/:sessionId/messages/:messageId/feedback', verifySessionOwnership, chatMessageController.submitFeedback);
 
