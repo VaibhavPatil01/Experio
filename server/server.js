@@ -29,10 +29,10 @@ import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
 // Connect to MongoDB
 await connectDB();
 
-// --------------------- Express App ---------------------
+// Express App
 const app = express();
 
-// --------------------- Middlewares ---------------------
+// Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
