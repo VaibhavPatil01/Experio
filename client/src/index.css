@@ -1,17 +1,23 @@
+/* Font and Tailwind Imports */
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 
+/* Swiper CSS Imports */
 @import 'swiper/css';
 @import 'swiper/css/navigation';
 @import 'swiper/css/pagination';
 
+/* Dark Mode Config */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Global Styles */
 * {
   font-family: "Outfit", sans-serif; 
 }
 
+/* Custom Theme Variables */
 @theme { 
-  --color-primary: #002E7D;  /* Dark Blue */
+  --color-primary: #002E7D;
   --color-banner-start: #60a5fa;
   --color-banner-end: #eff6ff;
   --color-hero-grad-start: #001233;
@@ -20,34 +26,21 @@
   --box-shadow: 0 12px 24px 2px rgb(129 146 179 / 8%);
 }
 
+/* Custom Utilities */
 @layer utilities {
-  .animate-scroll {
-    animation: scroll-x 30s linear infinite;
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 20px;
   }
 
-  .mask-linear {
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent,
-      white 10%,
-      white 90%,
-      transparent
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent,
-      white 10%,
-      white 90%,
-      transparent
-    );
-  }
-
-  @keyframes scroll-x {
-    to {
-      transform: translateX(calc(-50% - 0.5rem));
-    }
-  }
-
+  /* Animations */
   @keyframes slide-down-fade {
     from {
       opacity: 0;
@@ -63,19 +56,10 @@
     animation: slide-down-fade 0.3s ease-out forwards;
   }
 
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #e2e8f0;
-    border-radius: 20px;
-  }
+
 }
 
-/* React DatePicker Custom Premium Theme */
+/* React DatePicker Custom Theme */
 .react-datepicker-wrapper {
   width: 100%;
 }
