@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
-import notificationIcon from '../assets/images/icons/notification-13-svgrepo-com.svg';
-import emptyBellGif from '../assets/images/icons/icons8-bell.gif';
 import Logo from './Logo.jsx';
 import LogoutButton from './LogoutButton.jsx';
 import { useAppDispatch, useAppSelector } from '../redux/store.js';
@@ -201,7 +199,7 @@ const Navbar = () => {
             onClick={() => setIsNotificationOpen(!isNotificationOpen)}
             className="peer cursor-pointer inline-flex h-10 w-10 relative items-center justify-center rounded-full border border-gray-200 bg-white transition-transform duration-300 hover:scale-105 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
           >
-            <img src={notificationIcon} alt="Notifications" className="h-[22px] w-[22px] opacity-70 dark:invert pointer-events-none" />
+            <img src={assets.notificationIcon} alt="Notifications" className="h-[22px] w-[22px] opacity-70 dark:invert pointer-events-none" />
             {unreadCount > 0 && (
               <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                 {unreadCount > 99 ? '99+' : unreadCount}
@@ -286,7 +284,7 @@ const Navbar = () => {
                   </div>
                 ) : notifications.length === 0 && !isFetching ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                    <img src={emptyBellGif} alt="Empty Notifications" className="w-16 h-16 mb-3 opacity-80" />
+                    <img src={assets.bellIcon} alt="Empty Notifications" className="w-16 h-16 mb-3 opacity-80" />
                     <p className="font-medium text-gray-600 dark:text-gray-300">You’re all caught up!</p>
                   </div>
                 ) : (

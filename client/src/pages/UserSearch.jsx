@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { searchUser } from '../services/userServices.js';
 import { Helmet } from 'react-helmet';
 import { Users, ArrowUp, Search, Calendar } from 'lucide-react';
-import userListImage from '../assets/images/pages/user-list.png';
+import { assets } from '../assets/assets';
 
 function UserSearch() {
   const [search, setSearch] = useState('');
@@ -50,20 +50,20 @@ function UserSearch() {
           name="description"
           content="Search seniors and alumni and connect with them on Experio"
         />
-        <meta name="twitter:card" content={userListImage} />
+        <meta name="twitter:card" content={assets.userListPageImage} />
         <meta name="twitter:title" content="User List | Experio" />
         <meta
           name="twitter:description"
           content="Search seniors and alumni and connect with them on Experio"
         />
-        <meta name="twitter:image" content={userListImage} />
+        <meta name="twitter:image" content={assets.userListPageImage} />
 
         <meta property="og:title" content="User List | Experio" />
         <meta
           property="og:description"
           content="Search seniors and alumni and connect with them on Experio"
         />
-        <meta property="og:image" content={userListImage} />
+        <meta property="og:image" content={assets.userListPageImage} />
         <meta
           property="og:url"
           content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}/user/search`}

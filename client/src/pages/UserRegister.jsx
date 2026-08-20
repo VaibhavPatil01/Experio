@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
-import registrationPageImage from '../assets/images/pages/registration.png';
+import { assets } from '../assets/assets';
 import { branches } from '../assets/assets.js';
 import RegisterSuccessModal from '../components/RegisterSuccessModal';
 import SignInWithGoogle from '../components/SignInWithGoogle';
@@ -85,7 +85,7 @@ function UserRegister() {
           name="description"
           content="User Registration Page for Experio"
         />
-        <meta name="twitter:card" content={registrationPageImage} />
+        <meta name="twitter:card" content={assets.registrationPageImage} />
         <meta
           name="twitter:title"
           content="User registration | Experio"
@@ -94,7 +94,7 @@ function UserRegister() {
           name="twitter:description"
           content="User registration Page for Experio"
         />
-        <meta name="twitter:image" content={registrationPageImage} />
+        <meta name="twitter:image" content={assets.registrationPageImage} />
 
         <meta
           property="og:title"
@@ -104,7 +104,7 @@ function UserRegister() {
           property="og:description"
           content="User registration Page for Experio"
         />
-        <meta property="og:image" content={registrationPageImage} />
+        <meta property="og:image" content={assets.registrationPageImage} />
         <meta
           property="og:url"
           content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}/register`}

@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Phone, Mail, X, Camera, Loader2 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import penIcon from '../assets/images/icons/pen-svgrepo-com.svg';
-import starIcon from '../assets/images/icons/star-06-svgrepo-com.svg';
+import { assets } from '../assets/assets.js';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser, uploadProfilePicture } from '../services/userServices.js';
 
@@ -125,7 +124,7 @@ const ProfileLeftSide = ({ profileData, isEditable }) => {
         <div className="flex flex-col items-center text-center relative mb-6">
           {isEditable && (
             <button onClick={handleOpenBasicModal} className="absolute right-0 top-0 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-              <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+              <img src={assets.penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
             </button>
           )}
           <div 
@@ -190,7 +189,7 @@ const ProfileLeftSide = ({ profileData, isEditable }) => {
 
         <div className="border-t border-gray-100 pt-4">
           <p className="text-gray-500 text-[13px] flex items-center gap-1.5">
-            <img src={starIcon} alt="updated" className="w-[14px] h-[14px] opacity-60" />
+            <img src={assets.starIcon2} alt="updated" className="w-[14px] h-[14px] opacity-60" />
             Profile last updated on: {formatUpdatedAt(profileData?.updatedAt)}
           </p>
         </div>
@@ -203,7 +202,7 @@ const ProfileLeftSide = ({ profileData, isEditable }) => {
           <span className="text-[15px]">{profileData?.phone || '+91 7249412825'}</span>
           {isEditable && (
             <button onClick={() => setIsPhoneModalOpen(true)} className="ml-auto text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-              <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+              <img src={assets.penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
             </button>
           )}
         </div>

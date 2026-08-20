@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SquarePen, Calendar } from 'lucide-react';
-import defaultUserIcon from '../../../assets/images/icons/user-profile-icon-vector.jpg';
+import { assets } from '../../../assets/assets';
 
 const PostAuthorCard = ({ post }) => {
   const authorName = post?.postAuthor || 'Deleted User';
   const isAnonymous = authorName === 'Anonymous User';
-  const profilePicture = post?.postAuthorProfilePicture || (isAnonymous ? defaultUserIcon : `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`);
+  const profilePicture = post?.postAuthorProfilePicture || (isAnonymous ? assets.userProfileIcon : `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`);
   const authorId = post?.postAuthorId;
 
   const primaryExp = post?.authorWorkExperiences?.find(exp => exp.isCurrentlyWorking) || post?.authorWorkExperiences?.[0];

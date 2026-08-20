@@ -23,10 +23,10 @@ import {
 } from '../services/chatServices';
 import { useChatStream } from '../hooks/useChatStream';
 import ChatHistoryModal from '../components/ChatHistoryModal';
-import chatRobotIcon from '../assets/images/icons/chatroboticon.png';
+import { assets } from '../assets/assets';
 const AIAvatar = () => (
   <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
-    <img src={chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />
+    <img src={assets.chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />
   </div>
 );
 

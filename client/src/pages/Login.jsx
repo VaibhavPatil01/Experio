@@ -16,7 +16,6 @@ import {
 } from '../services/userServices.js';
 import { BASE_API_URL } from '../services/serverConfig.js';
 import { setLocalStorage } from '../utils/localStorage.js';
-import loginPageImage from '../assets/images/icons/updatedloginimage.png';
 
 function Login() {
   const queryClient = useQueryClient();
@@ -149,19 +148,19 @@ function Login() {
           name="description"
           content={`User ${formTitle} Page for Experio`}
         />
-        <meta name="twitter:card" content={loginPageImage} />
+        <meta name="twitter:card" content={assets.updatedLoginImage} />
         <meta name="twitter:title" content={`User ${formTitle} | Experio`} />
         <meta
           name="twitter:description"
           content={`User ${formTitle} Page for Experio`}
         />
-        <meta name="twitter:image" content={loginPageImage} />
+        <meta name="twitter:image" content={assets.updatedLoginImage} />
         <meta property="og:title" content={`User ${formTitle} | Experio`} />
         <meta
           property="og:description"
           content={`User ${formTitle} Page for Experio`}
         />
-        <meta property="og:image" content={loginPageImage} />
+        <meta property="og:image" content={assets.updatedLoginImage} />
         <meta
           property="og:url"
           content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}${
@@ -429,7 +428,7 @@ function Login() {
 
           <div className="hidden lg:block relative h-full w-full overflow-hidden">
             <img
-              src={loginPageImage}
+              src={assets.updatedLoginImage}
               alt="Login illustration"
               className="absolute bottom-0 right-0 max-h-full max-w-full object-contain"
             />

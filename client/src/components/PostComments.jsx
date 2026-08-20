@@ -8,7 +8,7 @@ import { useAppSelector } from '../redux/store.js';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserProfileStats } from '../services/userServices.js';
 import { getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote, editComment, deleteComment, editReply, deleteReply } from '../services/postServices.js';
-import defaultUserIcon from '../assets/images/icons/user-profile-icon-vector.jpg';
+import { assets } from '../assets/assets';
 
 const formatTimeAgo = (dateString) => {
   if (!dateString) return 'Just now';
@@ -461,7 +461,7 @@ const PostComments = ({ postId }) => {
     userId: c.userId?._id,
     author: c.userId?.username || 'Anonymous',
     role: c.userId?.role || 'User',
-    avatarUrl: c.userId?.username === 'Anonymous User' ? defaultUserIcon : (c.userId?.profilePicture || ''),
+    avatarUrl: c.userId?.username === 'Anonymous User' ? assets.userProfileIcon : (c.userId?.profilePicture || ''),
     badge: c.userId?.badge || '',
     time: formatTimeAgo(c.createdAt),
     content: c.content,
@@ -476,7 +476,7 @@ const PostComments = ({ postId }) => {
       userId: r.userId?._id,
       author: r.userId?.username || 'Anonymous',
       role: r.userId?.role || 'User',
-      avatarUrl: r.userId?.username === 'Anonymous User' ? defaultUserIcon : (r.userId?.profilePicture || ''),
+      avatarUrl: r.userId?.username === 'Anonymous User' ? assets.userProfileIcon : (r.userId?.profilePicture || ''),
       badge: r.userId?.badge || '',
       time: formatTimeAgo(r.createdAt),
       content: r.content,

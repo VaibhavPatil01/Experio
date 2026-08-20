@@ -5,7 +5,7 @@ import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2,
 import { useChatStream } from '../hooks/useChatStream';
 import { createSession, fetchSessionMessages, syncGuestSession } from '../services/chatServices';
 import ChatHistoryModal from './ChatHistoryModal';
-import robotIcon from '../assets/images/icons/chatroboticon.png';
+import { assets } from '../assets/assets';
 import { useAppSelector } from '../redux/store.js';
 import { toast } from 'react-hot-toast';
 
@@ -333,7 +333,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         {/* Floating Header Pill */}
         <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-sm px-4 py-1.5 flex items-center gap-3">
           <div className="relative">
-            <img src={robotIcon} alt="AI" className="w-7 h-7 object-cover rounded-full" />
+            <img src={assets.chatRobotIcon} alt="AI" className="w-7 h-7 object-cover rounded-full" />
             <div className="absolute top-0 right-0 w-2 h-2 bg-emerald-500 rounded-full border border-white"></div>
           </div>
           <div className="flex flex-col">
@@ -462,7 +462,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           ) : (
             <div key={msg.id} className="flex flex-col items-start mt-2">
               <div className="flex gap-3 w-full">
-                <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0" />
+                <img src={assets.chatRobotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0" />
                 <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%] markdown-body w-full">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {msg.content.replace(/\s*\[Source[^\]]*\]/gi, '')}
@@ -487,7 +487,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         {/* Streaming Active Message */}
         {(isGenerating || isCreatingSession) && (
           <div className="flex gap-3 mt-2">
-            <img src={robotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0" />
+            <img src={assets.chatRobotIcon} alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0" />
             <div className="text-[14px] text-gray-700 leading-relaxed max-w-[85%] markdown-body w-full">
               {streamText ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>

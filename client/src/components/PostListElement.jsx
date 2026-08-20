@@ -8,7 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleBookmark } from '../services/postServices.js';
 import { useAppSelector } from '../redux/store.js';
 import { toast } from 'react-hot-toast';
-import defaultUserIcon from '../assets/images/icons/user-profile-icon-vector.jpg';
+import { assets } from '../assets/assets';
 
 function PostListElement({ post, openModal, openDeleteModal }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -259,7 +259,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
           {post.userId?.profilePicture ? (
              <img src={post.userId.profilePicture} alt={authorName} className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
           ) : authorName === 'Anonymous User' ? (
-             <img src={defaultUserIcon} alt="Anonymous User" className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
+             <img src={assets.userProfileIcon} alt="Anonymous User" className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-base font-bold border border-indigo-100 shadow-sm">
               {authorInitial}

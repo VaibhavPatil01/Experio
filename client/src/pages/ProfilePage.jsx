@@ -7,7 +7,7 @@ import ProfileRightSide from '../components/ProfileRightSide';
 import { useAppSelector } from '../redux/store.js';
 import { getUserProfileStats } from '../services/userServices.js';
 import { Helmet } from 'react-helmet';
-import profilePageImage from '../assets/images/pages/profile-page.png';
+import { assets } from '../assets/assets';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -69,7 +69,7 @@ const ProfilePage = () => {
           name="description"
           content={`${profileData.username}'s Profile at Interview Experience. Check their posts and also view their bookmarked posts`}
         />
-        <meta name="twitter:card" content={profilePageImage} />
+        <meta name="twitter:card" content={assets.profilePageImage} />
         <meta
           name="twitter:title"
           content={`${profileData.username}'s Profile | Experio`}
@@ -78,7 +78,7 @@ const ProfilePage = () => {
           name="twitter:description"
           content={`${profileData.username}'s Profile at Interview Experience. Check their posts and also view their bookmarked posts`}
         />
-        <meta name="twitter:image" content={profilePageImage} />
+        <meta name="twitter:image" content={assets.profilePageImage} />
 
         <meta
           property="og:title"
@@ -88,7 +88,7 @@ const ProfilePage = () => {
           property="og:description"
           content={`${profileData.username}'s Profile at Interview Experience. Check their posts and also view their bookmarked posts`}
         />
-        <meta property="og:image" content={profilePageImage} />
+        <meta property="og:image" content={assets.profilePageImage} />
         <meta
           property="og:url"
           content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}/profile/${id}`}

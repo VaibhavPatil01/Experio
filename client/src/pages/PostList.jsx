@@ -14,7 +14,7 @@ import { useAppSelector } from '../redux/store.js';
 import DeletePostModal from '../components/DeletePostModal.jsx';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { Helmet } from 'react-helmet';
-import postListPageImage from '../assets/images/pages/post-list.png';
+import { assets } from '../assets/assets';
 
 function PostList() { 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -129,20 +129,20 @@ function PostList() {
           name="description"
           content="Search and filter posts about interview experience, discussion, doubts and many more on Experio"
         />
-        <meta name="twitter:card" content={postListPageImage} />
+        <meta name="twitter:card" content={assets.postListPageImage} />
         <meta name="twitter:title" content="Posts | Experio" />
         <meta
           name="twitter:description"
           content="Search and filter posts about interview experience, discussion, doubts and many more on Experio"
         />
-        <meta name="twitter:image" content={postListPageImage} />
+        <meta name="twitter:image" content={assets.postListPageImage} />
 
         <meta property="og:title" content="Posts | Experio" />
         <meta
           property="og:description"
           content="Search and filter posts about interview experience, discussion, doubts and many more on Experio"
         />
-        <meta property="og:image" content={postListPageImage} />
+        <meta property="og:image" content={assets.postListPageImage} />
         <meta
           property="og:url"
           content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}/posts`}

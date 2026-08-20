@@ -9,7 +9,7 @@ import { getPost } from '../services/postServices.js';
 import { useDeletePost } from '../hooks/useDeletePost.js';
 import generateTextFromHTML from '../utils/generateTextFromHTML.js';
 import generateSlug from '../utils/generateSlug.js';
-import postImage from '../assets/images/pages/home-page.png';
+import { assets } from '../assets/assets';
 
 // Components
 import Loading from './Loading.jsx';
@@ -94,19 +94,19 @@ function PostPage() {
           name="description"
           content={`${post.postType} titled "${post.title}" on Experio. ${generateTextFromHTML(post.content || '')}`}
         />
-        <meta name="twitter:card" content={postImage} />
+        <meta name="twitter:card" content={assets.homePageImage} />
         <meta name="twitter:title" content={`${post.title || post.company} | Experio`} />
         <meta
           name="twitter:description"
           content={`${post.postType} titled "${post.title}" on Experio. ${generateTextFromHTML(post.content || '')}`}
         />
-        <meta name="twitter:image" content={postImage} />
+        <meta name="twitter:image" content={assets.homePageImage} />
         <meta property="og:title" content={`${post.title || post.company} | Experio`} />
         <meta
           property="og:description"
           content={`${post.postType} titled "${post.title}" on Experio. ${generateTextFromHTML(post.content || '')}`}
         />
-        <meta property="og:image" content={postImage} />
+        <meta property="og:image" content={assets.homePageImage} />
         <meta
           property="og:url"
           content={`${import.meta.env.REACT_APP_BASE_CLIENT_URL}/post/${id}/${generateSlug(post.title || post.company || '')}`}

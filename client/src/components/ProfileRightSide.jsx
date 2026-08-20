@@ -3,7 +3,7 @@ import { MoreVertical, Sparkles, FileText, Trash2, Plus, X, Link2, ChevronDown, 
 import { useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser, uploadResumeFile } from '../services/userServices.js';
-import penIcon from '../assets/images/icons/pen-svgrepo-com.svg';
+import { assets } from '../assets/assets';
 import toast from 'react-hot-toast';
 
 const navItems = [
@@ -506,7 +506,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
           <h3 className="text-lg font-bold text-gray-900">Profile summary</h3>
           {isEditable && (
 <button onClick={() => setIsSummaryModalOpen(true)} className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+            <img src={assets.penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
 )}
         </div>
@@ -612,7 +612,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                   }}
                   className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
-                  <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+                  <img src={assets.penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
 )}
               </div>
@@ -636,7 +636,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
               }}
               className="text-gray-400 hover:text-gray-600 transition-colors p-1"
             >
-            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+            <img src={assets.penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
 )}
         </div>
@@ -698,7 +698,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                   }}
                   className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer mt-0.5"
                 >
-                  <img src={penIcon} alt="edit" className="w-[16px] h-[16px] opacity-60 hover:opacity-100 transition-opacity" />
+                  <img src={assets.penIcon} alt="edit" className="w-[16px] h-[16px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
 )}
               </div>
@@ -725,7 +725,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
             }}
             className="text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
           >
-            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+            <img src={assets.penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
 )}
         </div>
@@ -762,7 +762,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
             }}
             className="text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
           >
-            <img src={penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
+            <img src={assets.penIcon} alt="edit" className="w-[22px] h-[22px] opacity-60 hover:opacity-100 transition-opacity" />
           </button>
 )}
         </div>
@@ -833,7 +833,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                   }}
                   className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
-                  <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
+                  <img src={assets.penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
 )}
               </div>
@@ -873,7 +873,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                   }}
                   className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
-                  <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
+                  <img src={assets.penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
 )}
               </div>
@@ -925,7 +925,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                   }}
                   className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
-                  <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+                  <img src={assets.penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
 )}
               </div>
@@ -967,7 +967,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
               >
-                <img src={penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
+                <img src={assets.penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
               </button>
 )}
             </div>
@@ -1005,7 +1005,7 @@ const ProfileRightSide = ({ profileData, isEditable }) => {
                   }}
                   className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
-                  <img src={penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
+                  <img src={assets.penIcon} alt="edit" className="w-[20px] h-[20px] opacity-60 hover:opacity-100 transition-opacity" />
                 </button>
 )}
               </div>

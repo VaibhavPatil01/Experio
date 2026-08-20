@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { createPost, editPost, getPost, getCompanyAndRoleList } from '../services/postServices.js';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import postFormImage from '../assets/images/pages/post-form.png';
+import { assets } from '../assets/assets';
 import { ChevronDown, ChevronUp, X, Plus, Trash2, CheckCircle2, MessageSquare, BookOpen, PenTool, ShieldAlert, Eye, Clock, GripVertical, Star } from 'lucide-react';
 import { useAppSelector } from '../redux/store.js';
 import DatePicker from 'react-datepicker';
