@@ -3,7 +3,7 @@ import Loading from './pages/Loading';
 import Error from './pages/Error';
 import useUserStatus from './hooks/useUserStatus';
 import useThemeInit from './hooks/useThemeInit';
-import ScrollToTop from './components/ScrollToTop';
+import ScrollToTop from './components/common/ScrollToTop';
 import AppRoutes from './routes/AppRoutes';
 
 const App = () => {

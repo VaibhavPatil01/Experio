@@ -6,7 +6,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
-import Logo from '../components/Logo';
+import Logo from '../components/common/Logo';
 import { assets } from '../assets/assets.js';
 import {
   loginUser,

@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet';
-import Hero from '../components/Hero';
-import GithubSection from '../components/GithubSection';
-import Footer from '../components/Footer';
-import OurTeam from '../components/OurTeam';
+import Hero from '../components/home/Hero';
+import GithubSection from '../components/home/GithubSection';
+import Footer from '../components/common/Footer';
+import OurTeam from '../components/home/OurTeam';
 import { assets } from '../assets/assets';
-import { Testimonials } from '../components/Testimonials';
-import { CallToAction } from '../components/CallToAction';
+import { Testimonials } from '../components/home/Testimonials';
+import { CallToAction } from '../components/home/CallToAction';
 
 const Home = () => {
   return (
