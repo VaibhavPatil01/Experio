@@ -1,5 +1,5 @@
-import arrowPhotoroom from './images/icons/arrow-photoroom.png';
-import arrowPhotoroomSvg from './images/icons/arrow-photoroom.svg';
+import arrowPhotoroom from './images/icons/arrow-Photoroom.png';
+import arrowPhotoroomSvg from './images/icons/arrow-Photoroom.svg';
 import arrowIcon from './images/icons/arrow-icon.svg';
 import audioWaveIcon from './images/icons/audio-wave.svg';
 import chatbotIcon from './images/icons/chatbot-icon.png';
