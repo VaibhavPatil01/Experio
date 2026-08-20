@@ -11,7 +11,6 @@ import facebook_icon from './images/icons/facebook_logo.svg';
 import mail_icon from './images/icons/gmail_logo.svg';
 import arrow_icon from './images/icons/arrow_icon.svg';
 import loginpagegreenlogo from './images/icons/loginpagegreenlogo.png';
-
 import lock_icon from './images/icons/lock_icon.svg';
 import cross_icon from './images/icons/cross_icon.svg';
 import email_icon from './images/icons/email_icon.svg';
