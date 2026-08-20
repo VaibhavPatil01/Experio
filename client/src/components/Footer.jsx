@@ -10,7 +10,7 @@ const Footer = () => {
       `}</style>
       <div style={{ fontFamily: '"Geist", sans-serif' }} className="w-full relative">
         <div className="w-full max-w-7xl mx-auto flex justify-center px-4 sm:px-8 md:px-16 lg:px-28 relative z-10 pointer-events-none">
-          <img src={assets.standingfooter} alt="standing footer" className="h-64 sm:h-80 md:h-96 lg:h-[28rem] object-contain object-bottom pointer-events-auto" />
+          <img src={assets.standingFooter} alt="standing footer" className="h-64 sm:h-80 md:h-96 lg:h-[28rem] object-contain object-bottom pointer-events-auto" />
         </div>
 
         <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent relative z-10"></div>

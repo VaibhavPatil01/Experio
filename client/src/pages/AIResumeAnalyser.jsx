@@ -8,9 +8,9 @@ import {
   BarChart, ArrowRight, Loader2, BookOpen, ShieldCheck, Lock, Target, FileEdit, Building2, BarChart3, TrendingUp, Zap, FileSearch, History, RefreshCw, Eye, User, Trash2
 } from 'lucide-react';
 
-import axios from 'axios';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchResumeHistory, analyzeResume, reanalyzeResume, deleteResumeHistoryItem } from '../services/aiServices';
 import { toast } from 'react-hot-toast';
-import getAuthToken from '../utils/getAuthToken';
 import LoginRequiredModal from '../components/LoginRequiredModal.jsx';
 import { useAppSelector } from '../redux/store.js';
 
@@ -24,35 +24,17 @@ const AIResumeAnalyser = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   
-  const [history, setHistory] = useState([]);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
-
   const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
+  const queryClient = useQueryClient();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState('');
 
-  // Fetch history on mount
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
-    try {
-      setIsLoadingHistory(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/resume-analyzer/history`,
-        { 
-          headers: { token: getAuthToken() },
-          withCredentials: true 
-        }
-      );
-      setHistory(response.data.data);
-    } catch (error) {
-      console.error('Error fetching history:', error);
-    } finally {
-      setIsLoadingHistory(false);
-    }
-  };
+  const { data: historyRes, isLoading: isLoadingHistory } = useQuery({
+    queryKey: ['resume-history'],
+    queryFn: fetchResumeHistory,
+    enabled: !!isLoggedIn
+  });
+  const history = historyRes?.data || [];
 
   const handleReopen = (historyItem) => {
     setResult(historyItem);

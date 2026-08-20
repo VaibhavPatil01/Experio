@@ -22,6 +22,7 @@ import {
   syncGuestSession
 } from '../services/chatServices';
 import { useChatStream } from '../hooks/useChatStream';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ChatHistoryModal from '../components/ChatHistoryModal';
 import { assets } from '../assets/assets';
 const AIAvatar = () => (
@@ -57,6 +58,8 @@ const Assistant = () => {
   // Hooks
   const { isGenerating, streamText, streamError, startStream, stopStream } = useChatStream();
   const messagesEndRef = useRef(null);
+
+  const queryClient = useQueryClient();
 
   // Handle Authentication State Changes
   useEffect(() => {

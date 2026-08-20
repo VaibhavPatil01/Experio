@@ -1,14 +1,11 @@
-import axios from 'axios';
+import apiClient from './apiClient.js';
 import getAuthToken from '../utils/getAuthToken.js';
 import getTagsFromString from '../utils/getTagsFromString.js';
 import { BASE_API_URL } from './serverConfig.js';
 
 export function getPost(id) {
   const url = `${BASE_API_URL}/posts/${id}`;
-  const options = {
-    headers: { token: getAuthToken() }
-  };
-  return axios.get(url, options).then((res) => res.data.post);
+  return apiClient.get(url).then((res) => res.data.post);
 }
 
 export function getMostViewedPosts(limit) {
@@ -19,7 +16,7 @@ export function getMostViewedPosts(limit) {
   url.searchParams.set('limit', limit.toString());
   url.searchParams.set('sortBy', 'views');
 
-  return axios.get(url.href, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.get(url.href).then((res) => res.data);
 }
 
 export function getPostsPaginated(page, limit, filter, signal) {
@@ -56,13 +53,7 @@ export function getPostsPaginated(page, limit, filter, signal) {
     url.searchParams.set('datePosted', filter.datePosted);
   }
 
-  const options = {
-    headers: { token: getAuthToken() },
-    signal
-  };
-
-  return axios
-    .get(url.href, options)
+  return apiClient.get(url.href, { signal })
     .then((res) => res.data)
     .then((data) => {
       const postQueryData = structuredClone(data);
@@ -78,8 +69,7 @@ export function createPost(postData, status) {
   const tags = postData.tags ? getTagsFromString(postData.tags) : [];
   const body = { ...postData, tags, status };
 
-  return axios
-    .post(url, body, { headers: { token: getAuthToken() } })
+  return apiClient.post(url, body)
     .then((response) => response.data);
 }
 
@@ -88,8 +78,7 @@ export function getBookmarkedPostsPaginated(userId, page, limit) {
   url.searchParams.set('page', page.toString());
   url.searchParams.set('limit', limit.toString());
 
-  return axios
-    .get(url.href, { headers: { token: getAuthToken() } })
+  return apiClient.get(url.href)
     .then((res) => res.data)
     .then((data) => {
       const postQueryData = structuredClone(data);
@@ -104,8 +93,7 @@ export function getRelatedPosts(postId, limit) {
   const url = new URL(`${BASE_API_URL}/posts/related/${postId}`);
   url.searchParams.set('limit', limit.toString());
 
-  return axios
-    .get(url.href, { headers: { token: getAuthToken() } })
+  return apiClient.get(url.href)
     .then((res) => res.data)
     .then((data) => data.relatedPosts);
 }
@@ -115,8 +103,7 @@ export function getRecommendedFeedPaginated(page, limit) {
   url.searchParams.set('limit', limit.toString());
   // The backend might not support page for vector search yet, but we pass limit
 
-  return axios
-    .get(url.href, { headers: { token: getAuthToken() } })
+  return apiClient.get(url.href)
     .then((res) => res.data)
     .then((data) => {
       // Mock page object since recommendation API doesn't paginate yet
@@ -132,8 +119,7 @@ export function getUserPostPaginated(userId, page, limit) {
   url.searchParams.set('page', page.toString());
   url.searchParams.set('limit', limit.toString());
 
-  return axios
-    .get(url.href, { headers: { token: getAuthToken() } })
+  return apiClient.get(url.href)
     .then((res) => res.data)
     .then((data) => {
       const postQueryData = structuredClone(data);
@@ -147,8 +133,7 @@ export function getUserPostPaginated(userId, page, limit) {
 export function deletePost(postId) {
   const url = `${BASE_API_URL}/posts/${postId}`;
 
-  return axios
-    .delete(url, { headers: { token: getAuthToken() } })
+  return apiClient.delete(url)
     .then((response) => response.data);
 }
 
@@ -157,27 +142,25 @@ export function toggleBookmark(postId, isBookmarked) {
 
   // Remove the bookmark if already bookmarked
   if (isBookmarked) {
-    return axios
-      .delete(url, { headers: { token: getAuthToken() } })
+    return apiClient.delete(url)
       .then((response) => response.data);
   }
 
   // If not bookmarked then bookmark the post
-  return axios
-    .post(url, {}, { headers: { token: getAuthToken() } })
+  return apiClient.post(url, {})
     .then((response) => response.data);
 }
 
 export function getCompanyAndRoleList() {
   const url = new URL(`${BASE_API_URL}/posts/data/company-roles`);
 
-  return axios.get(url.href).then((res) => res.data);
+  return apiClient.get(url.href).then((res) => res.data);
 }
 
 export function getTopCompanies() {
   const url = new URL(`${BASE_API_URL}/posts/data/top-companies`);
 
-  return axios.get(url.href).then((res) => res.data);
+  return apiClient.get(url.href).then((res) => res.data);
 }
 
 export function editPost(editedPostData, postId, status) {
@@ -190,79 +173,76 @@ export function editPost(editedPostData, postId, status) {
     postId
   };
 
-  return axios
-    .put(url, body, { headers: { token: getAuthToken() } })
+  return apiClient.put(url, body)
     .then((response) => response.data);
 }
 
 export function upVotePost(postId) {
   const url = `${BASE_API_URL}/posts/upvote/${postId}`;
 
-  return axios
-    .post(url, {}, { headers: { token: getAuthToken() } })
+  return apiClient.post(url, {})
     .then((response) => response.data);
 }
 
 export function downVotePost(postId) {
   const url = `${BASE_API_URL}/posts/downvote/${postId}`;
 
-  return axios
-    .post(url, {}, { headers: { token: getAuthToken() } })
+  return apiClient.post(url, {})
     .then((response) => response.data);
 }
 
 export function getPostComments(postId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments`;
-  return axios.get(url, { headers: { token: getAuthToken() } }).then((res) => res.data.comments);
+  return apiClient.get(url).then((res) => res.data.comments);
 }
 
 export function addComment(postId, content) {
   const url = `${BASE_API_URL}/posts/${postId}/comments`;
-  return axios.post(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.post(url, { content }).then((res) => res.data);
 }
 
 export function addReply(postId, commentId, content, parentReplyId = null) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies`;
   const body = parentReplyId ? { content, parentReplyId } : { content };
-  return axios.post(url, body, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.post(url, body).then((res) => res.data);
 }
 
 export function editComment(postId, commentId, content) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}`;
-  return axios.put(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.put(url, { content }).then((res) => res.data);
 }
 
 export function deleteComment(postId, commentId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}`;
-  return axios.delete(url, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.delete(url).then((res) => res.data);
 }
 
 export function editReply(postId, commentId, replyId, content) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`;
-  return axios.put(url, { content }, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.put(url, { content }).then((res) => res.data);
 }
 
 export function deleteReply(postId, commentId, replyId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`;
-  return axios.delete(url, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.delete(url).then((res) => res.data);
 }
 
 export function toggleCommentUpvote(postId, commentId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/upvote`;
-  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.post(url, {}).then((res) => res.data);
 }
 
 export function toggleReplyUpvote(postId, commentId, replyId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}/upvote`;
-  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.post(url, {}).then((res) => res.data);
 }
 
 export function toggleCommentDownvote(postId, commentId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/downvote`;
-  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.post(url, {}).then((res) => res.data);
 }
 
 export function toggleReplyDownvote(postId, commentId, replyId) {
   const url = `${BASE_API_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}/downvote`;
-  return axios.post(url, {}, { headers: { token: getAuthToken() } }).then((res) => res.data);
+  return apiClient.post(url, {}).then((res) => res.data);
 }

@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import getAuthToken from '../utils/getAuthToken';
 import { useAppSelector } from '../redux/store';
 import { BASE_API_URL } from '../services/serverConfig';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   fetchNotifications, 
   fetchUnreadCount, 
@@ -176,6 +177,15 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  const markReadMutation = useMutation({
+    mutationFn: ({ isGrouped, id, notifIds }) => {
+      if (isGrouped) {
+        return markNotificationRead('batch', notifIds);
+      } else {
+        return markNotificationRead(id);
+      }
+    }
+  });
   const markAsRead = async (notif) => {
     console.log('markAsRead triggered for:', notif);
     // Only proceed if it is actually unread in our local state to prevent loop/spam
@@ -213,13 +223,16 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  const markAllReadMutation = useMutation({
+    mutationFn: markAllNotificationsRead
+  });
   const markAllAsRead = async () => {
     if (unreadCount === 0) return;
     
     setNotifications((prev) => prev.map(n => ({ ...n, isRead: true })));
     setUnreadCount(0);
     try {
-      await markAllNotificationsRead();
+      markAllReadMutation.mutate();
     } catch (error) {
       console.error('Failed to mark all read:', error);
     }
