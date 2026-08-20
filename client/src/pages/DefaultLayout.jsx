@@ -1,17 +1,18 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import { Banner } from '../components/home/Banner';
+import FloatingChatButton from '../components/FloatingChatButton';
 
 const DefaultLayout = () => {
   const { pathname } = useLocation();
   const showHomeBanner = pathname === '/';
-  const hideHeader = pathname === '/login' || pathname === '/register';
 
   return (
     <>
       {showHomeBanner && <Banner />}
-      {!hideHeader && <Header />}
+      <Header />
       <Outlet />
+      <FloatingChatButton />
     </>
   );
 };
