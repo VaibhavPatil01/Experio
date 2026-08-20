@@ -1,8 +1,6 @@
 import { Helmet } from 'react-helmet';
 import Hero from '../components/Hero';
 import GithubSection from '../components/GithubSection';
-// import UserReviews from '../components/UserReviews';
-import TopPosts from '../components/TopPosts';
 import Footer from '../components/Footer';
 import OurTeam from '../components/OurTeam';
 import homePageImage from '../assets/images/pages/home-page.png';
@@ -36,10 +34,7 @@ const Home = () => {
         <meta property="og:type" content="website" />
       </Helmet>
       <Hero />
-      {/* <TopPosts /> */}
       <GithubSection />
-      {/* <OurTeam /> */}
-      {/* <UserReviews /> */}
 
         <Testimonials />
       <CallToAction />
