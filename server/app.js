@@ -15,7 +15,7 @@ import notificationRouter from './modules/posts/routes/notificationRoutes.js';
 import recommendationRouter from './modules/posts/routes/recommendationRoutes.js';
 import { globalErrorHandler } from './middlewares/globalErrorHandler.js';
 import chatSessionRoutes from './modules/chat/routes/chatSessionRoutes.js';
-import analyzerRoutes from './modules/resumeAnalyzer/routes/analyzerRoutes.js';
+import analyzerRoutes from './modules/resume/routes/analyzerRoutes.js';
 
 // Express App
 const app = express();
