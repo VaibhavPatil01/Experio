@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getLocalStorageData, setLocalStorage } from '../utils/localStorage.js';
-import Loading from './Loading';
+import { getLocalStorageData, setLocalStorage } from '../../utils/localStorage.js';
+import Loading from '../common/Loading';
 
 function GoogleTokenSetter() {
   const { token } = useParams();

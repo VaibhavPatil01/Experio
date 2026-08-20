@@ -6,8 +6,8 @@ import {
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import LoginRequiredModal from '../components/users/LoginRequiredModal.jsx';
-import { useAppSelector } from '../redux/store.js';
+import LoginRequiredModal from '../../components/users/LoginRequiredModal.jsx';
+import { useAppSelector } from '../../redux/store.js';
 import { toast } from 'react-hot-toast';
 
 // Import our new services and hooks
@@ -20,11 +20,11 @@ import {
   fetchSessionMessages,
   submitFeedback,
   syncGuestSession
-} from '../services/chatServices';
-import { useChatStream } from '../hooks/useChatStream';
+} from '../../services/chatServices';
+import { useChatStream } from '../../hooks/useChatStream';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import ChatHistoryModal from '../components/chat/ChatHistoryModal';
-import { assets } from '../assets/assets';
+import ChatHistoryModal from '../../components/chat/ChatHistoryModal';
+import { assets } from '../../assets/assets';
 const AIAvatar = () => (
   <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
     <img src={assets.chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />

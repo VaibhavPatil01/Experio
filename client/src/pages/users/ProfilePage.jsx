@@ -2,12 +2,12 @@ import { FaGithubSquare } from 'react-icons/fa';
 import { FaLinkedin } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import ProfileLeftSide from '../components/users/ProfileLeftSide';
-import ProfileRightSide from '../components/users/ProfileRightSide';
-import { useAppSelector } from '../redux/store.js';
-import { getUserProfileStats } from '../services/userServices.js';
+import ProfileLeftSide from '../../components/users/ProfileLeftSide';
+import ProfileRightSide from '../../components/users/ProfileRightSide';
+import { useAppSelector } from '../../redux/store.js';
+import { getUserProfileStats } from '../../services/userServices.js';
 import { Helmet } from 'react-helmet';
-import { assets } from '../assets/assets';
+import { assets } from '../../assets/assets';
 
 const ProfilePage = () => {
   const { id } = useParams();

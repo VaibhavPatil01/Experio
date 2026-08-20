@@ -6,16 +6,16 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
-import Logo from '../components/common/Logo';
-import { assets } from '../assets/assets.js';
+import Logo from '../../components/common/Logo';
+import { assets } from '../../assets/assets.js';
 import {
   loginUser,
   registerUser,
   resetUserPassword,
   sendForgotPasswordMail
-} from '../services/userServices.js';
-import { BASE_API_URL } from '../services/serverConfig.js';
-import { setLocalStorage } from '../utils/localStorage.js';
+} from '../../services/userServices.js';
+import { BASE_API_URL } from '../../services/serverConfig.js';
+import { setLocalStorage } from '../../utils/localStorage.js';
 
 function Login() {
   const queryClient = useQueryClient();

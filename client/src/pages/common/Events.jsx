@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import { assets } from '../assets/assets';
+import { assets } from '../../assets/assets';
 
 function Events() {
   return (

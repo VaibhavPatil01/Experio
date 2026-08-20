@@ -9,10 +9,10 @@ import {
 } from 'lucide-react';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchResumeHistory, analyzeResume, reanalyzeResume, deleteResumeHistoryItem } from '../services/aiServices';
+import { fetchResumeHistory, analyzeResume, reanalyzeResume, deleteResumeHistoryItem } from '../../services/aiServices';
 import { toast } from 'react-hot-toast';
-import LoginRequiredModal from '../components/users/LoginRequiredModal.jsx';
-import { useAppSelector } from '../redux/store.js';
+import LoginRequiredModal from '../../components/users/LoginRequiredModal.jsx';
+import { useAppSelector } from '../../redux/store.js';
 
 const AIResumeAnalyser = () => {
   const [file, setFile] = useState(null);

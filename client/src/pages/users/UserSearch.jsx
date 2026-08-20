@@ -1,10 +1,10 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { searchUser } from '../services/userServices.js';
+import { searchUser } from '../../services/userServices.js';
 import { Helmet } from 'react-helmet';
 import { Users, ArrowUp, Search, Calendar } from 'lucide-react';
-import { assets } from '../assets/assets';
+import { assets } from '../../assets/assets';
 
 function UserSearch() {
   const [search, setSearch] = useState('');

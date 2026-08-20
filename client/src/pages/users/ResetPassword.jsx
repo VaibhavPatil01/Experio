@@ -6,7 +6,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { BiEnvelope, BiLockAlt } from 'react-icons/bi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
-import { resetUserPassword } from '../services/userServices.js';
+import { resetUserPassword } from '../../services/userServices.js';
 
 function ResetPassword() {
   const { token } = useParams();

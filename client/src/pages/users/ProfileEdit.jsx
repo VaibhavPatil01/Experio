@@ -5,9 +5,9 @@ import { Formik } from 'formik';
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 
-import { updateUser } from '../services/userServices.js';
-import { useAppSelector } from '../redux/store.js';
-import { branches } from '../assets/assets.js';
+import { updateUser } from '../../services/userServices.js';
+import { useAppSelector } from '../../redux/store.js';
+import { branches } from '../../assets/assets.js';
 
 function ProfileEdit() {
   const navigate = useNavigate();

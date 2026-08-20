@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAppSelector } from '../redux/store.js';
+import { useAppSelector } from '../../redux/store.js';
 
 // The component is used to check if the user is logged in or not
 function AuthRouteLayout() {

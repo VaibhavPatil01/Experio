@@ -1,27 +1,27 @@
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Loading from '../pages/Loading';
-import NotFound from '../pages/NotFound';
-import DefaultLayout from '../pages/DefaultLayout';
-import GoogleTokenSetter from '../pages/GoogleTokenSetter';
-import GithubTokenSetter from '../pages/GithubTokenSetter';
-import AuthRouteLayout from '../pages/AuthRouteLayout';
+import Loading from '../pages/common/Loading';
+import NotFound from '../pages/common/NotFound';
+import DefaultLayout from '../pages/common/DefaultLayout';
+import GoogleTokenSetter from '../pages/users/GoogleTokenSetter';
+import GithubTokenSetter from '../pages/users/GithubTokenSetter';
+import AuthRouteLayout from '../pages/users/AuthRouteLayout';
 
 // Lazily importing pages
-const Home = lazy(() => import('../pages/Home'));
-const Login = lazy(() => import('../pages/Login'));
-const Events = lazy(() => import('../pages/Events'));
-const PostForm = lazy(() => import('../pages/PostForm'));
-const PostList = lazy(() => import('../pages/PostList'));
-const PostPage = lazy(() => import('../pages/PostPage'));
-const Settings = lazy(() => import('../pages/Settings'));
-const Assistant = lazy(() => import('../pages/Assistant'));
-const UserSearch = lazy(() => import('../pages/UserSearch'));
-const ProfileEdit = lazy(() => import('../pages/ProfileEdit'));
-const ProfilePage = lazy(() => import('../pages/ProfilePage'));
-const AIResumeMaker = lazy(() => import('../pages/AIResumeMaker'));
-const AIMockInterview = lazy(() => import('../pages/AIMockInterview'));
-const AIResumeAnalyser = lazy(() => import('../pages/AIResumeAnalyser'));
+const Home = lazy(() => import('../pages/home/Home'));
+const Login = lazy(() => import('../pages/users/Login'));
+const Events = lazy(() => import('../pages/common/Events'));
+const PostForm = lazy(() => import('../pages/posts/PostForm'));
+const PostList = lazy(() => import('../pages/posts/PostList'));
+const PostPage = lazy(() => import('../pages/posts/PostPage'));
+const Settings = lazy(() => import('../pages/users/Settings'));
+const Assistant = lazy(() => import('../pages/chat/Assistant'));
+const UserSearch = lazy(() => import('../pages/users/UserSearch'));
+const ProfileEdit = lazy(() => import('../pages/users/ProfileEdit'));
+const ProfilePage = lazy(() => import('../pages/users/ProfilePage'));
+const AIResumeMaker = lazy(() => import('../pages/resume/AIResumeMaker'));
+const AIMockInterview = lazy(() => import('../pages/resume/AIMockInterview'));
+const AIResumeAnalyser = lazy(() => import('../pages/resume/AIResumeAnalyser'));
 
 const AppRoutes = () => {
   return (

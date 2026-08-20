@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import Header from '../components/common/Header';
-import { Banner } from '../components/home/Banner';
-import FloatingChatButton from '../components/chat/FloatingChatButton';
+import Header from '../../components/common/Header';
+import { Banner } from '../../components/home/Banner';
+import FloatingChatButton from '../../components/chat/FloatingChatButton';
 
 const DefaultLayout = () => {
   const { pathname } = useLocation();

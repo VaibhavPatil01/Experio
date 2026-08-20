@@ -4,12 +4,12 @@ import { Formik, FieldArray } from 'formik';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { createPost, editPost, getPost, getCompanyAndRoleList } from '../services/postServices.js';
+import { createPost, editPost, getPost, getCompanyAndRoleList } from '../../services/postServices.js';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { assets } from '../assets/assets';
+import { assets } from '../../assets/assets';
 import { ChevronDown, ChevronUp, X, Plus, Trash2, CheckCircle2, MessageSquare, BookOpen, PenTool, ShieldAlert, Eye, Clock, GripVertical, Star } from 'lucide-react';
-import { useAppSelector } from '../redux/store.js';
+import { useAppSelector } from '../../redux/store.js';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 

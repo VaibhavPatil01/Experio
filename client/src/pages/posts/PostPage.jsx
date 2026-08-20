@@ -4,28 +4,28 @@ import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { ArrowLeft } from 'lucide-react';
 
-import { useAppSelector } from '../redux/store.js';
-import { getPost } from '../services/postServices.js';
-import { useDeletePost } from '../hooks/useDeletePost.js';
-import generateTextFromHTML from '../utils/generateTextFromHTML.js';
-import generateSlug from '../utils/generateSlug.js';
-import { assets } from '../assets/assets';
+import { useAppSelector } from '../../redux/store.js';
+import { getPost } from '../../services/postServices.js';
+import { useDeletePost } from '../../hooks/useDeletePost.js';
+import generateTextFromHTML from '../../utils/generateTextFromHTML.js';
+import generateSlug from '../../utils/generateSlug.js';
+import { assets } from '../../assets/assets';
 
 // Components
-import Loading from './Loading.jsx';
-import DeletePostModal from '../components/posts/DeletePostModal.jsx';
-import PostComments from '../components/posts/PostComments';
+import Loading from '../common/Loading.jsx';
+import DeletePostModal from '../../components/posts/DeletePostModal.jsx';
+import PostComments from '../../components/posts/PostComments';
 
 // New Redesign Components
-import PostHeader from '../components/posts/PostDetails/PostHeader';
-import PostTabs from '../components/posts/PostDetails/PostTabs';
-import PostContent from '../components/posts/PostDetails/PostContent';
-import PostVotingAndShare from '../components/posts/PostDetails/PostVotingAndShare';
-import PostAuthorCard from '../components/posts/PostDetails/Sidebar/PostAuthorCard';
-import ExperienceHighlightsCard from '../components/posts/PostDetails/Sidebar/ExperienceHighlightsCard';
-import SimilarExperiencesCard from '../components/posts/PostDetails/Sidebar/SimilarExperiencesCard';
-import PopularTagsCard from '../components/posts/PostDetails/Sidebar/PopularTagsCard';
-import PracticePromoCard from '../components/posts/PostDetails/Sidebar/PracticePromoCard';
+import PostHeader from '../../components/posts/PostDetails/PostHeader';
+import PostTabs from '../../components/posts/PostDetails/PostTabs';
+import PostContent from '../../components/posts/PostDetails/PostContent';
+import PostVotingAndShare from '../../components/posts/PostDetails/PostVotingAndShare';
+import PostAuthorCard from '../../components/posts/PostDetails/Sidebar/PostAuthorCard';
+import ExperienceHighlightsCard from '../../components/posts/PostDetails/Sidebar/ExperienceHighlightsCard';
+import SimilarExperiencesCard from '../../components/posts/PostDetails/Sidebar/SimilarExperiencesCard';
+import PopularTagsCard from '../../components/posts/PostDetails/Sidebar/PopularTagsCard';
+import PracticePromoCard from '../../components/posts/PostDetails/Sidebar/PracticePromoCard';
 
 function PostPage() {
   const { id } = useParams();

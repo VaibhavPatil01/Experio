@@ -5,11 +5,11 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
-import { assets } from '../assets/assets';
-import { branches } from '../assets/assets.js';
-import RegisterSuccessModal from '../components/users/RegisterSuccessModal';
-import SignInWithGoogle from '../components/users/SignInWithGoogle';
-import { registerUser } from '../services/userServices.js'; 
+import { assets } from '../../assets/assets';
+import { branches } from '../../assets/assets.js';
+import RegisterSuccessModal from '../../components/users/RegisterSuccessModal';
+import SignInWithGoogle from '../../components/users/SignInWithGoogle';
+import { registerUser } from '../../services/userServices.js'; 
 
 console.log('branches:', branches);
 

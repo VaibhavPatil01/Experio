@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Settings, KeyRound, Palette, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { useAppSelector } from '../redux/store.js';
+import { useAppSelector } from '../../redux/store.js';
 import { HexColorPicker } from "react-colorful";
-import { applyThemeColor } from '../utils/theme.js';
+import { applyThemeColor } from '../../utils/theme.js';
 
 function SettingsPage() {
   const user = useAppSelector((state) => state.userState.user);
