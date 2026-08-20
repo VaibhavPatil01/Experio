@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import arrowSvgContent from '../../../../assets/images/icons/arrow-photoroom.svg?raw';
+import arrowSvgContent from '../../../../assets/images/icons/arrow-Photoroom.svg?raw';
 
 const PracticePromoCard = () => {
   return (
