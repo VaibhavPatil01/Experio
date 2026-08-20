@@ -8,7 +8,6 @@ const sendForgotPasswordMail = async (email, token, username) => {
 
   const verificationURL = CLIENT_BASE_URL + '/' + 'reset-password/' + token;
   console.log("Verification URL:", verificationURL);
-  return;
   const senderEmail = process.env['MAIL_USER'];
   const emailSubject = 'Reset Password Link';
   const emailTemplate = 'forgot_password_email';
