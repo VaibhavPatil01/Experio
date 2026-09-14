@@ -22,28 +22,28 @@ const logger = winston.createLogger({
   format: logFormat,
   transports: [
     // 1. Critical Errors
-    new winston.transports.File({ 
-      filename: path.join(__dirname, '../../logs/error.log'), 
-      level: 'error' 
+    new winston.transports.File({
+      filename: path.join(__dirname, '../../logs/error.log'),
+      level: 'error'
     }),
     // 2. AI specific telemetry (Gemini, Memory, Vectors)
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: path.join(__dirname, '../../logs/ai.log'),
       format: winston.format.combine(categoryFilter('ai')(), logFormat)
     }),
     // 3. HTTP Request/Response tracking
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: path.join(__dirname, '../../logs/http.log'),
       format: winston.format.combine(categoryFilter('http')(), logFormat)
     }),
     // 4. Database interactions (Mongo/Qdrant queries)
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: path.join(__dirname, '../../logs/db.log'),
       format: winston.format.combine(categoryFilter('db')(), logFormat)
     }),
     // 5. Global chronological log of everything
-    new winston.transports.File({ 
-      filename: path.join(__dirname, '../../logs/combined.log') 
+    new winston.transports.File({
+      filename: path.join(__dirname, '../../logs/combined.log')
     })
   ]
 });
