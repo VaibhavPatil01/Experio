@@ -121,10 +121,10 @@ const mergeAnonymousToUser = async (visitorId, cookieId, userId) => {
   try {
     for (const resource of resources) {
       const userKey = `ai:quota:${resource}:user:${userId}:${dateStr}`;
-      
+
       for (const id of identifiers) {
         const anonKey = `ai:quota:${resource}:anonymous:${id}:${dateStr}`;
-        
+
         let mergedAmount = 0;
         if (mergeScriptSha) {
           mergedAmount = await redisConnection.evalsha(mergeScriptSha, 2, anonKey, userKey, expirySeconds);
