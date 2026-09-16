@@ -50,7 +50,7 @@ export const deleteMessage = asyncHandler(async (req, res) => {
 export const submitFeedback = asyncHandler(async (req, res) => {
   const { messageId } = req.params;
   const { feedback } = req.body;
-  
+
   if (!['like', 'dislike'].includes(feedback)) {
     return res.status(400).json({ message: 'Feedback must be like or dislike' });
   }
@@ -59,6 +59,6 @@ export const submitFeedback = asyncHandler(async (req, res) => {
   if (!message) {
     return res.status(404).json({ message: 'Message not found' });
   }
-  
+
   res.status(200).json(message);
 });
