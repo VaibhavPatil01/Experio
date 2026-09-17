@@ -30,10 +30,10 @@ export const streamChatGeneration = async (req, res) => {
         logger.warn('Client aborted SSE connection mid-stream', { sessionId });
         break;
       }
-      
+
       // Write the chunk to the stream
       res.write(`data: ${JSON.stringify(chunk)}\n\n`);
-      
+
       // If the pipeline throws an error internally, it yields a { type: 'error' } chunk
       if (chunk.type === 'error') {
         if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
@@ -95,7 +95,7 @@ export const streamGuestChatGeneration = async (req, res) => {
 export const regenerateChat = async (req, res) => {
   const { sessionId, messageId } = req.params;
   const userId = req.authTokenData.id;
-  
+
   // NOTE: A full regeneration implementation requires finding the message,
   // deleting everything after it, grabbing the *original* user prompt for that message,
   // and re-running the pipeline. For this scope, we simulate the SSE endpoint setup.
@@ -106,7 +106,7 @@ export const regenerateChat = async (req, res) => {
 
   try {
     // 1. In a complete app, you'd fetch the old prompt using messageId here.
-    const originalPrompt = "Regenerated prompt placeholder"; 
+    const originalPrompt = "Regenerated prompt placeholder";
 
     const generator = pipelineService.executePipeline(sessionId, userId, originalPrompt);
 
