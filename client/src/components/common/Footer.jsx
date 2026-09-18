@@ -23,9 +23,7 @@ const Footer = () => {
                 <Logo className="w-32 sm:w-40 h-auto text-primary" />
               </a>
               <p className="text-sm/6 text-neutral-600">
-                Experio is a student-led platform empowering peers with firsthand insights into interviews across diverse companies and roles. By contributing and engaging, users foster a culture of collaboration and growth.
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Labore modi beatae veritatis. Consequuntur id magni consectetur eaque obcaecati. Quisquam inventore id minima ratione nisi aliquam quam, quod deserunt. Sit labore, praesentium omnis nesciunt fugiat quasi reprehenderit quisquam veritatis nisi dignissimos facere qui ut enim provident nihil, magnam velit animi unde?
-              </p>
+                Experio is an AI-powered career preparation platform built to make placement preparation more focused, personalized, and practical. It brings together real interview experiences, intelligent resume feedback, personalized mock interviews, and AI-assisted guidance in one platform. By connecting students with insights from successful candidates and providing actionable preparation support, Experio helps turn scattered preparation into a structured and meaningful journey toward career opportunities.</p>
               <div className="flex gap-5 md:gap-6 order-1 md:order-2">
                 <a href="https://github.com/VaibhavPatil01/Experio" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-primary hover:-translate-y-1 hover:scale-110 transition-all duration-300 transform-gpu will-change-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,12 +37,12 @@ const Footer = () => {
                 </a>
                 <a href="mailto:vaibhavvpatil132@gmail.com" className="text-neutral-600 hover:text-primary hover:-translate-y-1 hover:scale-110 transition-all duration-300 transform-gpu will-change-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
                   </svg>
                 </a>
                 <a href="https://vaibhav-portfolio-navy.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-primary hover:-translate-y-1 hover:scale-110 transition-all duration-300 transform-gpu will-change-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                   </svg>
                 </a>
                 {/* <a href="https://github.com/VaibhavPatil01/Experio" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-700">
