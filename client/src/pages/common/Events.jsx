@@ -52,7 +52,7 @@ function Events() {
             {/* Long Description */}
             <div className="max-w-3xl mx-auto mt-8 text-left">
               <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Event Page is Under Construction
+                This Page is Under Construction
               </h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 text-sm md:text-base">
                 We're thrilled to let you know that something amazing is on the way! Our team is

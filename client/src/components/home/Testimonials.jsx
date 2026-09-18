@@ -136,7 +136,7 @@ export const Testimonials = () => {
         </div>
         <Title
           title="Don't just take our words"
-          description="This is the dummy description for the testimonials section. It will be replaced with actual testimonials later."
+          description="See how students are using Experio to confidently prepare for placements, ace their interviews, and land their dream jobs."
         />
       </div>
       <style>{`

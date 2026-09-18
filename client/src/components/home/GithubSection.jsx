@@ -217,7 +217,7 @@ const GithubSection = () => {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12 md:mt-16">
             <a
-              href="https://github.com/VaibhavPatil01/Interview-Experience-GSMCOE"
+              href="https://github.com/VaibhavPatil01/Experio"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"
@@ -227,7 +227,7 @@ const GithubSection = () => {
               <ArrowUpRight size={18} />
             </a>
             <a
-              href="https://github.com/VaibhavPatil01/Interview-Experience-GSMCOE"
+              href="https://github.com/VaibhavPatil01/Experio"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 border border-primary/20 hover:bg-primary/10 text-primary px-6 py-3 rounded-lg font-medium transition-colors bg-white w-full sm:w-auto justify-center"
