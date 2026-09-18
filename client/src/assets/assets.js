@@ -139,21 +139,20 @@ export const editorPlaceholder = `- Interview date - an approximate date is fine
 
 export const footer_data = [
   {
-    title: 'Products',
+    title: 'Features',
     links: [
-      { name: 'Components', path: '/' },
-      { name: 'Templates', path: '/' },
-      { name: 'Icons', path: '/' }
+      { name: 'Interview Experiences', path: '/posts' },
+      { name: 'Resume Analyzer', path: '/resume' },
+      { name: 'AI Assistant', path: '/assistant' }
     ]
   },
   {
-    title: 'Resources',
+    title: 'Platform',
     links: [
-      { name: 'PrebuiltUI', path: '/' },
-      { name: 'Templates', path: '/' },
-      { name: 'Components', path: '/' },
-      { name: 'Blogs', path: '/' },
-      { name: 'Store', path: '/' }
+      { name: 'Home', path: '/' },
+      { name: 'Share Experience', path: '/post' },
+      { name: 'Search Users', path: '/user/search' },
+      { name: 'Events', path: '/events' }
     ]
   }
 ];
