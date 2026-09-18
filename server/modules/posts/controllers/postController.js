@@ -608,27 +608,16 @@ export async function getAllPost(req, res) {
   // check and find all the filter parameters
   // if articleType is in query
   if (articleType) {
-    filters['$and'][1].postType = articleType;
+    filters['$and'][1].postType = { $in: articleType.split(',') };
   }
   if (jobRole) {
-    filters['$and'][1].role = jobRole;
+    filters['$and'][1].role = { $in: jobRole.split(',') };
   }
   if (company) {
-    filters['$and'][1].company = company;
+    filters['$and'][1].company = { $in: company.split(',') };
   }
   const convertedRating = parseInt(rating);
   if (convertedRating) filters['$and'][1].rating = convertedRating;
-
-  if (datePosted) {
-    const now = new Date();
-    if (datePosted === 'Past 24 hours') {
-      filters['$and'][1].createdAt = { $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) };
-    } else if (datePosted === 'Past week') {
-      filters['$and'][1].createdAt = { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) };
-    } else if (datePosted === 'Past month') {
-      filters['$and'][1].createdAt = { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) };
-    }
-  }
 
   try {
     const userId = req.body.userId;
