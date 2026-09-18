@@ -31,7 +31,7 @@ function PostList() {
     jobRole: searchParams.get('jobRole') || '',
     company: searchParams.get('company') || '',
     rating: searchParams.get('rating') || '',
-    datePosted: searchParams.get('datePosted') || 'Anytime'
+    matchScore: parseInt(searchParams.get('matchScore')) || 70
   };
 
   const companyAndRoleQuery = useQuery({
@@ -170,6 +170,7 @@ function PostList() {
                 filter={filter} 
                 setSearchParams={setSearchParams} 
                 companyAndRoleQuery={companyAndRoleQuery} 
+                activeTab={activeTab}
               />
             </div>
 
@@ -211,6 +212,13 @@ function PostList() {
               <div className="space-y-4">
                 {data?.pages
                   .flatMap((page) => page.data)
+                  .filter((post) => {
+                    if (activeTab === 'For You' && post.matchPercentage) {
+                      const score = parseInt(post.matchPercentage);
+                      return !isNaN(score) ? score >= filter.matchScore : true;
+                    }
+                    return true;
+                  })
                   .map((post) => (
                     <PostListElement
                       key={post._id}

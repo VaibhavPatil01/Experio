@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { Search, ChevronUp, ChevronDown } from 'lucide-react';
 import FilterModal from '../common/FilterModal';
 
-const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
+const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery, activeTab }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [isCompanyCollapsed, setIsCompanyCollapsed] = useState(false);
-  const [isRoleCollapsed, setIsRoleCollapsed] = useState(false);
-  const [matchScore, setMatchScore] = useState(70);
-  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
+  const [isRoleCollapsed, setIsRoleCollapsed] = useState(true);
   const [companySearchTerm, setCompanySearchTerm] = useState('');
   const [roleSearchTerm, setRoleSearchTerm] = useState('');
 
@@ -186,7 +184,7 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
       </div>
 
       {/* Experience Type */}
-      <div className="border-b border-gray-200 py-4">
+      <div className={`border-gray-200 py-4 ${activeTab === 'For You' ? 'border-b' : ''}`}>
         <h4 className="font-semibold text-gray-800 text-[13px] tracking-wider uppercase mb-3">Experience Type</h4>
         <div className="flex flex-wrap gap-2">
           {experienceTypes.map((type) => {
@@ -207,65 +205,27 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery }) => {
         </div>
       </div>
 
-      {/* Date Posted */}
-      <div className="border-b border-gray-200 py-4">
-        <h4 className="font-semibold text-gray-800 text-[13px] tracking-wider uppercase mb-3">Date Posted</h4>
-        <div className="relative">
-          <button
-            onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
-            className={`w-full flex items-center justify-between outline-none text-sm text-gray-600 bg-white rounded-lg py-2 px-3 transition cursor-pointer border ${isDateDropdownOpen ? 'border-primary/50 ring-1 ring-primary/50' : 'border-gray-200 hover:border-gray-300'}`}
-          >
-            <span>{filter.datePosted || 'Anytime'}</span>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDateDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {isDateDropdownOpen && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setIsDateDropdownOpen(false)}></div>
-              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-100 rounded-lg shadow-lg z-50 overflow-hidden py-1">
-                {['Anytime', 'Past 24 hours', 'Past week', 'Past month'].map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => {
-                      updateFilter('datePosted', option);
-                      setIsDateDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-sm transition-colors cursor-pointer ${(filter.datePosted || 'Anytime') === option ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'}`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
       {/* Match Score */}
-      <div className="border-b border-gray-200 py-4 mb-6">
-        <div className="flex justify-between items-end mb-2">
-          <h4 className="font-medium text-gray-800">Match Score</h4>
-          <span className="text-xs text-gray-500 font-medium">{matchScore}% - 100%</span>
+      {activeTab === 'For You' && (
+        <div className="py-4 mb-6">
+          <div className="flex justify-between items-end mb-2">
+            <h4 className="font-medium text-gray-800">Match Score</h4>
+            <span className="text-xs text-gray-500 font-medium">{filter.matchScore}% - 100%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={filter.matchScore}
+            onChange={(e) => updateFilter('matchScore', e.target.value)}
+            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+          />
+          <div className="flex justify-between mt-2 text-xs text-gray-400">
+            <span>0%</span>
+            <span>100%</span>
+          </div>
         </div>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={matchScore}
-          onChange={(e) => setMatchScore(e.target.value)}
-          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-        />
-        <div className="flex justify-between mt-2 text-xs text-gray-400">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
-      </div>
-
-      {/* Apply Filters */}
-      <button className="w-full bg-primary hover:bg-primary/90 text-white rounded-lg py-2.5 font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-        Apply Filters
-      </button>
+      )}
 
     {/* Filter Modals */}
       {activeModal === 'company' && (
