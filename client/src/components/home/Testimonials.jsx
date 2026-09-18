@@ -64,36 +64,43 @@ import { Zap } from 'lucide-react';
 import React from 'react';
 import Title from '../common/Title';
 
+import imgDekisuki from '../../assets/images/testimonials/dekisuki.png';
+import imgJiyan from '../../assets/images/testimonials/jiyan.png';
+import imgNobita from '../../assets/images/testimonials/nobita.png';
+import imgShizuka from '../../assets/images/testimonials/shizuka.png';
+
 export const Testimonials = () => {
   const cardsData = [
     {
-      image: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200',
-      name: 'Briar Martin',
-      handle: '@neilstellar'
+      image: imgNobita,
+      name: 'Nobita Nobi',
+      handle: '@nobita',
+      review: 'Experio made preparing for my campus placements an absolute breeze.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200',
-      name: 'Avery Johnson',
-      handle: '@averywrites'
+      image: imgShizuka,
+      name: 'Shizuka Minamoto',
+      handle: '@shizuka',
+      review: 'The AI resume analyzer caught tiny mistakes I never would have seen.'
     },
     {
-      image:
-        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&auto=format&fit=crop&q=60',
-      name: 'Jordan Lee',
-      handle: '@jordantalks'
+      image: imgJiyan,
+      name: 'Takeshi Goda',
+      handle: '@jiyan',
+      review: 'Mock interviews gave me the exact confidence I needed to get hired.'
     },
     {
-      image:
-        'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&auto=format&fit=crop&q=60',
-      name: 'Avery Johnson',
-      handle: '@averywrites'
+      image: imgDekisuki,
+      name: 'Hidetoshi Dekisuki',
+      handle: '@dekisuki',
+      review: 'Reading real interview experiences gave me perfectly clear insights.'
     }
   ];
 
   const CreateCard = ({ card }) => (
     <div className="p-4 rounded-lg mx-4 shadow hover:shadow-lg transition-all duration-200 w-72 shrink-0">
       <div className="flex gap-2">
-        <img className="size-11 rounded-full" src={card.image} alt="User Image" />
+        <img className="size-11 rounded-full object-cover" src={card.image} alt="User Image" />
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <p>{card.name}</p>
@@ -115,7 +122,7 @@ export const Testimonials = () => {
         </div>
       </div>
       <p className="text-sm py-4 text-gray-800">
-        Radiant made undercutting all of our competitors an absolute breeze.
+        {card.review}
       </p>
     </div>
   );
