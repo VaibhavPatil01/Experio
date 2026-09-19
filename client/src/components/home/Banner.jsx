@@ -14,9 +14,8 @@ export const Banner = () => {
 
   return (
     <div
-      className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-1000 ease-in-out ${
-        isVisible ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-      }`}
+      className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-1000 ease-in-out ${isVisible ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+        }`}
     >
       <div className="min-h-0 overflow-hidden">
         <div className="relative w-full px-12 py-2 font-medium text-sm text-primary text-center bg-gradient-to-r from-[var(--color-banner-start)] to-[var(--color-banner-end)]">
