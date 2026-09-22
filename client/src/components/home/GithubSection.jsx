@@ -114,7 +114,7 @@ const GithubSection = () => {
                 <div className="absolute -top-6 -left-1 md:-left-5 bg-primary text-white p-3 rounded-[14px] shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transform -rotate-[10deg] hover:rotate-0 transition-transform duration-300 z-20">
                   <CodeXml size={26} strokeWidth={2.5} />
                 </div>
-                
+
                 {/* Floating GitHub Icon (Bottom Right) */}
                 <div className="absolute -bottom-6 -right-1 md:-right-5 bg-primary text-white p-3.5 rounded-[16px] shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transform rotate-[10deg] hover:rotate-0 transition-transform duration-300 z-20">
                   <FaGithub size={36} />
@@ -175,7 +175,7 @@ const GithubSection = () => {
                     <h4 className="font-bold text-gray-800 text-[12px] md:text-[13px]">Repository Stats</h4>
                     <FaGithub className="text-gray-800 text-base" />
                   </div>
-                  
+
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
@@ -184,7 +184,7 @@ const GithubSection = () => {
                       </div>
                       <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">23k</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
                         <GitBranch className="w-3 h-3 text-primary" />
@@ -192,7 +192,7 @@ const GithubSection = () => {
                       </div>
                       <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">420</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
                         <Eye className="w-3 h-3 text-primary" />
@@ -200,7 +200,7 @@ const GithubSection = () => {
                       </div>
                       <span className="font-bold text-gray-800 text-[11px] md:text-[12px]">66</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-gray-600">
                         <Users className="w-3 h-3 text-primary" />
