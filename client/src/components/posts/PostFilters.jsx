@@ -91,14 +91,14 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery, activeTab }
 
       {/* Company */}
       <div className="border-b border-gray-200 py-4">
-        <div 
+        <div
           className="flex justify-between items-center cursor-pointer"
           onClick={() => setIsCompanyCollapsed(!isCompanyCollapsed)}
         >
           <h4 className="font-semibold text-gray-800 text-[13px] tracking-wider uppercase">Company</h4>
           <ChevronUp className={`w-4 h-4 text-gray-500 transition-transform ${isCompanyCollapsed ? 'rotate-180' : ''}`} />
         </div>
-        
+
         {!isCompanyCollapsed && (
           <div className="pt-4">
             <div className="relative mb-4">
@@ -138,14 +138,14 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery, activeTab }
 
       {/* Role */}
       <div className="border-b border-gray-200 py-4">
-        <div 
+        <div
           className="flex justify-between items-center cursor-pointer"
           onClick={() => setIsRoleCollapsed(!isRoleCollapsed)}
         >
           <h4 className="font-semibold text-gray-800 text-[13px] tracking-wider uppercase">Role</h4>
           <ChevronUp className={`w-4 h-4 text-gray-500 transition-transform ${isRoleCollapsed ? 'rotate-180' : ''}`} />
         </div>
-        
+
         {!isRoleCollapsed && (
           <div className="pt-4">
             <div className="relative mb-4">
@@ -194,8 +194,8 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery, activeTab }
                 key={type}
                 onClick={() => updateFilter('articleType', type === 'All' ? '' : type)}
                 className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${isSelected
-                    ? 'bg-primary text-white border-primary'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-primary/30 hover:bg-primary/5'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary/30 hover:bg-primary/5'
                   }`}
               >
                 {type}
@@ -227,9 +227,9 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery, activeTab }
         </div>
       )}
 
-    {/* Filter Modals */}
+      {/* Filter Modals */}
       {activeModal === 'company' && (
-        <FilterModal 
+        <FilterModal
           title="Company"
           options={companies}
           initialSelected={selectedCompanies}
@@ -242,7 +242,7 @@ const PostFilters = ({ filter, setSearchParams, companyAndRoleQuery, activeTab }
       )}
 
       {activeModal === 'role' && (
-        <FilterModal 
+        <FilterModal
           title="Role"
           options={roles}
           initialSelected={selectedRoles}
