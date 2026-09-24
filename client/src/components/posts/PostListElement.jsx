@@ -30,7 +30,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
   const role = post.role || 'Unknown Role';
   const displayHiringType = post.hiringType || 'On Campus';
   const interviewDate = post.interviewDate ? getFormattedDate(post.interviewDate) : getFormattedDate(post.createdAt);
-  
+
   const user = useAppSelector((state) => state.userState.user);
   const queryClient = useQueryClient();
 
@@ -63,7 +63,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
   // Real match score if available, otherwise null
   const matchScore = post.matchPercentage || null;
   const matchPercentageNum = matchScore ? parseInt(matchScore.split('%')[0], 10) : 0;
-  
+
   let matchColorClass = 'text-emerald-600 bg-emerald-50';
   if (matchScore) {
     if (matchPercentageNum >= 75) {
@@ -106,7 +106,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 px-5 pt-5 pb-3 mb-5 hover:border-gray-300 transition-colors duration-300">
-      
+
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-4">
@@ -117,10 +117,10 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             <div className="flex items-center gap-1.5">
               <h3 className="text-lg font-semibold text-gray-900">
                 <LoginRequiredLink
-                    textContent={companyName}
-                    to={`/post/${post._id}/${generateSlug(post.title || companyName)}`}
-                    className="hover:underline"
-                    openModal={openModal}
+                  textContent={companyName}
+                  to={`/post/${post._id}/${generateSlug(post.title || companyName)}`}
+                  className="hover:underline"
+                  openModal={openModal}
                 />
               </h3>
               <BadgeCheck className="w-4 h-4 text-emerald-500" fill="currentColor" stroke="white" />
@@ -128,7 +128,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             <p className="text-sm text-gray-500 mt-0.5">
               {role} • {displayHiringType} • {interviewDate}
             </p>
-            
+
             {/* Chips */}
             <div className="flex flex-wrap items-center gap-3 mt-2.5">
               <span className="inline-flex items-center text-[11px] font-medium px-2.5 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-100">
@@ -143,7 +143,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             </div>
           </div>
         </div>
-        
+
         {/* Top Right Actions */}
         <div className="flex items-center gap-3">
           {matchScore && (
@@ -151,7 +151,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
               {matchScore}
             </span>
           )}
-          <button 
+          <button
             className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
             onClick={handleBookmarkClick}
             disabled={bookmarkMutation.isLoading}
@@ -159,7 +159,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             <Bookmark className="w-5 h-5" fill={post.isBookmarked ? 'currentColor' : 'none'} />
           </button>
           <div className="relative flex items-center" ref={menuRef}>
-            <button 
+            <button
               className="flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
               onClick={(e) => {
                 e.preventDefault();
@@ -168,38 +168,38 @@ function PostListElement({ post, openModal, openDeleteModal }) {
             >
               <MoreVertical className="w-5 h-5" />
             </button>
-            
+
             {isMenuOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-2 z-10">
                 <div className="absolute -top-1.5 right-1.5 w-3 h-3 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
                 <div className="relative bg-white flex flex-col">
-                  <button 
-                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer" 
-                    onClick={(e) => { 
-                      e.preventDefault(); 
+                  <button
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
                       toast.success("Sharing functionality coming soon");
-                      setIsMenuOpen(false); 
+                      setIsMenuOpen(false);
                     }}
                   >
                     <Share2 className="w-4 h-4 text-gray-500" strokeWidth={2} /> Share Post
                   </button>
-                  <button 
-                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left w-full cursor-pointer" 
-                    onClick={(e) => { 
-                      e.preventDefault(); 
+                  <button
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left w-full cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
                       toast.success("Post reported");
-                      setIsMenuOpen(false); 
+                      setIsMenuOpen(false);
                     }}
                   >
                     <Flag className="w-4 h-4 text-red-500" strokeWidth={2} /> Report Post
                   </button>
-                  <button 
-                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer" 
-                    onClick={(e) => { 
-                      e.preventDefault(); 
+                  <button
+                    className="flex items-center gap-3 px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors text-left w-full cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
                       navigator.clipboard.writeText(`${window.location.origin}/post/${generateSlug(post.title, post._id)}`);
                       toast.success("Link copied to clipboard!");
-                      setIsMenuOpen(false); 
+                      setIsMenuOpen(false);
                     }}
                   >
                     <Link2 className="w-4 h-4 text-gray-500" strokeWidth={2} /> Copy Link
@@ -251,14 +251,14 @@ function PostListElement({ post, openModal, openDeleteModal }) {
           </div>
         </div>
 
-        <Link 
-          to={`/profile/${post.userId?._id || post.userId}`} 
+        <Link
+          to={`/profile/${post.userId?._id || post.userId}`}
           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
         >
           {post.userId?.profilePicture ? (
-             <img src={post.userId.profilePicture} alt={authorName} className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
+            <img src={post.userId.profilePicture} alt={authorName} className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
           ) : authorName === 'Anonymous User' ? (
-             <img src={assets.userProfileIcon} alt="Anonymous User" className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
+            <img src={assets.userProfileIcon} alt="Anonymous User" className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-base font-bold border border-indigo-100 shadow-sm">
               {authorInitial}
@@ -272,7 +272,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
           </div>
         </Link>
       </div>
-      
+
     </div>
   );
 }
