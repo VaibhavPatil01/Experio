@@ -57,11 +57,10 @@ function ForgetPasswordModal({ closeModalCallback }) {
                 onBlur={formik.handleBlur}
                 onFocus={formik.handleFocus} // optional if you want custom behavior
                 className={`peer absolute h-full w-full pl-9 outline-none text-base transition-all duration-200 border-b-2
-      ${
-        formik.touched.email && formik.errors.email
-          ? 'border-b-red-600'
-          : 'border-b-gray-300 focus:border-b-primary'
-      }
+      ${formik.touched.email && formik.errors.email
+                    ? 'border-b-red-600'
+                    : 'border-b-gray-300 focus:border-b-primary'
+                  }
     `}
               />
               <BiEnvelope className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 text-xl transition-all duration-200 peer-focus:text-primary peer-valid:text-primary" />
