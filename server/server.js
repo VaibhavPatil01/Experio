@@ -1,7 +1,5 @@
 import './env.js';
 
-
-
 import app from './app.js';
 import connectDB from './configs/db.js';
 import { initQdrant } from './configs/qdrant.js';
