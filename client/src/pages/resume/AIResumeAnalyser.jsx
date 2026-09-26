@@ -44,8 +44,9 @@ const AIResumeAnalyser = () => {
     setTargetCompany(historyItem.target.company || '');
     setJobDescription(historyItem.target.jobDescription || '');
     toast.success('Loaded past analysis');
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleReanalyze = async (historyItem) => {
@@ -399,21 +400,21 @@ const AIResumeAnalyser = () => {
                           <button
                             onClick={() => handleReopen(item)}
                             disabled={item.status !== 'completed'}
-                            className="flex-[2] py-1.5 px-3 bg-gray-50 hover:bg-gray-100 dark:bg-[#252525] dark:hover:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-[2] py-2 px-3 cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-[#252525] dark:hover:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Eye className="w-3.5 h-3.5" /> View
                           </button>
                           <button
                             onClick={() => handleReanalyze(item)}
                             disabled={!item.resumeMetadata?.extractedText || isAnalyzing}
-                            className="flex-[2] py-1.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-[2] py-2 px-3 cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             title={!item.resumeMetadata?.extractedText ? 'Resume text not stored for this analysis.' : 'Re-analyze with latest AI'}
                           >
                             <RefreshCw className="w-3.5 h-3.5" /> Re-analyze
                           </button>
                           <button
                             onClick={(e) => handleDelete(item, e)}
-                            className="flex-1 py-1.5 px-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/10 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 py-2 px-3 cursor-pointer bg-red-50 hover:bg-red-100 dark:bg-red-900/10 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete analysis"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -567,6 +568,7 @@ const AIResumeAnalyser = () => {
             {/* Results State */}
             {!isAnalyzing && result && result.result && (
               <motion.div
+                id="results-container"
                 key="results"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
