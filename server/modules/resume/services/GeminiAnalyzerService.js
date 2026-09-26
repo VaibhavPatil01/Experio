@@ -1,5 +1,5 @@
 import { Type } from '@google/genai';
-import geminiClient from '../../../configs/gemini.js';
+import geminiClient, { MODELS } from '../../../configs/gemini.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 import { withExponentialBackoff } from '../utils/retry.js';
@@ -19,7 +19,7 @@ export default class GeminiAnalyzerService {
       const generation = startObservation(
         "ResumeAnalysis",
         {
-          model: "gemini-3.5-flash",
+          model: MODELS.FAST_TEXT,
           input: prompt,
         },
         { asType: "generation" }
@@ -127,7 +127,7 @@ export default class GeminiAnalyzerService {
         response = await withExponentialBackoff(
           async () => {
             return await geminiClient.models.generateContent({
-              model: 'gemini-3.5-flash',
+              model: MODELS.FAST_TEXT,
               contents: contents,
               config: {
                 responseMimeType: 'application/json',

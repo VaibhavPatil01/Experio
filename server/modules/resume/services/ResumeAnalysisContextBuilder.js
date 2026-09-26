@@ -24,8 +24,7 @@ export default class ResumeAnalysisContextBuilder {
       const startTime = performance.now();
       
       const candidateFacts = {
-        resumeText: resumeText || '',
-        profile: userProfile || {}
+        resumeText: resumeText || ''
       };
       
       const targetFacts = {

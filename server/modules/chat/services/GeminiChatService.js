@@ -80,7 +80,7 @@ export default class GeminiChatService {
    * @param {string} modelSelection The Gemini model to use (defaults to flash)
    * @returns {AsyncGenerator<Object, Object, unknown>} Yields text chunks, returns final metadata object
    */
-  static async *streamChat(prompt, userId, modelSelection = 'gemini-3.5-flash') {
+  static async *streamChat(prompt, userId, modelSelection = CHAT_CONSTANTS.MODELS.FAST_TEXT) {
     this._checkRateLimit(userId);
     this._checkCircuitBreaker();
 

@@ -11,7 +11,7 @@ import { withExponentialBackoff } from '../utils/retry.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-
+import { MODELS } from '../../../configs/gemini.js';
 const repository = new ResumeAnalysisRepository();
 
 export default class ResumeAnalysisOrchestrator {
@@ -39,13 +39,9 @@ export default class ResumeAnalysisOrchestrator {
       
       const preProcessStartTime = performance.now();
       
-      const [extractionResult, userProfile] = await Promise.all([
-        DocumentExtractionService.extractText(filePath, mimetype, userId),
-        ResumeAnalysisContextBuilder.buildUserProfileContext(userId) 
-      ]);
+      const extractionResult = await DocumentExtractionService.extractText(filePath, mimetype, userId);
 
       logger.info('resume_processing_completed', { requestId, analysisId: analysisDoc._id, userId });
-      logger.info('profile_context_loaded', { requestId, analysisId: analysisDoc._id, userId });
       
       const preProcessDuration = performance.now() - preProcessStartTime;
 
@@ -91,12 +87,12 @@ export default class ResumeAnalysisOrchestrator {
       );
 
       // 3. RAG Retrieval Layer
-      // Now that we have the profile (skills) and target, we can fetch context.
+      // Now that we have the target, we can fetch context.
       const retrievalStartTime = performance.now();
       logger.info('retrieval_started', { requestId, analysisId: analysisDoc._id, userId });
       
       const targetFacts = { role: targetRole, company: targetCompany, jobDescription };
-      const candidateFacts = { profile: userProfile };
+      const candidateFacts = { resumeText: extractionResult.text };
       
       const relevantExperiences = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences(
         targetFacts, 
@@ -118,7 +114,7 @@ export default class ResumeAnalysisOrchestrator {
         targetCompany, 
         jobDescription,
         extractionResult.text,
-        userProfile,
+        null,
         relevantExperiences
       );
 
@@ -129,7 +125,7 @@ export default class ResumeAnalysisOrchestrator {
       await repository.updateStatus(analysisDoc._id, 'processing');
       
       const aiStartTime = performance.now();
-      logger.info('gemini_analysis_started', { requestId, analysisId: analysisDoc._id, userId, model: 'gemini-3.5-flash' });
+      logger.info('gemini_analysis_started', { requestId, analysisId: analysisDoc._id, userId, model: MODELS.FAST_TEXT });
 
       const analysisJson = await this._executeWithTimeout(
         GeminiAnalyzerService.generateStructuredAnalysis(prompt),
@@ -150,7 +146,7 @@ export default class ResumeAnalysisOrchestrator {
       // 7. Persist and Finalize (With Rescue Backup)
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
-        modelUsed: 'gemini-3.5-flash',
+        modelUsed: MODELS.FAST_TEXT,
         totalLatencyMs: Math.round(totalLatencyMs),
         preProcessDuration: Math.round(preProcessDuration),
         retrievalDuration: Math.round(retrievalDuration),
@@ -270,15 +266,13 @@ export default class ResumeAnalysisOrchestrator {
       
       newAnalysisDoc = await repository.createAnalysis(userId, targetData, resumeMetadata);
 
-      // 1. Fetch Fresh Profile Context
+      // 1. Fresh RAG Retrieval
       const preProcessStartTime = performance.now();
-      const userProfile = await ResumeAnalysisContextBuilder.buildUserProfileContext(userId);
       const preProcessDuration = performance.now() - preProcessStartTime;
 
-      // 2. Fresh RAG Retrieval
       const retrievalStartTime = performance.now();
       const targetFacts = { role: targetRole, company: targetCompany, jobDescription };
-      const candidateFacts = { profile: userProfile };
+      const candidateFacts = { resumeText: existingAnalysis.resumeMetadata.extractedText };
       
       const relevantExperiences = await ResumeAnalysisRetrievalService.retrieveRelevantExperiences(
         targetFacts, 
@@ -293,7 +287,7 @@ export default class ResumeAnalysisOrchestrator {
         targetCompany, 
         jobDescription,
         existingAnalysis.resumeMetadata.extractedText,
-        userProfile,
+        null,
         relevantExperiences
       );
 
@@ -319,7 +313,7 @@ export default class ResumeAnalysisOrchestrator {
       // 7. Persist (With Rescue Backup)
       const totalLatencyMs = performance.now() - startTime;
       const executionInfo = {
-        modelUsed: 'gemini-3.5-flash',
+        modelUsed: MODELS.FAST_TEXT,
         totalLatencyMs: Math.round(totalLatencyMs),
         preProcessDuration: Math.round(preProcessDuration),
         retrievalDuration: Math.round(retrievalDuration),

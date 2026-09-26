@@ -59,14 +59,23 @@ export class QdrantRepository {
     }
   }
   
-  static async searchPosts(vector, limit = 10, filter = null) {
-      const response = await qdrantClient.search('interviews', {
-          vector: vector,
-          limit: limit,
-          filter: filter,
-          with_payload: true,
-      });
-      return response;
+  static async searchPosts(vector, limit = 10, filter = null, scoreThreshold = null) {
+      try {
+          const searchParams = {
+              vector: vector,
+              limit: limit,
+              filter: filter,
+              with_payload: true,
+          };
+          if (scoreThreshold !== null) {
+              searchParams.score_threshold = scoreThreshold;
+          }
+          const response = await qdrantClient.search('interviews', searchParams);
+          return response;
+      } catch (error) {
+          console.error('[QdrantRepository] searchPosts failed:', error.message, error.data || error.response?.data);
+          throw error;
+      }
   }
 
   static async searchUsers(vector, limit = 10, filter = null, scoreThreshold = null) {

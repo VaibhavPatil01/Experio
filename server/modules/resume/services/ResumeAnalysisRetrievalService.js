@@ -33,21 +33,11 @@ export default class ResumeAnalysisRetrievalService {
       ]);
       const embedDuration = performance.now() - embedStartTime;
 
-      // 3. Build Filters
-      let targetFilter = null;
-      if (targetFacts.company) {
-        targetFilter = {
-          must: [
-            { key: 'company', match: { text: targetFacts.company } }
-          ]
-        };
-      }
-
       // 4. Perform Qdrant Searches Concurrently
       const qdrantStartTime = performance.now();
       const [targetResults, candidateResults] = await Promise.all([
-        QdrantRepository.searchPosts(targetVector, 5, targetFilter),
-        QdrantRepository.searchPosts(candidateVector, 3, null) // No filter to find diverse similar candidates
+        QdrantRepository.searchPosts(targetVector, 5, null, 0.70),
+        QdrantRepository.searchPosts(candidateVector, 3, null, 0.70) // Score threshold filters out completely irrelevant posts
       ]);
       const qdrantDuration = performance.now() - qdrantStartTime;
 
@@ -149,8 +139,8 @@ export default class ResumeAnalysisRetrievalService {
 
   static _buildCandidateQuery(candidateFacts, role) {
     let query = `Interview experience for ${role || 'candidate'}`;
-    if (candidateFacts.profile && candidateFacts.profile.skills && candidateFacts.profile.skills.length > 0) {
-      query += ` with skills in ${candidateFacts.profile.skills.slice(0, 10).join(', ')}`;
+    if (candidateFacts.resumeText) {
+      query += ` with background: ${candidateFacts.resumeText.substring(0, 400)}`;
     }
     return query;
   }

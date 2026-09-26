@@ -20,7 +20,7 @@ export default class ChatSessionService {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await geminiClient.models.generateContent({
-          model: 'gemini-3.5-flash',
+          model: CHAT_CONSTANTS.MODELS.FAST_TEXT,
           contents: promptText
         });
         let title = (response.text || '').trim();

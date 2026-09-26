@@ -25,7 +25,7 @@ export default class ChatPipelineService {
    * @param {string} prompt 
    * @param {string} modelSelection 
    */
-  async *executePipeline(sessionId, userId, prompt, modelSelection = 'gemini-3.5-flash') {
+  async *executePipeline(sessionId, userId, prompt, modelSelection = CHAT_CONSTANTS.MODELS.FAST_TEXT) {
     const pipelineId = Math.random().toString(36).substring(7); // Unique ID for logging correlation
     logger.info(`[Pipeline ${pipelineId}] Starting RAG Pipeline`, { sessionId, userId });
 
@@ -190,7 +190,7 @@ export default class ChatPipelineService {
    * Guest pipeline: Bypasses DB and user profile retrieval.
    * Strict system prompt is applied via ChatPromptBuilder.
    */
-  async *executeGuestPipeline(prompt, history = [], modelSelection = 'gemini-3.5-flash') {
+  async *executeGuestPipeline(prompt, history = [], modelSelection = CHAT_CONSTANTS.MODELS.FAST_TEXT) {
     const pipelineId = Math.random().toString(36).substring(7);
     logger.info(`[Pipeline ${pipelineId}] Starting GUEST Chat Pipeline`);
 
