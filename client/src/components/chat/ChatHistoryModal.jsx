@@ -48,18 +48,18 @@ const ChatHistoryModal = ({ isOpen, onClose, activeSessionId, onSessionSelect })
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[10000] flex flex-col items-center justify-center p-4"
       onClick={onClose}
     >
       {/* Inner Modal Box */}
-      <div 
+      <div
         className="w-full max-w-[600px] h-[550px] max-h-[85vh] bg-[#f7f7f8] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input */}
         <div className="w-full p-3 bg-white rounded-t-xl border-b border-gray-100">
-          <input 
+          <input
             type="text"
             placeholder="Search all convos..."
             className="w-full bg-white text-gray-800 text-[13px] outline-none px-4 py-2.5 rounded-md border border-gray-300 focus:border-primary transition-colors placeholder-gray-400"
@@ -80,8 +80,8 @@ const ChatHistoryModal = ({ isOpen, onClose, activeSessionId, onSessionSelect })
               const previousSessions = activeSessionId ? filtered.filter(s => s._id !== activeSessionId) : filtered;
 
               const renderSession = (session) => (
-                <div 
-                  key={session._id} 
+                <div
+                  key={session._id}
                   onClick={() => {
                     onSessionSelect(session._id);
                     onClose();
@@ -91,7 +91,7 @@ const ChatHistoryModal = ({ isOpen, onClose, activeSessionId, onSessionSelect })
                   <span className="text-[14px] truncate mr-4 font-medium">{session.title}</span>
                   <div className="flex items-center gap-4 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
                     <span className="text-[12px] text-gray-400">{getRelativeTime(session.updatedAt || session.createdAt)}</span>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
@@ -111,7 +111,7 @@ const ChatHistoryModal = ({ isOpen, onClose, activeSessionId, onSessionSelect })
                       {renderSession(currentSession)}
                     </div>
                   )}
-                  
+
                   {previousSessions.length > 0 && (
                     <div>
                       <h3 className="text-[12px] font-semibold text-gray-400 mb-1 px-3 tracking-wider">Previous</h3>
