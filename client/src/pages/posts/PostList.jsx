@@ -31,7 +31,7 @@ function PostList() {
     jobRole: searchParams.get('jobRole') || '',
     company: searchParams.get('company') || '',
     rating: searchParams.get('rating') || '',
-    matchScore: parseInt(searchParams.get('matchScore')) || 70
+    matchScore: searchParams.has('matchScore') ? parseInt(searchParams.get('matchScore')) : 0
   };
 
   const companyAndRoleQuery = useQuery({
