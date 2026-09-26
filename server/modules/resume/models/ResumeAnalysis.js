@@ -1,21 +1,5 @@
 import mongoose from "mongoose";
 
-const improvementAreaSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  reason: { type: String, required: true },
-  suggestedRewrite: { type: String, required: false },
-  citation: { type: String, required: false },
-  sourceType: { type: String, enum: ['resume', 'profile', 'job-description', 'platform', 'general'], default: 'general' }
-}, { _id: false });
-
-const referenceSchema = new mongoose.Schema({
-  experienceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
-  title: { type: String, required: true },
-  company: { type: String, required: false },
-  role: { type: String, required: false },
-  deepLink: { type: String, required: true }
-}, { _id: false });
 
 const resumeAnalysisSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
