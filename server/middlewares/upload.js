@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import os from 'os';
 import path from 'path';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Configure Cloudinary
 cloudinary.config({

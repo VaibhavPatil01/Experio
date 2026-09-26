@@ -4,6 +4,8 @@ import GeminiChatService from './GeminiChatService.js';
 import CitationEngine from './CitationEngine.js';
 import ChatMessageService from './ChatMessageService.js';
 import logger from '../../../utils/logger.js';
+import { startObservation, propagateAttributes } from '@langfuse/tracing';
+import { langfuseSpanProcessor } from '../../../configs/langfuse.js';
 
 export default class ChatPipelineService {
   constructor(
@@ -32,6 +34,17 @@ export default class ChatPipelineService {
       stages: {}
     };
 
+    const generator = propagateAttributes({
+      traceName: "ChatPipeline",
+      traceId: pipelineId,
+      sessionId: sessionId.toString(),
+      userId: userId.toString(),
+      tags: ["rag-chat"]
+    }, async function* () {
+      const trace = startObservation("ChatPipeline", {
+        input: prompt
+      });
+
     let rankedContext = null;
     let finalPrompt = null;
     let fullAiResponse = '';
@@ -52,7 +65,18 @@ export default class ChatPipelineService {
       // STAGE 2: Retrieve Context (Includes Loading Memory & Profile)
       // ---------------------------------------------------------
       const s2 = performance.now();
+      
+      const retrievalSpan = startObservation("ContextRetrieval", {
+        input: prompt,
+      }, { asType: "span" });
+      
       rankedContext = await this.retrievalService.buildContext(userId, sessionId, prompt);
+      
+      retrievalSpan.update({
+        output: { docsFound: rankedContext.retrievedDocuments.length }
+      });
+      retrievalSpan.end();
+      
       timing.stages.retrieval = Math.round(performance.now() - s2);
       logger.info(`[Pipeline ${pipelineId}] Stage 2 Complete: Context retrieved`, { 
         ms: timing.stages.retrieval,
@@ -75,6 +99,11 @@ export default class ChatPipelineService {
       const s4 = performance.now();
       logger.info(`[Pipeline ${pipelineId}] Stage 4 Started: Streaming from Gemini`);
       
+      const generation = startObservation("GeminiStream", {
+        model: modelSelection,
+        input: finalPrompt,
+      }, { asType: "generation" });
+      
       const streamGenerator = GeminiChatService.streamChat(finalPrompt, userId, modelSelection);
       
       for await (const chunk of streamGenerator) {
@@ -86,6 +115,11 @@ export default class ChatPipelineService {
         } else if (chunk.tokenUsage !== undefined) {
           // This is the final metadata object returned by the generator
           geminiMetadata = chunk;
+          generation.update({
+            output: fullAiResponse,
+            usageDetails: { total: chunk.tokenUsage }
+          });
+          generation.end();
         }
       }
 
@@ -112,7 +146,8 @@ export default class ChatPipelineService {
       const metadataPayload = {
         tokenUsage: geminiMetadata?.tokenUsage || 0,
         modelUsed: geminiMetadata?.modelUsed || modelSelection,
-        citations: generatedCitations
+        citations: generatedCitations,
+        langfuseTraceId: pipelineId
       };
       
       const finalMessage = await this.messageService.saveAssistantMessage(sessionId, fullAiResponse, metadataPayload);
@@ -121,6 +156,12 @@ export default class ChatPipelineService {
 
       const totalTime = Math.round(performance.now() - timing.start);
       logger.info(`[Pipeline ${pipelineId}] RAG Pipeline Complete`, { totalTimeMs: totalTime });
+      
+      trace.update({
+        output: fullAiResponse
+      });
+      trace.end();
+      langfuseSpanProcessor.forceFlush();
 
       // Yield the final completion event
       yield { 
@@ -131,10 +172,19 @@ export default class ChatPipelineService {
       };
 
     } catch (error) {
+      trace.update({
+        level: "ERROR",
+        statusMessage: error.message
+      });
+      trace.end();
+      langfuseSpanProcessor.forceFlush();
       logger.error(`[Pipeline ${pipelineId}] Pipeline Failed`, { error: error.message });
       yield { type: 'error', error: error.message };
     }
-  }
+  }.bind(this));
+
+  yield* generator;
+}
 
   /**
    * Guest pipeline: Bypasses DB and user profile retrieval.

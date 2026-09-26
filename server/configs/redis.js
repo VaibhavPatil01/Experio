@@ -1,6 +1,13 @@
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ quiet: true });
+
+// Suppress annoying BullMQ eviction policy warning(Removed annoying bullmq eviction warning)
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (typeof args[0] === 'string' && args[0].includes('IMPORTANT! Eviction policy is')) return;
+  originalWarn(...args);
+};
 
 const redisConfig = {
   url: process.env.REDIS_URL || 'redis://localhost:6379',

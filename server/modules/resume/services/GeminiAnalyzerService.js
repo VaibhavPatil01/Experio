@@ -3,7 +3,8 @@ import geminiClient from '../../../configs/gemini.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
 import { withExponentialBackoff } from '../utils/retry.js';
-
+import { langfuseSpanProcessor } from '../../../configs/langfuse.js';
+import { startObservation } from '@langfuse/tracing';
 export default class GeminiAnalyzerService {
   /**
    * Calls Gemini to perform the resume analysis based on the complete prompt.
@@ -15,7 +16,15 @@ export default class GeminiAnalyzerService {
   static async generateStructuredAnalysis(prompt, retries = 1) {
     try {
       logger.info('Calling Gemini 3.5 Flash for Resume Analysis');
-      
+      const generation = startObservation(
+        "ResumeAnalysis",
+        {
+          model: "gemini-3.5-flash",
+          input: prompt,
+        },
+        { asType: "generation" }
+      );
+
       const contents = [ prompt ];
 
       const responseSchema = {
@@ -142,6 +151,11 @@ export default class GeminiAnalyzerService {
           }
         );
       } catch (geminiError) {
+        generation.update({
+          level: "ERROR",
+          statusMessage: geminiError.message,
+        });
+        generation.end();
         throw new ResumeAnalysisError(
           ErrorCategories.GEMINI_ERROR,
           'Failed to connect to the AI analysis engine after multiple attempts. Please try again later.',
@@ -150,6 +164,11 @@ export default class GeminiAnalyzerService {
       }
 
       if (!response || !response.text) {
+        generation.update({
+          level: "ERROR",
+          statusMessage: "Empty response from Gemini",
+        });
+        generation.end();
         throw new ResumeAnalysisError(
           ErrorCategories.OUTPUT_VALIDATION_ERROR,
           'The AI analysis engine returned an empty response.'
@@ -167,9 +186,21 @@ export default class GeminiAnalyzerService {
            throw new Error("Invalid schema structure returned from Gemini");
         }
         
+        generation.update({
+          output: parsedResponse,
+          level: "DEFAULT",
+        });
+        generation.end();
+        
         logger.info('Successfully generated structured analysis from Gemini');
         return parsedResponse;
       } catch (jsonError) {
+        generation.update({
+          level: "ERROR",
+          statusMessage: jsonError.message,
+          output: response.text,
+        });
+        generation.end();
         throw new ResumeAnalysisError(
           ErrorCategories.OUTPUT_VALIDATION_ERROR,
           'The AI analysis engine returned malformed data that could not be parsed.',

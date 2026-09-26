@@ -1,6 +1,7 @@
 import ChatMessageService from '../services/ChatMessageService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import ChatMessage from '../models/ChatMessage.js';
+import { langfuseClient } from '../../../configs/langfuse.js';
 
 const chatMessageService = new ChatMessageService();
 
@@ -58,6 +59,16 @@ export const submitFeedback = asyncHandler(async (req, res) => {
   const message = await ChatMessage.findByIdAndUpdate(messageId, { feedback }, { new: true });
   if (!message) {
     return res.status(404).json({ message: 'Message not found' });
+  }
+
+  // Sync feedback with Langfuse
+  if (message.langfuseTraceId) {
+    langfuseClient.score.create({
+      traceId: message.langfuseTraceId,
+      name: 'user-feedback',
+      value: feedback === 'like' ? 1 : 0,
+      comment: "User rated via Chat UI"
+    });
   }
 
   res.status(200).json(message);

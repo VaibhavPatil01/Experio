@@ -40,7 +40,7 @@ export default class ChatMessageService {
   async saveAssistantMessage(sessionId, content, aiMetadata = {}) {
     logger.info('Saving assistant message completion', { sessionId, tokens: aiMetadata.tokenUsage });
     
-    const { tokenUsage, modelUsed, citations, regeneratedFromId } = aiMetadata;
+    const { tokenUsage, modelUsed, citations, regeneratedFromId, langfuseTraceId } = aiMetadata;
 
     const message = await this.messageRepo.createMessage({
       sessionId,
@@ -49,7 +49,8 @@ export default class ChatMessageService {
       tokenUsage,
       modelUsed,
       citations: citations || [],
-      regeneratedFromId: regeneratedFromId || null
+      regeneratedFromId: regeneratedFromId || null,
+      langfuseTraceId: langfuseTraceId || null
     });
 
     // Update the session's token usage and timestamp

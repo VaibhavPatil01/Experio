@@ -44,6 +44,7 @@ const ChatMessageSchema = new mongoose.Schema({
   modelUsed: { type: String },
   tokenUsage: { type: Number },
   citations: [CitationSchema],
+  langfuseTraceId: { type: String, default: null },
   feedback: {
     type: String,
     enum: ['like', 'dislike'],

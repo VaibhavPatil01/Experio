@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
-dotenv.config(); // Load environment variables from .env
+dotenv.config({ quiet: true }); // Load environment variables from .env
 
 const makeRequestToServer = async (SERVER_BASE_URL, limit) => {
   for (let i = 0; i < limit; i++) {

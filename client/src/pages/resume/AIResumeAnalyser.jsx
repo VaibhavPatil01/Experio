@@ -13,6 +13,8 @@ import { fetchResumeHistory, analyzeResume, reanalyzeResume, deleteResumeHistory
 import { toast } from 'react-hot-toast';
 import LoginRequiredModal from '../../components/users/LoginRequiredModal.jsx';
 import { useAppSelector } from '../../redux/store.js';
+import axios from 'axios';
+import getAuthToken from '../../utils/getAuthToken.js';
 
 const AIResumeAnalyser = () => {
   const [file, setFile] = useState(null);
@@ -66,7 +68,7 @@ const AIResumeAnalyser = () => {
         }
       );
       setResult(response.data.data);
-      fetchHistory(); // Refresh history
+      queryClient.invalidateQueries({ queryKey: ['resume-history'] }); // Refresh history
       toast.success('Resume re-analyzed successfully!');
     } catch (error) {
       console.error('Error re-analyzing resume:', error);
@@ -98,7 +100,7 @@ const AIResumeAnalyser = () => {
         setResult(null);
       }
       
-      fetchHistory();
+      queryClient.invalidateQueries({ queryKey: ['resume-history'] });
     } catch (error) {
       console.error('Error deleting analysis:', error);
       toast.error('Failed to delete analysis.');
@@ -169,7 +171,7 @@ const AIResumeAnalyser = () => {
       );
 
       setResult(response.data.data);
-      fetchHistory(); // Refresh history
+      queryClient.invalidateQueries({ queryKey: ['resume-history'] }); // Refresh history
       toast.success('Resume analyzed successfully!');
     } catch (error) {
       console.error('Error analyzing resume:', error);
