@@ -129,7 +129,7 @@ export default class ResumeAnalysisOrchestrator {
 
       const analysisJson = await this._executeWithTimeout(
         GeminiAnalyzerService.generateStructuredAnalysis(prompt),
-        60000 // 60 seconds
+        180000 // 180 seconds
       );
       const aiDuration = performance.now() - aiStartTime;
       
@@ -300,7 +300,7 @@ export default class ResumeAnalysisOrchestrator {
       const aiStartTime = performance.now();
       const analysisJson = await this._executeWithTimeout(
         GeminiAnalyzerService.generateStructuredAnalysis(prompt),
-        60000 
+        180000 // 180 seconds
       );
       const aiDuration = performance.now() - aiStartTime;
 
