@@ -12,8 +12,9 @@ export const httpLogger = (req, res, next) => {
   res.on('finish', () => {
     const duration = performance.now() - start;
 
-    // Ignore static assets or purely internal health checks if needed
-    if (req.originalUrl.includes('/api/')) {
+    // Log all main API routes (ignore static assets or internal health checks)
+    const url = req.originalUrl;
+    if (url.startsWith('/api') || url.startsWith('/posts') || url.startsWith('/user') || url.startsWith('/recommendations')) {
       logger.info('API Request completed', {
         category: 'http',
         method: req.method,
