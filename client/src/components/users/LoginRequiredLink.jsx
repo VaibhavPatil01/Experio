@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../redux/store.js';
 
-function LoginRequiredLink({ textContent, to, className, openModal }) {
+function LoginRequiredLink({ textContent, to, className, openModal, state }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userState = useAppSelector((state) => state.userState);
 
@@ -26,7 +26,7 @@ function LoginRequiredLink({ textContent, to, className, openModal }) {
 
   return (
     <>
-      <Link to={to} className={className} onClick={handleNonLoggedInUserClick}>
+      <Link to={to} state={state} className={className} onClick={handleNonLoggedInUserClick}>
         {textContent}
       </Link>
     </>

@@ -119,6 +119,7 @@ function PostListElement({ post, openModal, openDeleteModal }) {
                 <LoginRequiredLink
                   textContent={companyName}
                   to={`/post/${post._id}/${generateSlug(post.title || companyName)}`}
+                  state={{ matchScore }}
                   className="hover:underline"
                   openModal={openModal}
                 />

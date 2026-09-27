@@ -120,7 +120,15 @@ export default class ChatRetrievalService {
 
     // Deduplicate on mongoId immediately to prevent fetching the same post twice
     const uniqueMap = new Map();
+    // Similarity Threshold: Use 0.70 because Qdrant is using Cosine similarity with Gemini Embeddings.
+    // Scores typically range from 0.65 to 0.85 for relevant text.
+    const SCORE_THRESHOLD = 0.70; 
+
     for (const result of qdrantResults) {
+      if (result.score < SCORE_THRESHOLD) {
+        continue; // Drop irrelevant hits
+      }
+
       const mongoId = result.payload.mongoId;
       // Keep only the highest scoring chunk per document
       if (!uniqueMap.has(mongoId)) {
@@ -135,8 +143,7 @@ export default class ChatRetrievalService {
 
     const startTime = performance.now();
     const posts = await Post.find({ _id: { $in: uniquePostIds } })
-      .select('title content author company role status tags createdAt')
-      .populate('userId', 'username branch designation')
+      .select('title content company role status tags createdAt hiringType interviewMode interviewDate result rounds difficulty technologies dsaTopics coreSubjects preparationDuration preparationResources overallTips')
       .lean();
     const endTime = performance.now();
     logger.info('Mongo Hydration completed', { category: 'db', latencyMs: Math.round(endTime - startTime), hydratedCount: posts.length });
@@ -151,10 +158,17 @@ export default class ChatRetrievalService {
         company: post.company,
         role: post.role,
         status: post.status,
-        author: post.userId ? post.userId.username : 'Anonymous',
-        authorDetails: post.userId ? 'Student' : '',
         score: scoreObj ? scoreObj.score : 0,
-        url: `/post/${post._id}` // Citation reference link
+        url: `/post/${post._id}`, // Citation reference link
+        hiringType: post.hiringType,
+        interviewMode: post.interviewMode,
+        result: post.result,
+        rounds: post.rounds,
+        difficulty: post.difficulty,
+        technologies: post.technologies,
+        dsaTopics: post.dsaTopics,
+        coreSubjects: post.coreSubjects,
+        overallTips: post.overallTips
       };
     });
 

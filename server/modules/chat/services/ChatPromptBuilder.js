@@ -19,17 +19,43 @@ export default class ChatPromptBuilder {
    * Formats a single retrieved document into a citation block.
    */
   static formatRetrievedDocument(doc, index) {
-    return `
+    let details = `
 ---
 [Source ${index + 1}]
 Title: ${doc.title}
-Company: ${doc.company} | Role: ${doc.role} | Status: ${doc.status}
-Author: ${doc.author} (${doc.authorDetails})
+Company: ${doc.company} | Role: ${doc.role} | Result: ${doc.result || doc.status}
 URL: ${doc.url}
+`;
 
-Content:
-${doc.content}
----`;
+    if (doc.technologies && doc.technologies.length > 0) details += `Technologies: ${doc.technologies.join(', ')}\n`;
+    if (doc.dsaTopics && doc.dsaTopics.length > 0) details += `DSA Topics: ${doc.dsaTopics.join(', ')}\n`;
+    if (doc.coreSubjects && doc.coreSubjects.length > 0) details += `Core Subjects: ${doc.coreSubjects.join(', ')}\n`;
+
+    details += `\nDescription:\n${doc.content}\n`;
+
+    if (doc.rounds && doc.rounds.length > 0) {
+      details += `\nInterview Rounds:\n`;
+      doc.rounds.forEach((round, rIdx) => {
+        details += `  Round ${rIdx + 1}: ${round.roundType} (${round.duration}, ${round.difficulty})\n`;
+        if (round.topicsCovered && round.topicsCovered.length > 0) {
+          details += `  Topics: ${round.topicsCovered.join(', ')}\n`;
+        }
+        if (round.questionsAsked && round.questionsAsked.length > 0) {
+          details += `  Questions Asked:\n`;
+          round.questionsAsked.forEach(q => details += `    - ${q}\n`);
+        }
+        if (round.experienceAndTips) {
+          details += `  Tips: ${round.experienceAndTips}\n`;
+        }
+      });
+    }
+
+    if (doc.overallTips) {
+      details += `\nOverall Tips:\n${doc.overallTips}\n`;
+    }
+
+    details += `---`;
+    return details;
   }
 
   /**

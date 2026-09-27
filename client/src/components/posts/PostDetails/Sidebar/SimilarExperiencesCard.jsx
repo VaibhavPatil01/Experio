@@ -39,6 +39,7 @@ const SimilarExperiencesCard = ({ postId }) => {
             <Link 
               key={post._id} 
               to={`/post/${post._id}/${generateSlug(post.title || post.company || '')}`}
+              state={{ matchScore: `${post.matchPercentage || 75}% Match` }}
               className="flex justify-between items-center group cursor-pointer"
             >
               <div className="pr-4">

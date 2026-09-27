@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Bookmark, MoreVertical, MapPin, Calendar, Briefcase, BadgeCheck, Share2, Flag, Link2, Pencil, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleBookmark } from '../../../services/postServices.js';
@@ -20,6 +20,9 @@ const PostHeader = ({ post, postId, isEditable, openDeleteModal }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const location = useLocation();
+  const matchScore = location.state?.matchScore || null;
 
   const user = useAppSelector((state) => state.userState.user);
   const queryClient = useQueryClient();
@@ -66,9 +69,11 @@ const PostHeader = ({ post, postId, isEditable, openDeleteModal }) => {
 
         {/* Right Side: Match % & Actions */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">
-            92% Match
-          </span>
+          {matchScore && (
+            <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">
+              {matchScore}
+            </span>
+          )}
           <button 
             className={`flex items-center transition-colors cursor-pointer ${post.isBookmarked ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
             onClick={handleBookmarkClick}
