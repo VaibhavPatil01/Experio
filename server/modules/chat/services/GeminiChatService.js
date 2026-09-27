@@ -132,7 +132,9 @@ export default class GeminiChatService {
           tokens: metadata.tokenUsage 
         });
 
-        return metadata; // The final return of the async generator
+        // We MUST yield the metadata so the for-await-of loop in ChatPipelineService receives it
+        yield metadata;
+        return metadata; 
 
       } catch (error) {
         attempt++;

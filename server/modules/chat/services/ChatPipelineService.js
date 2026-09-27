@@ -201,15 +201,30 @@ export default class ChatPipelineService {
       const finalPrompt = ChatPromptBuilder.buildGuestPrompt(prompt, history);
       
       // Stage 2: Stream response
+      const generation = startObservation("GeminiGuestStream", {
+        model: modelSelection,
+        input: finalPrompt,
+      }, { asType: "generation" });
+
       const streamGenerator = GeminiChatService.streamChat(finalPrompt, 'guest', modelSelection);
       
+      let geminiMetadata = null;
+
       for await (const chunk of streamGenerator) {
         if (chunk.text) {
           fullAiResponse += chunk.text;
           yield { type: 'chunk', text: chunk.text };
+        } else if (chunk.tokenUsage !== undefined) {
+          geminiMetadata = chunk;
+          generation.update({
+            output: fullAiResponse,
+            usageDetails: { total: chunk.tokenUsage }
+          });
+          generation.end();
         }
       }
 
+      langfuseSpanProcessor.forceFlush();
       logger.info(`[Pipeline ${pipelineId}] Guest Pipeline Complete`);
 
       yield { 
@@ -219,6 +234,7 @@ export default class ChatPipelineService {
 
     } catch (error) {
       logger.error(`[Pipeline ${pipelineId}] Guest Pipeline Failed`, { error: error.message });
+      langfuseSpanProcessor.forceFlush();
       yield { type: 'error', error: error.message };
     }
   }
