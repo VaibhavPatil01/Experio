@@ -2,6 +2,7 @@ import geminiClient from '../../../configs/gemini.js';
 import ChatSessionRepository from '../repositories/ChatSessionRepository.js';
 import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
 import logger from '../../../utils/logger.js';
+import { CHAT_CONSTANTS } from '../utils/chatConstants.js';
 
 export default class ChatSessionService {
   constructor(repo = new ChatSessionRepository(), messageRepo = new ChatMessageRepository()) {
@@ -13,6 +14,10 @@ export default class ChatSessionService {
    * Generates a short title based on the first prompt
    */
   async generateTitle(prompt) {
+    if (process.env.ENABLE_CHAT_AUTO_NAMING !== 'true') {
+      return 'New Conversation';
+    }
+
     const promptText = `Generate a very short, concise title (max 5 words) summarizing this chat prompt. Do not use quotes or prefixes. Prompt: "${prompt}"`;
     const maxRetries = 3;
     let delay = 1000;
