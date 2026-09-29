@@ -16,7 +16,7 @@ export class RetrievalService {
       // 1. Get user and generate/retrieve their embedding
       const user = await User.findById(userId);
       if (!user) throw new Error('User not found');
-      
+
       const userDocStr = PromptBuilder.buildUserDocument(user);
       const userVector = await EmbeddingService.generateEmbedding(userDocStr);
 
@@ -45,7 +45,7 @@ export class RetrievalService {
       const recommendedFeed = posts.map(post => {
         const qScore = postScores.find(p => p.mongoId === post._id.toString());
         const similarity = qScore ? qScore.score : 0;
-        
+
         // High-dimensional LLM embeddings (like Gemini) suffer from the "Narrow Cone" effect,
         // where even completely unrelated text has a baseline cosine similarity around 0.55 - 0.60 
         // simply for being written in the same language and format. The true semantic difference 
@@ -54,7 +54,7 @@ export class RetrievalService {
         const MIN_SCORE = 0.60; // Baseline for completely unrelated posts
         const MAX_SCORE = 0.75; // Baseline for highly related posts
         const normalizedScore = (similarity - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
-        
+
         const matchPercentage = Math.max(0, Math.min(100, Math.round(normalizedScore * 100)));
 
         return {
