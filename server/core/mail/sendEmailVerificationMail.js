@@ -1,9 +1,9 @@
 import sendMail from './sendMail.js';
 
-const sendEmailVerificationMail = async (email, token, username) => { 
+const sendEmailVerificationMail = async (email, token, username) => {
   const SERVER_BASE_URL = process.env['SERVER_BASE_URL'];
   if (!SERVER_BASE_URL) {
-    throw new Error('SERVER_BASE_URL not Defined'); 
+    throw new Error('SERVER_BASE_URL not Defined');
   }
 
   const verificationURL = SERVER_BASE_URL + '/user/verify-email/' + token;
@@ -21,13 +21,13 @@ const sendEmailVerificationMail = async (email, token, username) => {
     context: context,
   };
 
-try {
-  const info = await sendMail(mailOptions);
-  return info;
-} catch (error) {
-  console.error("❌ Failed to send verification email:", error);
-  throw new Error(`Failed to send verification email: ${error.message}`);
-}
+  try {
+    const info = await sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    console.error("❌ Failed to send verification email:", error);
+    throw new Error(`Failed to send verification email: ${error.message}`);
+  }
 
 };
 
