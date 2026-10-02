@@ -12,7 +12,7 @@ const sendForgotPasswordMail = async (email, token, username) => {
   const emailSubject = 'Reset Password Link';
   const emailTemplate = 'forgot_password_email';
   const officialName = 'InterviewExperience';
-  const context = { verificationURL, username, officialName };  
+  const context = { verificationURL, username, officialName };
 
   const mailOptions = {
     from: senderEmail,
