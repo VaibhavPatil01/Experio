@@ -5,13 +5,13 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename); 
+const __dirname = path.dirname(__filename);
 
 dotenv.config({ quiet: true });
 
 // Setup Node Mailer
 const SMTP_LOGIN = process.env['SMTP_LOGIN'];
-const SMTP_KEY = process.env['SMTP_KEY']; 
+const SMTP_KEY = process.env['SMTP_KEY'];
 
 if (!SMTP_LOGIN || !SMTP_KEY) {
   throw new Error('SMTP_LOGIN or SMTP_KEY not defined in .env');
