@@ -9,7 +9,7 @@ import logger from '../utils/logger.js';
 export const aiGlobalLimiter = async (req, res, next) => {
   const windowSeconds = 3600; // 1 hour window
   const globalLimit = parseInt(process.env.AI_GLOBAL_HOURLY_LIMIT || '1000', 10);
-  
+
   // Create a time bucket key based on the current hour
   const currentHour = Math.floor(Date.now() / (windowSeconds * 1000));
   const key = `ai:global_limit:${currentHour}`;
