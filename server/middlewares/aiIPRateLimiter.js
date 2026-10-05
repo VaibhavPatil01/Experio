@@ -16,7 +16,7 @@ export const aiIPRateLimiter = (windowMs = 600000, limit = 15) => {
     try {
       // INCR returns the value AFTER incrementing
       const current = await redisConnection.incr(key);
-      
+
       if (current === 1) {
         // First request in the window, set expiry
         // converting ms to seconds for EXPIRE command or use PEXPIRE
