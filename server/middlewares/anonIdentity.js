@@ -11,7 +11,7 @@ export const anonIdentity = (req, res, next) => {
   if (!cookieId) {
     // Generate a secure random hex string (32 bytes = 64 chars)
     cookieId = crypto.randomBytes(32).toString('hex');
-    
+
     // Set cookie: HttpOnly, Secure (in production), SameSite Lax
     res.cookie('experio_anon_id', cookieId, {
       httpOnly: true,
