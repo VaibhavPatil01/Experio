@@ -12,7 +12,7 @@ export const sanitizeInput = (req, res, next) => {
     sanitized = sanitized.replace(/<[^>]*>?/gm, ''); // Strip all remaining tags
     req.body.prompt = sanitized.trim();
   }
-  
+
   if (req.body.title) {
     req.body.title = req.body.title.replace(/<[^>]*>?/gm, '').trim();
   }
