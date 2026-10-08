@@ -39,7 +39,7 @@ const ChatMessageSchema = new mongoose.Schema({
     ref: 'ChatMessage',
     default: null
   },
-  
+
   // AI specific tracking fields
   modelUsed: { type: String },
   tokenUsage: { type: Number },
