@@ -52,19 +52,19 @@ const logger = winston.createLogger({
 // In production, use JSON format for log aggregators (like Datadog/Render).
 // In dev, use colored text for readability.
 logger.add(new winston.transports.Console({
-  format: process.env.NODE_ENV === 'production' 
+  format: process.env.NODE_ENV === 'production'
     ? winston.format.json()
     : winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(({ level, message, timestamp, stack, category, ...metadata }) => {
-          let metaString = Object.keys(metadata).length ? JSON.stringify(metadata) : '';
-          let catString = category ? `[${category.toUpperCase()}] ` : '';
-          if (stack) {
-            return `${timestamp} ${level}: ${catString}${message} ${metaString}\n${stack}`;
-          }
-          return `${timestamp} ${level}: ${catString}${message} ${metaString}`;
-        })
-      )
+      winston.format.colorize(),
+      winston.format.printf(({ level, message, timestamp, stack, category, ...metadata }) => {
+        let metaString = Object.keys(metadata).length ? JSON.stringify(metadata) : '';
+        let catString = category ? `[${category.toUpperCase()}] ` : '';
+        if (stack) {
+          return `${timestamp} ${level}: ${catString}${message} ${metaString}\n${stack}`;
+        }
+        return `${timestamp} ${level}: ${catString}${message} ${metaString}`;
+      })
+    )
 }));
 
 export default logger;
