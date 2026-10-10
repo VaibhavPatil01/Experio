@@ -18,11 +18,11 @@ export const getNotifications = async (req, res) => {
     const isUnreadOnly = unreadOnly === 'true';
 
     const notifications = await getUserNotifications(userId, limitNum, cursor, isUnreadOnly, category);
-    
+
     // Grouped notifications have an object _id. The frontend needs a stable string key.
     const formatted = notifications.map(n => ({
       ...n,
-      _id: (typeof n._id === 'object' && n.notificationIds) ? n.notificationIds.join('_') : n._id, 
+      _id: (typeof n._id === 'object' && n.notificationIds) ? n.notificationIds.join('_') : n._id,
     }));
 
     return res.status(200).json({ notifications: formatted });
@@ -57,7 +57,7 @@ export const markAsRead = async (req, res) => {
     }
 
     const result = await markMultipleNotificationsAsRead(notificationIds, userId);
-    
+
     // For legacy batch arrays, loop over the original list and emit individually, or add a batch emit.
     // Given the prompt, emitNotificationRead for each or let frontend refetch. 
     // Emitting individually is fine.
@@ -115,7 +115,7 @@ export const deleteNotification = async (req, res) => {
     const { id } = req.params;
 
     const result = await Notification.findOneAndDelete({ _id: id, recipientId: userId });
-    
+
     if (!result) {
       return res.status(404).json({ message: 'Notification not found' });
     }
