@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import generateSummaryFromHTMLContent from '../utils/generateSummaryFromHTMLContent.js';
-import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService,  deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, editCommentService, deleteCommentService, editReplyService, deleteReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
+import { getAllPostsService, getPostService, getUserBookmarkedPostService, getRelatedPostsService, getUserPostsService, deletePostUsingAuthorId, upVotePostService, nullifyUserVote, downVotePostService, addUserToBookmark, removeUserFromBookmark, getCompanyAndRoleService, getTopCompaniesService, editPostService, deletePostService, createPostService, getPostCommentsService, addCommentService, addReplyService, editCommentService, deleteCommentService, editReplyService, deleteReplyService, toggleCommentUpvoteService, toggleReplyUpvoteService, toggleCommentDownvoteService, toggleReplyDownvoteService, getPostCountByUserIdService } from '../services/postService.js';
 import { findUserById } from '../../users/services/userService.js';
 import { eventBus, EVENTS } from '../events/index.js';
 import winston from 'winston';
@@ -30,7 +30,7 @@ export async function getPost(req, res) {
     const postAuthorProfilePicture = post.userId?.profilePicture;
     const authorWorkExperiences = post.userId?.workExperiences || [];
     const authorJoinedDate = post.userId?.createdAt;
-    
+
     // fetch author contributions (total posts)
     let authorContributions = 0;
     if (post.userId?._id) {
@@ -114,7 +114,7 @@ export async function createPost(req, res) {
     role,
     status,
     authTokenData,
-    
+
     // Legacy fields
     title,
     content,
@@ -122,7 +122,7 @@ export async function createPost(req, res) {
     domain,
     rating,
     tags,
-    
+
     // New Fields
     hiringType,
     interviewMode,
@@ -167,7 +167,7 @@ export async function createPost(req, res) {
     status,
     tags: tags || [],
     userId: authTokenData.id,
-    
+
     // New Fields
     hiringType,
     interviewMode,
@@ -188,7 +188,7 @@ export async function createPost(req, res) {
   // Create post using the post services
   try {
     const post = await createPostService(postData);
-    
+
     // AI Layer Sync
     eventBus.emit(EVENTS.POST_CREATED, { postId: post._id.toString() });
 
@@ -273,12 +273,12 @@ export async function upVotePost(req, res) {
     // Check if user was already bookmarked
     if (updateDetail.matchedCount === 0) {
       await nullifyUserVote(postId, userId);
-      
+
       // Dispatch domain event to remove notification
       eventBus.emit(EVENTS.POST_UNLIKED, {
         eventId: `like_${userId}_${postId}`
       });
-      
+
       return res
         .status(200)
         .json({ message: 'Removed Up Vote Successfully' });
@@ -319,12 +319,12 @@ export async function downVotePost(req, res) {
     // Check if user was already bookmarked
     if (updateDetail.matchedCount === 0) {
       await nullifyUserVote(postId, userId);
-      
+
       // Dispatch domain event to remove notification
       eventBus.emit(EVENTS.POST_UNDISLIKED, {
         eventId: `dislike_${userId}_${postId}`
       });
-      
+
       return res
         .status(200)
         .json({ message: 'Removed Down Vote Successfully' });
@@ -356,7 +356,7 @@ export async function editPost(req, res) {
     role,
     status,
     authTokenData,
-    
+
     // Legacy fields
     title,
     content,
@@ -365,7 +365,7 @@ export async function editPost(req, res) {
     domain,
     rating,
     tags,
-    
+
     // New Fields
     hiringType,
     interviewMode,
@@ -435,7 +435,7 @@ export async function editPost(req, res) {
     );
 
     if (!post) {
-      console.log('Not acknowledged while editing the post'); 
+      console.log('Not acknowledged while editing the post');
       return res.status(400).json({
         message:
           'NO such post Found OR You do not have permission to edit this post.... ',
@@ -849,7 +849,7 @@ export async function getUserPost(req, res) {
 
 
 
- 
+
 
 
 
@@ -875,11 +875,11 @@ export async function getPostComments(req, res) {
   try {
     const post = await getPostCommentsService(postId);
     if (!post) return res.status(404).json({ message: 'No such Post found' });
-    
+
     let comments = post.comments;
     if (post.isAnonymous && post.userId) {
       const authorIdStr = post.userId.toString();
-      
+
       comments = post.comments.map(c => {
         if (c.userId && c.userId._id && c.userId._id.toString() === authorIdStr) {
           c.userId = { ...c.userId._doc, username: 'Anonymous User', profilePicture: null };
@@ -919,11 +919,11 @@ export async function addComment(req, res) {
 
     // The added comment is the last one in the array
     const newComment = updatedPost.comments[updatedPost.comments.length - 1];
-    
+
     eventBus.emit(EVENTS.POST_COMMENTED, {
       eventId: `comment_${newComment._id}`,
       actorUserId: userId,
-      targetEntityId: postId, 
+      targetEntityId: postId,
       recipientId: updatedPost.userId, // Avoids extra DB lookup in worker
       postId: postId,
       commentId: newComment._id,
@@ -950,7 +950,7 @@ export async function addReply(req, res) {
   try {
     // If frontend sends parentReplyId, extract it to find the actual user being replied to
     const { parentReplyId } = req.body;
-    
+
     const updatedPost = await addReplyService(postId, commentId, userId, content);
     if (!updatedPost) return res.status(404).json({ message: 'Post or comment not found' });
 
@@ -967,15 +967,15 @@ export async function addReply(req, res) {
         actualTargetEntityId = parentReplyId;
       }
     }
-    
+
     if (actualReplyToUserId) {
       // This is a reply to another reply
       eventBus.emit(EVENTS.REPLY_REPLIED, {
         eventId: `reply_${newReply._id}`,
         actorUserId: userId,
-        targetEntityId: actualTargetEntityId, 
+        targetEntityId: actualTargetEntityId,
         recipientId: actualReplyToUserId, // Securely derived from DB
-        replyToUserId: actualReplyToUserId, 
+        replyToUserId: actualReplyToUserId,
         postId: postId,
         commentId: commentId,
         replyId: newReply._id,
