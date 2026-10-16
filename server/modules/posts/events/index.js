@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { syncQueue } from '../../../core/qdrant/syncQueue.js';
 
-class AppEventBus extends EventEmitter {}
+class AppEventBus extends EventEmitter { }
 export const eventBus = new AppEventBus();
 
 // Entity Sync Events
@@ -10,7 +10,7 @@ export const EVENTS = {
   POST_UPDATED: 'post.updated',
   POST_DELETED: 'post.deleted',
   USER_UPDATED: 'user.updated',
-  
+
   // Notification Events
   POST_COMMENTED: 'post.commented',
   POST_LIKED: 'post.liked',
