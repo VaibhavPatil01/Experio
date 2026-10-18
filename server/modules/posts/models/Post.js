@@ -9,7 +9,7 @@ const replySchema = new mongoose.Schema({
   editedAt: { type: Date },
 }, { timestamps: true });
 
-const commentSchema = new mongoose.Schema({ 
+const commentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   content: { type: String, required: true },
   upVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -17,7 +17,7 @@ const commentSchema = new mongoose.Schema({
   replies: [replySchema],
   isEdited: { type: Boolean, default: false },
   editedAt: { type: Date },
-}, { timestamps: true }); 
+}, { timestamps: true });
 
 const roundSchema = new mongoose.Schema({
   roundType: { type: String, required: true },
@@ -29,14 +29,14 @@ const roundSchema = new mongoose.Schema({
   isMostImportant: { type: Boolean, default: false }
 });
 
-const postSchema = new mongoose.Schema({  
+const postSchema = new mongoose.Schema({
   title: { type: String, required: false },
   content: { type: String, required: false },
   summary: { type: String, required: false, default: '' },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   company: { type: String, required: true },
   role: { type: String, required: true },
-  postType: { type: String, required: false }, 
+  postType: { type: String, required: false },
   domain: { type: String, required: false },
   rating: { type: Number, required: false },
   status: { type: String, required: true },
@@ -46,7 +46,7 @@ const postSchema = new mongoose.Schema({
   bookmarks: [mongoose.Schema.Types.ObjectId],
   tags: [String],
   comments: [commentSchema],
-  
+
   // New Fields
   hiringType: { type: String, required: false },
   interviewMode: { type: String, required: false },
