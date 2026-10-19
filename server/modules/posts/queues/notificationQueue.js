@@ -11,7 +11,7 @@ export const notificationQueue = new Queue(NOTIFICATION_QUEUE_NAME, {
       type: 'exponential',
       delay: 5000,
     },
-    removeOnComplete: true, 
+    removeOnComplete: true,
     removeOnFail: false, // Keep failed jobs for inspection
   }
 });
