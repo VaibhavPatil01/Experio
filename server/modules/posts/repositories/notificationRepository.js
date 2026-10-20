@@ -57,11 +57,11 @@ export const createNotificationsBatch = async (notificationsDataArray) => {
 export const getUserNotifications = async (userId, limit = 20, cursor = null, unreadOnly = false, category = 'All') => {
   try {
     const matchQuery = { recipientId: new mongoose.Types.ObjectId(userId) };
-    
+
     if (unreadOnly) {
       matchQuery.isRead = false;
     }
-    
+
     // Cursor-based pagination: if cursor is provided, fetch older items
     if (cursor) {
       matchQuery.createdAt = { $lt: new Date(cursor) };
@@ -134,7 +134,7 @@ export const getUserNotifications = async (userId, limit = 20, cursor = null, un
       n.createdAt = n.latestCreatedAt;
       return n;
     });
-    
+
   } catch (error) {
     logger.error('Failed to fetch user notifications', { error: error.message, userId });
     throw error;
