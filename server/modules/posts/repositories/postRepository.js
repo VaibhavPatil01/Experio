@@ -4,8 +4,8 @@ export const createPost = (post) => {
   return postModel.create(post);
 };
 
-export const deletePostById = (postId) => { 
-  return postModel.deleteOne({ _id: postId }); 
+export const deletePostById = (postId) => {
+  return postModel.deleteOne({ _id: postId });
 };
 
 export const addUpVote = (postId, userId) => {
@@ -88,31 +88,37 @@ export const removeBookmark = (postId, userId) => {
 export const getTopPostsAggregation = (filter, limit, skip) => {
   return postModel.aggregate([
     { $match: filter },
-    { $addFields: { 
-        voteCount: { 
+    {
+      $addFields: {
+        voteCount: {
           $subtract: [
-            { $size: { $ifNull: ["$upVotes", []] } }, 
+            { $size: { $ifNull: ["$upVotes", []] } },
             { $size: { $ifNull: ["$downVotes", []] } }
-          ] 
-        } 
-    }},
+          ]
+        }
+      }
+    },
     { $sort: { voteCount: -1, createdAt: -1 } },
     { $skip: skip },
     { $limit: limit },
     { $project: { comments: 0, status: 0, tags: 0, voteCount: 0 } },
-    { $lookup: { 
-        from: 'users', 
-        localField: 'userId', 
-        foreignField: '_id', 
-        as: 'userId' 
-    }},
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'userId'
+      }
+    },
     { $unwind: "$userId" },
-    { $project: {
+    {
+      $project: {
         "userId.password": 0,
         "userId.email": 0,
         "userId.isAdmin": 0,
         "userId.isEmailVerified": 0
-    }}
+      }
+    }
   ]);
 };
 
@@ -139,10 +145,10 @@ export const findPostsByCompanyExcluding = (company, excludePostIds, limit) => {
     company: company,
     _id: { $nin: excludePostIds }
   })
-  .select('_id title company userId isAnonymous')
-  .populate('userId', 'username profilePicture')
-  .limit(limit)
-  .lean();
+    .select('_id title company userId isAnonymous')
+    .populate('userId', 'username profilePicture')
+    .limit(limit)
+    .lean();
 };
 
 export const findPostsByRoleExcluding = (role, excludePostIds, limit) => {
@@ -150,10 +156,10 @@ export const findPostsByRoleExcluding = (role, excludePostIds, limit) => {
     role: role,
     _id: { $nin: excludePostIds }
   })
-  .select('_id title company userId isAnonymous')
-  .populate('userId', 'username profilePicture')
-  .limit(limit)
-  .lean();
+    .select('_id title company userId isAnonymous')
+    .populate('userId', 'username profilePicture')
+    .limit(limit)
+    .lean();
 };
 
 export const getUserBookmarkedPosts = (userId, limit, skip) => {
@@ -177,7 +183,7 @@ export const getUserPosts = (userId, limit, skip) => {
 };
 
 export const deletePostByAuthorId = (postId, userId) => {
-  return postModel.deleteOne({ _id: postId, userId: userId }); 
+  return postModel.deleteOne({ _id: postId, userId: userId });
 };
 
 export const incrementViewsAndGetPost = (postId) => {
