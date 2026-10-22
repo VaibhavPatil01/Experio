@@ -3,7 +3,7 @@ import tokenDataParser from '../../../middlewares/tokenDataParser.js';
 import isUserAuth from '../../../middlewares/isUserAuth.js';
 import { addUserBookmark, createPost, deletePost, downVotePost, editPost, getAllPost, getCompanyAndRole, getTopCompanies, getPost, getRelatedPosts, getUserBookmarkedPost, getUserPost, removeUserBookmark, upVotePost, getPostComments, addComment, addReply, toggleCommentUpvote, toggleReplyUpvote, toggleCommentDownvote, toggleReplyDownvote, editComment, deleteComment, editReply, deleteReply } from '../controllers/postController.js';
 
-const postRouter = express.Router(); 
+const postRouter = express.Router();
 
 // Static data routes
 postRouter.get('/data/company-roles', getCompanyAndRole);
@@ -42,4 +42,4 @@ postRouter.delete('/:id/comments/:commentId/replies/:replyId', isUserAuth, delet
 postRouter.post('/:id/comments/:commentId/replies/:replyId/upvote', isUserAuth, toggleReplyUpvote);
 postRouter.post('/:id/comments/:commentId/replies/:replyId/downvote', isUserAuth, toggleReplyDownvote);
 
-export default postRouter;
+export default postRouter;
