@@ -6,8 +6,8 @@ export const createPostService = (post) => {
   return postRepository.createPost(post);
 };
 
-export const deletePostService = (postId) => { 
-  return postRepository.deletePostById(postId); 
+export const deletePostService = (postId) => {
+  return postRepository.deletePostById(postId);
 };
 
 export const upVotePostService = (postId, userId) => {
@@ -124,7 +124,7 @@ export const getRelatedPostsService = async (postId, limit) => {
           }
           return null;
         }).filter(Boolean);
-        
+
         excludePostIds.push(...relatedPosts.map(p => p._id.toString()));
       }
     }
