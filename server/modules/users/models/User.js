@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   location: { type: String, default: "" },
   nationality: { type: String, default: "" },
   profilePicture: { type: String, default: "" },
-  resume: { 
+  resume: {
     url: { type: String, default: "" },
     filename: { type: String, default: "" }
   },
@@ -73,7 +73,7 @@ const userSchema = new mongoose.Schema({
     write: Boolean,
     speak: Boolean
   }]
-}, {timestamps: true}); 
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 
