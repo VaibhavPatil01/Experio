@@ -22,12 +22,12 @@ export const analyzeResume = async (req, res) => {
       fs.unlinkSync(file.path);
       return res.status(400).json({ error: 'Target role is required and must be under 100 characters.' });
     }
-    
+
     if (targetCompany && (typeof targetCompany !== 'string' || targetCompany.length > 100)) {
       fs.unlinkSync(file.path);
       return res.status(400).json({ error: 'Target company must be under 100 characters.' });
     }
-    
+
     if (jobDescription && (typeof jobDescription !== 'string' || jobDescription.length > 3000)) {
       fs.unlinkSync(file.path);
       return res.status(400).json({ error: 'Job description must be under 3000 characters.' });
@@ -69,14 +69,14 @@ export const analyzeResume = async (req, res) => {
     if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     if (error instanceof ResumeAnalysisError) {
       // Log the categorized error so we can see the internalDetails
-      logger.error('Categorized Resume Analysis Error', { 
-        category: error.category, 
-        internalDetails: error.internalDetails, 
-        message: error.message 
+      logger.error('Categorized Resume Analysis Error', {
+        category: error.category,
+        internalDetails: error.internalDetails,
+        message: error.message
       });
       // Handle categorized errors gracefully
       const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
-      return res.status(statusCode).json({ 
+      return res.status(statusCode).json({
         error: error.userMessage,
         category: error.category
       });
@@ -141,12 +141,12 @@ export const getAnalysisStatus = async (req, res) => {
       return res.status(404).json({ error: 'Analysis not found' });
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       data: {
         status: analysis.status,
         createdAt: analysis.createdAt,
         updatedAt: analysis.updatedAt
-      } 
+      }
     });
   } catch (error) {
     logger.error('Get Analysis Status Error', { error: error.message });
@@ -209,7 +209,7 @@ export const retryAnalysis = async (req, res) => {
   } catch (error) {
     if (error instanceof ResumeAnalysisError) {
       const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
-      return res.status(statusCode).json({ 
+      return res.status(statusCode).json({
         error: error.userMessage,
         category: error.category
       });
@@ -218,7 +218,7 @@ export const retryAnalysis = async (req, res) => {
     if (error.message.includes('not store extracted text')) {
       return res.status(400).json({ error: 'Cannot retry: The original extracted text was not stored. Please upload the resume again.' });
     }
-    
+
     logger.error('Unhandled Retry Resume Error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'An unexpected internal error occurred during retry. Please try again later.' });
   }
@@ -234,11 +234,11 @@ export const reanalyzeResume = async (req, res) => {
     if (!targetRole || typeof targetRole !== 'string' || targetRole.length > 100) {
       return res.status(400).json({ error: 'Target role is required and must be under 100 characters.' });
     }
-    
+
     if (targetCompany && (typeof targetCompany !== 'string' || targetCompany.length > 100)) {
       return res.status(400).json({ error: 'Target company must be under 100 characters.' });
     }
-    
+
     if (jobDescription && (typeof jobDescription !== 'string' || jobDescription.length > 3000)) {
       return res.status(400).json({ error: 'Job description must be under 3000 characters.' });
     }
@@ -261,7 +261,7 @@ export const reanalyzeResume = async (req, res) => {
     if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     if (error instanceof ResumeAnalysisError) {
       const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
-      return res.status(statusCode).json({ 
+      return res.status(statusCode).json({
         error: error.userMessage,
         category: error.category
       });
@@ -273,7 +273,7 @@ export const reanalyzeResume = async (req, res) => {
     if (error.message === 'Analysis not found') {
       return res.status(404).json({ error: error.message });
     }
-    
+
     logger.error('Unhandled Reanalyze Resume Error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'An unexpected internal error occurred. Please try again later.' });
   }
