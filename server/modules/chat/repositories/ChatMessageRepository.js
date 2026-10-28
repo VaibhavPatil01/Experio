@@ -18,13 +18,13 @@ export default class ChatMessageRepository {
    */
   async findMessagesBySessionId(sessionId, limit = 50, beforeCursor = null) {
     const query = { sessionId, isDeleted: false };
-    
+
     if (beforeCursor) {
       query.createdAt = { $lt: new Date(beforeCursor) };
     }
 
     return await this.model.find(query)
-      .sort({ createdAt: -1 }) 
+      .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
   }
