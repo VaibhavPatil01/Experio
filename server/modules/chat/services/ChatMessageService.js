@@ -19,7 +19,7 @@ export default class ChatMessageService {
    */
   async saveUserMessage(sessionId, userId, content) {
     logger.info('Saving user message', { sessionId, userId });
-    
+
     // Route middleware guarantees ownership
 
     const message = await this.messageRepo.createMessage({
@@ -39,7 +39,7 @@ export default class ChatMessageService {
    */
   async saveAssistantMessage(sessionId, content, aiMetadata = {}) {
     logger.info('Saving assistant message completion', { sessionId, tokens: aiMetadata.tokenUsage });
-    
+
     const { tokenUsage, modelUsed, citations, regeneratedFromId, langfuseTraceId } = aiMetadata;
 
     const message = await this.messageRepo.createMessage({
@@ -72,7 +72,7 @@ export default class ChatMessageService {
    */
   async getSessionMessages(sessionId, userId, limit = 50, beforeCursor = null) {
     logger.debug('Fetching session messages', { sessionId, limit, beforeCursor });
-    
+
     // Route middleware guarantees ownership
 
     return await this.messageRepo.findMessagesBySessionId(sessionId, limit, beforeCursor);
@@ -83,7 +83,7 @@ export default class ChatMessageService {
    */
   async deleteMessage(messageId, sessionId, userId) {
     logger.info('Deleting message', { messageId });
-    
+
     // Route middleware guarantees ownership
 
     return await this.messageRepo.markAsDeleted(messageId);
@@ -94,7 +94,7 @@ export default class ChatMessageService {
    */
   async editUserMessage(messageId, sessionId, userId, newContent) {
     logger.info('Editing user message', { messageId });
-    
+
     // Route middleware guarantees ownership
 
     return await this.messageRepo.editMessage(messageId, newContent);
